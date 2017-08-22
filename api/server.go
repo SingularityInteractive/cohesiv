@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/trace"
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -15,7 +14,6 @@ import (
 type server struct {
 	// userSvc pb.UserDirectoryClient
 	tagSvc pb.TagDirectoryClient
-	tc     *trace.Client
 }
 
 func errorCode(w http.ResponseWriter, code int, msg string, err error) {
@@ -47,9 +45,8 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 func logHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		e := log.WithFields(logrus.Fields{
-			"method":     r.Method,
-			"path":       r.URL.Path,
-			"request.id": trace.FromContext(r.Context()).TraceID(),
+			"method": r.Method,
+			"path":   r.URL.Path,
 		})
 		e.Debug("request accepted")
 		start := time.Now()
@@ -61,27 +58,3 @@ func logHandler(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r) // call original
 	})
 }
-
-// // traceHandler wraps the HTTP handler with tracing that automatically finishes
-// // the span. It adds additional fields to the trace span about the response and
-// // adds correlation header to the headers.
-// func (s *server) traceHandler(h func(http.ResponseWriter, *http.Request)) http.Handler {
-// 	return traceutil.HTTPHandler(s.tc, func(w http.ResponseWriter, r *http.Request) {
-// 		ww := &proxyResponseWriter{w: w}
-// 		span := trace.FromContext(r.Context())
-// 		defer func() {
-// 			code := ww.code
-// 			if code == 0 {
-// 				code = http.StatusOK
-// 			}
-// 			span.SetLabel("http/resp/status_code", fmt.Sprint(code))
-// 			span.SetLabel("http/response/content_length", fmt.Sprint(ww.length))
-// 			span.SetLabel("http/req/id", span.TraceID())
-// 			span.SetLabel("app/version", version.Version())
-// 			span.Finish()
-// 		}()
-// 		ww.Header().Set("X-Cloud-Trace-Context", span.TraceID())
-// 		ww.Header().Set("X-App-Version", version.Version())
-// 		h(ww, r)
-// 	})
-// }
