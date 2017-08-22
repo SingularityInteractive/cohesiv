@@ -2,8 +2,11 @@ machine:
   services:
     - docker
   environment:
-    BUILD_PARENT: "${HOME}/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}"
-    BUILD_PATH: "${BUILD_PARENT}/${CIRCLE_PROJECT_REPONAME}"
+    # GOROOT is not set by default
+    GOROOT: ""
+    GOPATH: "${HOME}/.go_project"
+    PATH: "${GOPATH}/bin:${PATH}"
+    BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
 
 dependencies:
   pre:
@@ -15,8 +18,8 @@ dependencies:
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
   override:
-    - mkdir -p "$BUILD_PARENT"
-    - ln -sf ${HOME}/${CIRCLE_PROJECT_REPONAME}/ ${BUILD_PATH}
+    - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
     - cd $BUILD_PATH && dep ensure
     - mv ${BUILD_PATH}/vendor/* "${HOME}/.go_workspace/src/"
   post:
