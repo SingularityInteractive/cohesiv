@@ -1,13 +1,15 @@
 BIN_DIR=./gopath/bin
 BINARIES=api tagdirectory
+SECURITY_GROUP_ID?=sg-792e8309
+IP_ADDRESS=`curl -s icanhazip.com`
 
 SHELL=/usr/bin/env bash
 
 docker-images: binaries
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
-	  docker build -f=Dockerfile.$$b \
-		-t ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} \
-		-t ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} . ;\
+	  docker build -f=Dockerfile.$$b --rm=false \
+		-t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} \
+		-t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} . ;\
 	done
 binaries:
 	if [ -z "$$GOPATH" ]; then echo "GOPATH is not set"; exit 1; fi
@@ -18,10 +20,26 @@ binaries:
 	done
 docker-push-ecr: configure_aws_cli
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
-		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
-		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
+		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
+		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
 	done
 configure_aws_cli:
 	aws --version
 	aws configure set default.region us-east-1
 	aws configure set default.output json
+get_ip:
+	echo "Getting container/machine IP address..."
+  IP_ADDRESS=`curl -s icanhazip.com`
+  if [ -z "$IP_ADDRESS" ];then \
+  	IP_ADDRESS=$(wget -qO- http://checkip.amazonaws.com) ;\
+    if [ -z "$IP_ADDRESS" ];then \
+      @echo "Cannot get IP address, fubar'd" ;\
+      exit 1 ;\
+    fi
+  else
+  	@echo "Got IP address of ${IP_ADDRESS}" ;\
+  fi
+authorize-circle-ip: get_ip
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 22 --cidr ${IP_ADDRESS}/32
+deauthorize-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 22 --cidr ${IP_ADDRESS}/32

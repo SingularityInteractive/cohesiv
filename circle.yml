@@ -40,22 +40,24 @@ deployment:
   development:
     branch: development
     commands:
-      - eval $(aws ecr get-login --region us-east-1)
+      - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
       - make docker-push-ecr
       - kops get cluster --name=development.cohesiv.io
-      - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
+      - kops export kubecfg --name=development.cohesiv.io --state=${KOPS_STATE_STORE}
       - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/development/deployment.yaml
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+      - make authorize-circle-ip
       - kubectl apply -f misc/kube/
       - kubectl apply -f misc/development
+      - make deauthorize-circle-ip
   staging:
     branch: staging
     commands:
-      - eval $(aws ecr get-login --region us-east-1 --no-include-email)
+      - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
       - make docker-push-ecr
       - kops get cluster --name=staging.cohesiv.io
-      - kops export kubecfg --name=staging.cohesiv.io --state=s3://clusters.cohesiv.io
+      - kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
       - kubectl apply -f misc/kube/
