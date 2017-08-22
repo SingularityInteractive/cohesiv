@@ -7,7 +7,6 @@ machine:
     GOPATH: "${HOME}/.go_project"
     PATH: "${GOPATH}/bin:${PATH}"
     BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
-    GO15VENDOREXPERIMENT: 1
 
 dependencies:
   pre:
@@ -19,7 +18,7 @@ dependencies:
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
   override:
-    - mkdir -p ${BUILD_PATH}
+    - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
     - cd $BUILD_PATH && dep ensure
   post:
