@@ -12,18 +12,15 @@ docker-images: binaries
 binaries:
 	if [ -z "$$GOPATH" ]; then echo "GOPATH is not set"; exit 1; fi
 	@echo "Building statically compiled linux/amd64 binaries"
-	set -x; BINARIES=(api tagdirectory); \
-	  GOOS=linux GOARCH=amd64 go build \
-	  -tags netgo \
-	  -ldflags="-w -X github.com/SingularityInteractive/cohesiv/version.version=$$(git describe --always --dirty)" \
-	    $(patsubst %, ./%, $(BINARIES)) && \
-	rm -rf ${BIN_DIR} && mkdir -p ${BIN_DIR} && \
-	cp $(patsubst %, $$GOPATH/bin/linux_amd64/%, $(BINARIES)) ${BIN_DIR}
+	rm -rf ${BIN_DIR} && mkdir -p ${BIN_DIR}
+	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
+	  GOOS=linux GOARCH=amd64 go build -tags netgo -o ${BIN_DIR}/$$b ./$$b ;\
+	done
 docker-push-ecr: configure_aws_cli
 	eval $(aws ecr get-login --region us-east-1 --no-include-email)
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
-		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1}
-		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH}
+		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
+		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
 	done
 configure_aws_cli:
 	aws --version
