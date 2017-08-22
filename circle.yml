@@ -21,7 +21,9 @@ dependencies:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
     - cd $BUILD_PATH && dep ensure
-   post:
+  post:
+    - kops version
+    - kubectl version
     - go version
     - dep status
 
