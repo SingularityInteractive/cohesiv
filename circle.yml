@@ -17,6 +17,7 @@ dependencies:
     - wget https://github.com/kubernetes/kops/releases/download/1.6.1/kops-linux-amd64
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
+    - rm -rf $GOPATH/pkg
   override:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
