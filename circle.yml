@@ -21,7 +21,7 @@ dependencies:
   override:
     - mkdir -p ${BUILD_PATH}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
-    - cd $cd $BUILD_PATH && dep ensure
+    - cd $BUILD_PATH && dep ensure
   post:
     - echo "noop"
 
