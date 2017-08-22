@@ -28,7 +28,7 @@ dependencies:
 
 compile:
   override:
-    - cd $BUILD_PATH && dep ensure make docker-images
+    - cd $BUILD_PATH && make docker-images
   post:
     - docker images
 
