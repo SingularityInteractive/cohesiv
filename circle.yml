@@ -40,6 +40,7 @@ deployment:
   development:
     branch: development
     commands:
+      - eval $(aws ecr get-login --region us-east-1 --no-include-email)
       - make docker-push-ecr
       - kops get cluster --name=development.cohesiv.io
       - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
@@ -51,6 +52,7 @@ deployment:
   staging:
     branch: staging
     commands:
+      - eval $(aws ecr get-login --region us-east-1 --no-include-email)
       - make docker-push-ecr
       - kops get cluster --name=staging.cohesiv.io
       - kops export kubecfg --name=staging.cohesiv.io --state=s3://clusters.cohesiv.io
