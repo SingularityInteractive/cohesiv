@@ -13,8 +13,8 @@ binaries:
 	if [ -z "$$GOPATH" ]; then echo "GOPATH is not set"; exit 1; fi
 	@echo "Building statically compiled linux/amd64 binaries"
 	set -x; BINARIES=(api tagdirectory); \
-	  GOOS=linux GOARCH=amd64 go install \
-	  -tags netgo \
+	  GOOS=linux GOARCH=amd64 sudo go install \
+	  -a -tags netgo \
 	  -ldflags="-w -X github.com/SingularityInteractive/cohesiv/version.version=$$(git describe --always --dirty)" \
 	    $(patsubst %, ./%, $(BINARIES)) && \
 	rm -rf ${BIN_DIR} && mkdir -p ${BIN_DIR} && \
