@@ -4,9 +4,9 @@ machine:
   environment:
     # GOROOT is not set by default
     GOROOT: ""
-    GOPATH: "${HOME}/.go_project"
-    PATH: "${GOPATH}/bin:${PATH}"
-    BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+    GOPATH: "$HOME/.go_project"
+    PROJECT_PARENT_PATH: "$GOPATH/src/github.com/$CIRCLE_PROJECT_USERNAME"
+    PROJECT_PATH: "$PROJECT_PARENT_PATH/$CIRCLE_PROJECT_REPONAME"
 
 dependencies:
   pre:
@@ -18,17 +18,17 @@ dependencies:
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
   override:
-    - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
-    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
-    - cd $BUILD_PATH && dep ensure
+    - mkdir -p "$PROJECT_PARENT_PATH"
+    - ln -sf "$HOME/$CIRCLE_PROJECT_REPONAME/" "$PROJECT_PATH"
+    - cd "$PROJECT_PATH" && dep ensure
   post:
     - kops version
     - go version
-    - cd $BUILD_PATH && dep status
+    - cd "$PROJECT_PATH" && dep status
 
 test:
   override:
-    - cd $BUILD_PATH && go vet $(go list ./... | grep -v /vendor/)
+    - cd "$PROJECT_PATH" && go vet $(go list ./... | grep -v /vendor/)
   post:
     - echo "noop"
 
