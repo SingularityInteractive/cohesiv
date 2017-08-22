@@ -40,6 +40,6 @@ get_ip:
   	@echo "Got IP address of ${IP_ADDRESS}" ;\
   fi
 authorize-circle-ip: get_ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 22 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
 deauthorize-circle-ip:
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 22 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
