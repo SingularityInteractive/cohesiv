@@ -14,7 +14,7 @@ binaries:
 	@echo "Building statically compiled linux/amd64 binaries"
 	set -x; BINARIES=(api tagdirectory); \
 	  GOOS=linux GOARCH=amd64 go install \
-	  -a -tags netgo \
+	  -tags netgo \
 	  -ldflags="-w -X github.com/SingularityInteractive/cohesiv/version.version=$$(git describe --always --dirty)" \
 	    $(patsubst %, ./%, $(BINARIES)) && \
 	rm -rf ${BIN_DIR} && mkdir -p ${BIN_DIR} && \
