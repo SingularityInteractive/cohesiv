@@ -40,7 +40,7 @@ deployment:
   development:
     branch: development
     commands:
-      - eval $(aws ecr get-login --region us-east-1 --no-include-email)
+      - eval $(aws ecr get-login --region us-east-1)
       - make docker-push-ecr
       - kops get cluster --name=development.cohesiv.io
       - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
