@@ -1,0 +1,50 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - sudo mv ./kubectl /usr/local/bin/kubectl
+    - wget https://github.com/kubernetes/kops/releases/download/1.6.1/kops-linux-amd64
+    - chmod +x kops-linux-amd64
+    - mv kops-linux-amd64 /usr/local/bin/kops
+  post:
+    - make docker-images
+
+test:
+  post:
+    - echo "noop"
+
+deployment:
+  development:
+    branch: development
+    commands:
+      - make docker-push-ecr
+      - kops get cluster --name=development.cohesiv.io
+      - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
+      - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/development/deployment.yaml
+      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+      - kubectl apply -f misc/kube/
+      - kubectl apply -f misc/development
+  staging:
+    branch: staging
+    commands:
+      - make docker-push-ecr
+      - kops get cluster --name=staging.cohesiv.io
+      - kops export kubecfg --name=staging.cohesiv.io --state=s3://clusters.cohesiv.io
+      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+      - kubectl apply -f misc/kube/
+      - kubectl apply -f misc/staging
+  # production:
+  #   branch: master
+  #   commands:
+  #     - sudo /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials production --zone ${CLOUDSDK_COMPUTE_ZONE}
+  #     - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/production/deployment.yaml
+  #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+  #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+  #     - kubectl apply -f misc/kube/
+  #     - kubectl apply -f misc/production

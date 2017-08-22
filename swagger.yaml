@@ -1,0 +1,149 @@
+swagger: "2.0"
+info:
+  description: "API for the Cohesiv suite of services."
+  version: "1.0.0"
+  title: "Adhesive"
+  termsOfService: ""
+  contact:
+    email: "smccord@singularity-interactive.com"
+host: "104.154.213.108"
+basePath: "/"
+tags:
+- name: "tag"
+- name: "entity"
+  description: "An entity is anything with an ID that can have tags and visa versa"
+schemes:
+- "http"
+paths:
+  /tags:
+    post:
+      tags:
+      - "tag"
+      summary: "Create tags for an entity"
+      description: ""
+      operationId: "createTags"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Batch create tags request"
+        required: true
+        schema:
+          $ref: '#/definitions/CreateTagsRequest'
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Tags"
+        400:
+          description: "Bad request, misshapen request"
+        500:
+          description: "Upstream server error"
+      security:
+      - api_key: []
+  /entity/{entityID}/tags:
+    get:
+      tags:
+      - "tag"
+      summary: "Find tags given an entity ID"
+      description: "Returns a single pet"
+      operationId: "getTagsByEntityID"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "entityID"
+        in: "path"
+        description: "ID of entity to query tags by"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Tags"
+        400:
+          description: "Bad or no entity ID supplied"
+        500:
+          description: "Upstream server error"
+      security:
+      - api_key: []
+  /tags/{tagName}/entities:
+    get:
+      tags:
+      - "entity"
+      summary: "Find entities by a tag name"
+      description: "Returns a single pet"
+      operationId: "getEntitiesByTagName"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tagName"
+        in: "path"
+        description: "Name of tag to query entities by"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Entities"
+        400:
+          description: "Bad or no name supplied"
+        500:
+          description: "Upstream server error"
+      security:
+      - api_key: []
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    description: "Authorization: bearer XXXXXXXXXXX"
+definitions:
+  Tag:
+    type: "object"
+    properties:
+      Name:
+        type: "string"
+  Tags:
+    type: "object"
+    properties:
+      Results:
+        type: "array"
+        items:
+          $ref: "#/definitions/Tag"
+  CreateTagsRequest:
+    type: "object"
+    properties:
+      Tags:
+        type: "array"
+        items:
+          $ref: "#/definitions/CreateTagRequest"
+  CreateTagRequest:
+    type: "object"
+    properties:
+      RelationID:
+        type: "string"
+        description: "ID of entity on which to join the tag, entity doesn't have to exist in DB"
+      Name:
+        type: "string"
+        description: "The tag name"
+  Entity:
+    type: "object"
+    properties:
+      ID:
+        type: "string"
+        description: "Any string will do"
+  Entities:
+    type: "object"
+    properties:
+      Results:
+        type: "array"
+        items:
+          $ref: "#/definitions/Entity"
+externalDocs:
+  description: "See the GRPC specs"
+  url: "https://github.com/SingularityInteractive/cohesiv/blob/master/cohesiv/cohesiv.proto"

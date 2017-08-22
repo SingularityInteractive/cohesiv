@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+service TagDirectory {
+    rpc GetTags(GetTagsRequest) returns(Tags) {}
+    rpc CreateTags(CreateTagsRequest) returns(Tags) {}
+    rpc GetEntitiesByTagName(GetEntitiesByTagNameRequest) returns(Entities) {}
+}
+
+message Tag {
+    string Name = 2;
+}
+
+message Tags {
+    repeated Tag Results = 1;
+}
+
+message GetTagsRequest {
+    string RelationID = 1;
+}
+
+message GetEntitiesByTagNameRequest {
+    string Name = 1;
+}
+
+message CreateTagRequest {
+    string RelationID = 1;
+    string Name = 2;
+}
+
+message CreateTagsRequest {
+    repeated CreateTagRequest Tags = 1;
+}
+
+message Entity {
+    string ID = 1;
+}
+
+message Entities {
+    repeated Entity Results = 1;
+}
