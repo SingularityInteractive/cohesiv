@@ -17,7 +17,7 @@ spec:
       # [START containers]
       containers:
       - name: api
-        image: "$(AWS_ACCOUNT_ID).dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/api:latest"
+        image: "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/api:latest"
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
@@ -60,7 +60,7 @@ spec:
         app: tagdirectory
     spec:
       containers:
-      - image: "$(AWS_ACCOUNT_ID).dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/tagdirectory:latest"
+      - image: "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/tagdirectory:latest"
         name: tagdirectory
         imagePullPolicy: Always
         ports:
