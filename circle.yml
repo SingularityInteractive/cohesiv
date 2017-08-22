@@ -2,8 +2,6 @@ machine:
   services:
     - docker
   environment:
-    # GOROOT is not set by default
-    GOROOT: ""
     GOPATH: "${HOME}/.go_project"
     PATH: "${GOPATH}/bin:${PATH}"
     BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
