@@ -7,7 +7,7 @@ machine:
     GOPATH: "${HOME}/.go_project"
     PATH: "${GOPATH}/bin:${PATH}"
     BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
-    GO15VENDOREXPERIMENT: 1
+    GO15VENDOREXPERIMENT: "1"
 
 dependencies:
   pre:
