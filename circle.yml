@@ -4,12 +4,14 @@ machine:
   environment:
     # GOROOT is not set by default
     GOROOT: ""
-    GOPATH: "${HOME}/.go_project:${HOME}/.go_project/vendor"
+    GOPATH: "${HOME}/.go_project"
     PATH: "${GOPATH}/bin:${PATH}"
     BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+    GO15VENDOREXPERIMENT: 1
 
 dependencies:
   pre:
+    - go get -u github.com/golang/dep/cmd/dep
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - sudo mv ./kubectl /usr/local/bin/kubectl
@@ -17,12 +19,15 @@ dependencies:
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
   override:
-    - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    - mkdir -p ${BUILD_PATH}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
+    - cd $cd $BUILD_PATH && dep ensure
   post:
-    - make docker-images
+    - echo "noop"
 
 test:
+  override:
+    - cd $BUILD_PATH && go vet $(go list ./... | grep -v /vendor/)
   post:
     - echo "noop"
 
@@ -30,6 +35,7 @@ deployment:
   development:
     branch: development
     commands:
+      - make docker-images
       - make docker-push-ecr
       - kops get cluster --name=development.cohesiv.io
       - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
@@ -41,6 +47,7 @@ deployment:
   staging:
     branch: staging
     commands:
+      - make docker-images
       - make docker-push-ecr
       - kops get cluster --name=staging.cohesiv.io
       - kops export kubecfg --name=staging.cohesiv.io --state=s3://clusters.cohesiv.io
