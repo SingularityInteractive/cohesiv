@@ -7,7 +7,6 @@ machine:
     GOPATH: "$HOME/.go_project"
     PROJECT_PARENT_PATH: "$GOPATH/src/github.com/$CIRCLE_PROJECT_USERNAME"
     PROJECT_PATH: "$PROJECT_PARENT_PATH/$CIRCLE_PROJECT_REPONAME"
-    GO15VENDOREXPERIMENT: 1
 
 dependencies:
   pre:
@@ -19,25 +18,22 @@ dependencies:
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
   override:
-    - mkdir -p "$PROJECT_PARENT_PATH"
-    - ln -sf "$HOME/$CIRCLE_PROJECT_REPONAME/" "$PROJECT_PATH"
-    - cd "$PROJECT_PATH" && dep ensure
+    - mkdir -p ${PROJECT_PARENT_PATH}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${PROJECT_PATH}
+    - go get -t -d -v ./...
+    - make docker-images
   post:
     - kops version
     - go version
-    - cd "$PROJECT_PATH" && dep status
 
 test:
   override:
-    - cd "$PROJECT_PATH" && go vet $(go list ./... | grep -v /vendor/)
-  post:
-    - echo "noop"
+    - go vet $(go list ./... | grep -v /vendor/)
 
 deployment:
   development:
     branch: development
     commands:
-      - make docker-images
       - make docker-push-ecr
       - kops get cluster --name=development.cohesiv.io
       - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
@@ -49,7 +45,6 @@ deployment:
   staging:
     branch: staging
     commands:
-      - make docker-images
       - make docker-push-ecr
       - kops get cluster --name=staging.cohesiv.io
       - kops export kubecfg --name=staging.cohesiv.io --state=s3://clusters.cohesiv.io
