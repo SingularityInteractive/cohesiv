@@ -60,8 +60,10 @@ deployment:
       - kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+      - make authorize-circle-ip
       - kubectl apply -f misc/kube/
       - kubectl apply -f misc/staging
+      - make deauthorize-circle-ip
   # production:
   #   branch: master
   #   commands:
