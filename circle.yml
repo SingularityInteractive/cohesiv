@@ -18,6 +18,7 @@ dependencies:
     - mkdir -p "$BUILD_PARENT"
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
     - cd $BUILD_PATH && dep ensure
+    - mv ${BUILD_PATH}/vendor/* "${HOME}/.go_workspace/src/"
   post:
     - kops version
     - go version
