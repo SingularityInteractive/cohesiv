@@ -1,6 +1,12 @@
 machine:
   services:
     - docker
+  environment:
+    # GOROOT is not set by default
+    GOROOT: ""
+    GOPATH: "${HOME}/.go_project"
+    PATH: "${GOPATH}/bin:${PATH}"
+    BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
 
 dependencies:
   pre:
@@ -10,6 +16,9 @@ dependencies:
     - wget https://github.com/kubernetes/kops/releases/download/1.6.1/kops-linux-amd64
     - chmod +x kops-linux-amd64
     - sudo mv kops-linux-amd64 /usr/local/bin/kops
+  override:
+    - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
   post:
     - make docker-images
 
