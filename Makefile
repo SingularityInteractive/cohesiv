@@ -22,9 +22,8 @@ binaries:
 docker-push-ecr: configure_aws_cli
 	eval $(aws ecr get-login --region us-east-1 --no-include-email)
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
-	  docker push -f=Dockerfile.$$b \
-		-t ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} \
-		-t ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} . ;\
+		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1}
+		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH}
 	done
 configure_aws_cli:
 	aws --version

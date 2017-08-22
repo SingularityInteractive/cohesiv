@@ -24,7 +24,7 @@ dependencies:
   post:
     - kops version
     - go version
-    - dep status
+    - cd $BUILD_PATH && dep status
 
 compile:
   override:
