@@ -22,17 +22,22 @@ dependencies:
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
   override:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
-    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
     - dep ensure:
-      pwd:
-        "$BUILD_PATH"
-    - make docker-images:
-      pwd:
-        "$BUILD_PATH"
+        pwd:
+          "$BUILD_PATH"
   post:
     - kops version
     - go version
     - dep status
+
+compile:
+  override:
+    - make docker-images:
+        pwd:
+          "$BUILD_PATH"
+  post:
+    - docker images
 
 test:
   override:
