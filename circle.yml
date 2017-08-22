@@ -23,9 +23,8 @@ dependencies:
     - cd $BUILD_PATH && dep ensure
   post:
     - kops version
-    - kubectl version
     - go version
-    - dep status
+    - cd $BUILD_PATH && dep status
 
 test:
   override:
