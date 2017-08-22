@@ -1,6 +1,8 @@
 machine:
   services:
     - docker
+  environment:
+    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project:${HOME}/${CIRCLE_PROJECT_REPONAME}"
 
 dependencies:
   pre:
