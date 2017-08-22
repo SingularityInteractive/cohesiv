@@ -7,6 +7,7 @@ machine:
     GOPATH: "${HOME}/.go_project"
     PATH: "${GOPATH}/bin:${PATH}"
     BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+    GO15VENDOREXPERIMENT: 1
 
 dependencies:
   pre:
@@ -21,8 +22,9 @@ dependencies:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
     - cd $BUILD_PATH && dep ensure
-  post:
-    - echo "noop"
+   post:
+    - go version
+    - dep status
 
 test:
   override:
