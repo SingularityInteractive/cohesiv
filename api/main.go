@@ -15,6 +15,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"net/http"
 	"os"
@@ -67,6 +68,16 @@ func main() {
 		tagSvcConn.Close()
 	}()
 
+	TLSKeyPath := os.Getenv("TLS_KEY_PATH")
+	if TLSKeyPath == "" {
+		log.Fatal("TLS_KEY_PATH environment variable is not set")
+	}
+
+	TLSCrtPath := os.Getenv("TLS_CRT_PATH")
+	if TLSCrtPath == "" {
+		log.Fatal("TLS_CRT_PATH environment variable is not set")
+	}
+
 	secretAuthJWT := os.Getenv("SECRET_AUTH_JWT")
 	if secretAuthJWT == "" {
 		log.Fatal("SECRET_AUTH_JWT environment variable is not set")
@@ -98,11 +109,26 @@ func main() {
 		),
 	)
 
+	cfg := &tls.Config{
+		MinVersion:               tls.VersionTLS12,
+		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		PreferServerCipherSuites: true,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		},
+	}
+
 	srv := http.Server{
-		Addr:    *addr, // TODO make configurable
-		Handler: handler}
+		Addr:         *addr, // TODO make configurable
+		Handler:      handler,
+		TLSConfig:    cfg,
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+	}
 
 	log.WithFields(logrus.Fields{"addr": *addr,
 		"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
-	log.Fatal(errors.Wrap(srv.ListenAndServe(), "failed to listen/serve"))
+	log.Fatal(errors.Wrap(srv.ListenAndServeTLS(TLSCrtPath, TLSKeyPath), "failed to listen/serve"))
 }

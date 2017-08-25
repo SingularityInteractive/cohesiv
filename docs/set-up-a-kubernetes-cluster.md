@@ -1,6 +1,6 @@
 # Set up a Kubernetes cluster
 
-Adhesive consists of several microservices, which are deployed
+Cohesiv consists of several microservices, which are deployed
 as [Docker](https://docker.com) containers.
 
 To orchestrate deployment, lifecycle and replication of these services

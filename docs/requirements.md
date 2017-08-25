@@ -1,6 +1,6 @@
 # Requirements to run cohesiv
 
-Adhesive requires a [Google Cloud Platform](https://cloud.google.com) account
+Cohesiv requires a [Google Cloud Platform](https://cloud.google.com) account
 as it uses services such as:
 
 - [Google Cloud SQL](http://cloud.google.com/sql/)

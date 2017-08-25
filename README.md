@@ -1,13 +1,13 @@
 # cohesiv
 
-Adhesive is a multi-tier, microservice architecture built to supplement Gloo's monolith
+Cohesiv is a multi-tier, microservice architecture built to supplement Gloo's monolith
 with services useful to third-party clients, without modifying Gloo's core codebase.
 
 This is intended to be a sample cloud-native application to showcase the best
 practices in application deployment, products of [Google Cloud](https://cloud.google.com)
 and test new features.
 
-Adhesive is written in [Go](https://golang.org), but can host services in any language with docker, 
+Cohesiv is written in [Go](https://golang.org), but can host services in any language with docker, 
 uses [gRPC](https://grpc.io) for communication between microservices. It runs on [Google
 Cloud](https://cloud.google.com) and uses Cloud Datastore, Cloud Storage,
 [Google Container Engine](https://cloud.google.com/container-engine/), [Cloud
