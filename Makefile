@@ -1,10 +1,14 @@
 BIN_DIR=./gopath/bin
 BINARIES=api tagdirectory
-SECURITY_GROUP_ID?=sg-792e8309
-IP_ADDRESS=`curl -s icanhazip.com`
 
 SHELL=/usr/bin/env bash
 
+set-security-group-id:
+	if [ "${CIRCLE_BRANCH}" == "master" ]; then \
+  	SECURITY_GROUP_ID=${MASTER_SECURITY_GROUP_ID} ;\
+	elif [ "${CIRCLE_BRANCH}" == "stage" ]; then \
+		SECURITY_GROUP_ID=${STAGE_SECURITY_GROUP_ID} ;\
+	fi;
 docker-images: binaries
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
 	  docker build -f=Dockerfile.$$b -t singularity/cohesiv/$$b --rm=false . ;\
@@ -27,7 +31,7 @@ configure_aws_cli:
 	aws --version
 	aws configure set default.region us-east-1
 	aws configure set default.output json
-get_ip:
+set_ip:
 	echo "Getting container/machine IP address..."
   IP_ADDRESS=`curl -s icanhazip.com`
   if [ -z "$IP_ADDRESS" ];then \
@@ -39,7 +43,7 @@ get_ip:
   else \
   	@echo "Got IP address of ${IP_ADDRESS}" ;\
   fi
-authorize-circle-ip: get_ip
+authorize-circle-ip: set_ip set-security-group-id
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-deauthorize-circle-ip:
+deauthorize-circle-ip: set_ip set-security-group-id
 	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32

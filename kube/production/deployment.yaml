@@ -2,10 +2,11 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: cohesiv
   name: api-deployment
 spec:
-  revisionHistoryLimit: 3
-  replicas: 1
+  revisionHistoryLimit: 5
+  replicas: 3
   strategy:
     rollingUpdate:
       maxUnavailable: 40%
@@ -14,15 +15,19 @@ spec:
       labels:
         app: api
     spec:
+      volumes:
+      - name: tls
+        secret:
+          secretName: cohesiv-tls
       # [START containers]
       containers:
       - name: api
-        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/api:latest"
+        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/api:master"
         imagePullPolicy: Always
         ports:
-        - containerPort: 8000
+        - containerPort: 8080
         args:
-        - "-addr=:8000"
+        - "-addr=:8080"
         - "-tag-directory-addr=$(TAG_SVC_ADDR)"
         env:
         - name: SECRET_AUTH_JWT
@@ -30,8 +35,16 @@ spec:
         - name: TAG_SVC_ADDR
           valueFrom:
             configMapKeyRef:
-              name: hosts
-              key: tagdirectory
+              name: cohesiv
+              key: hosts.tagdirectory
+        - name: TLS_KEY_PATH
+          value: /tls/tls.key
+        - name: TLS_CRT_PATH
+          value: /tls/tls.crt
+        volumeMounts:
+        - mountPath: /tls/
+          name: tls
+          readOnly: true
         resources:
           requests:
             cpu: 100m
@@ -41,12 +54,13 @@ spec:
         livenessProbe:
           initialDelaySeconds: 10
           tcpSocket:
-            port: 8000
+            port: 8080
       # [END containers]
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: cohesiv
   name: tagdirectory-deployment
 spec:
   revisionHistoryLimit: 3
@@ -60,16 +74,19 @@ spec:
         app: tagdirectory
     spec:
       containers:
-      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/tagdirectory:latest"
+      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/tagdirectory:master"
         name: tagdirectory
         imagePullPolicy: Always
         ports:
-        - containerPort: 8002
+        - containerPort: 8001
         args:
-        - "-addr=:8002"
+        - "-addr=:8001"
         env:
         - name: DB_CONNECTION_STRING
-          value: postgres://dev:1mm3rs10n@cohesiv-development.cdss37tgqbbl.us-east-1.rds.amazonaws.com:5432/cohesiv
+          valueFrom:
+            secretKeyRef:
+              name: cohesiv-secrets
+              key: production-db-connection-string
         resources:
           requests:
             cpu: 100m
@@ -79,4 +96,4 @@ spec:
         livenessProbe:
           initialDelaySeconds: 10
           tcpSocket:
-            port: 8002
+            port: 8001

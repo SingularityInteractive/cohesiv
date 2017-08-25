@@ -2,7 +2,6 @@ machine:
   services:
     - docker
   environment:
-    # GOROOT is not set by default
     GOROOT: ""
     GOPATH: "${HOME}/.go_project"
     PATH: "${GOPATH}/bin:${PATH}"
@@ -24,7 +23,6 @@ dependencies:
   post:
     - kops version
     - go version
-    - cd $BUILD_PATH && dep status
 
 compile:
   override:
@@ -37,39 +35,31 @@ test:
     - cd $BUILD_PATH && go vet $(go list ./... | grep -v /vendor/)
 
 deployment:
-  development:
-    branch: development
+  production:
+    branch: master
     commands:
       - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
       - make docker-push-ecr
-      - kops get cluster --name=development.cohesiv.io
-      - kops export kubecfg --name=development.cohesiv.io --state=${KOPS_STATE_STORE}
-      - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/development/deployment.yaml
+      - kops get cluster --name=cohesiv.io
+      - kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
       - make authorize-circle-ip
-      - kubectl apply -f misc/kube/
-      - kubectl apply -f misc/development
+      - kubectl apply -f kube/nginx
+      - kubectl apply -f kube/lego
+      - kubectl apply -f kube/production
       - make deauthorize-circle-ip
   staging:
-    branch: staging
+    branch: stage
     commands:
       - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
       - make docker-push-ecr
-      - kops get cluster --name=staging.cohesiv.io
-      - kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
+      - kops get cluster --name=stage.cohesiv.io
+      - kops export kubecfg --name=stage.cohesiv.io --state=${KOPS_STATE_STORE}
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
       - make authorize-circle-ip
-      - kubectl apply -f misc/kube/
-      - kubectl apply -f misc/staging
+      - kubectl apply -f kube/nginx
+      - kubectl apply -f kube/lego
+      - kubectl apply -f kube/stage
       - make deauthorize-circle-ip
-  # production:
-  #   branch: master
-  #   commands:
-  #     - sudo /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials production --zone ${CLOUDSDK_COMPUTE_ZONE}
-  #     - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/production/deployment.yaml
-  #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-  #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-  #     - kubectl apply -f misc/kube/
-  #     - kubectl apply -f misc/production
