@@ -2,3 +2,4 @@ volumes/**/*
 gopath
 Gopkg.lock
 vendor
+kube/secrets/**/*
