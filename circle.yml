@@ -35,20 +35,20 @@ test:
     - cd $BUILD_PATH && go vet $(go list ./... | grep -v /vendor/)
 
 deployment:
-  production:
-    branch: master
-    commands:
-      - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
-      - make docker-push-ecr
-      - kops get cluster --name=cohesiv.io
-      - kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
-      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-      - make authorize-circle-ip
-      - kubectl apply -f kube/nginx
-      - kubectl apply -f kube/lego
-      - kubectl apply -f kube/production
-      - make deauthorize-circle-ip
+  # production:
+  #   branch: master
+  #   commands:
+  #     - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+  #     - make docker-push-ecr
+  #     - kops get cluster --name=cohesiv.io
+  #     - kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
+  #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+  #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+  #     - make authorize-circle-ip
+  #     - kubectl apply -f kube/nginx
+  #     - kubectl apply -f kube/lego
+  #     - kubectl apply -f kube/production
+  #     - make deauthorize-circle-ip
   staging:
     branch: stage
     commands:
