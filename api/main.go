@@ -20,6 +20,8 @@ import (
 	"net/http"
 	"os"
 
+	"golang.org/x/crypto/acme/autocert"
+
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
 	"github.com/SingularityInteractive/cohesiv/version"
 	"github.com/auth0/go-jwt-middleware"
@@ -41,7 +43,7 @@ var log *logrus.Entry
 
 func main() {
 	flag.Parse()
-	host, err := os.Hostname()
+	hostname, err := os.Hostname()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "cannot get hostname"))
 	}
@@ -49,7 +51,7 @@ func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{FieldMap: logrus.FieldMap{logrus.FieldKeyLevel: "severity"}})
 	log = logrus.WithFields(logrus.Fields{
 		"service": "api",
-		"host":    host,
+		"host":    hostname,
 		"v":       version.Version(),
 	})
 	grpclog.SetLogger(log.WithField("facility", "grpc"))
@@ -68,14 +70,9 @@ func main() {
 		tagSvcConn.Close()
 	}()
 
-	TLSKeyPath := os.Getenv("TLS_KEY_PATH")
-	if TLSKeyPath == "" {
-		log.Fatal("TLS_KEY_PATH environment variable is not set")
-	}
-
-	TLSCrtPath := os.Getenv("TLS_CRT_PATH")
-	if TLSCrtPath == "" {
-		log.Fatal("TLS_CRT_PATH environment variable is not set")
+	host := os.Getenv("HOST")
+	if host == "" {
+		log.Fatal("HOST environment variable is not set")
 	}
 
 	secretAuthJWT := os.Getenv("SECRET_AUTH_JWT")
@@ -109,26 +106,45 @@ func main() {
 		),
 	)
 
-	cfg := &tls.Config{
-		MinVersion:               tls.VersionTLS12,
-		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
-		PreferServerCipherSuites: true,
-		CipherSuites: []uint16{
-			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		},
+	if host == "localhost" {
+		srv := http.Server{
+			Addr:    *addr, // TODO make configurable
+			Handler: handler,
+		}
+
+		log.WithFields(logrus.Fields{"addr": *addr,
+			"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
+		log.Fatal(errors.Wrap(srv.ListenAndServe(), "failed to listen/serve"))
+	} else {
+		certManager := autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(host), //your domain here
+			Cache:      autocert.DirCache("certs"),   //folder for storing certificates
+		}
+
+		cfg := &tls.Config{
+			MinVersion:               tls.VersionTLS12,
+			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+			PreferServerCipherSuites: true,
+			GetCertificate:           certManager.GetCertificate,
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			},
+		}
+
+		srv := http.Server{
+			Addr:         *addr, // TODO make configurable
+			Handler:      handler,
+			TLSConfig:    cfg,
+			TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+		}
+
+		log.WithFields(logrus.Fields{"addr": *addr,
+			"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
+		log.Fatal(errors.Wrap(srv.ListenAndServeTLS("", ""), "failed to listen/serve"))
 	}
 
-	srv := http.Server{
-		Addr:         *addr, // TODO make configurable
-		Handler:      handler,
-		TLSConfig:    cfg,
-		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
-	}
-
-	log.WithFields(logrus.Fields{"addr": *addr,
-		"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
-	log.Fatal(errors.Wrap(srv.ListenAndServeTLS(TLSCrtPath, TLSKeyPath), "failed to listen/serve"))
 }

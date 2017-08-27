@@ -1,7 +1,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: nginx
+  name: nginx-config
   namespace: nginx-ingress
   labels:
     k8s-addon: ingress-nginx.addons.k8s.io

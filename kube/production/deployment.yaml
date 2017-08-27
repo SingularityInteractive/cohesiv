@@ -15,10 +15,6 @@ spec:
       labels:
         app: api
     spec:
-      volumes:
-      - name: tls
-        secret:
-          secretName: cohesiv-tls
       # [START containers]
       containers:
       - name: api
@@ -30,6 +26,8 @@ spec:
         - "-addr=:8080"
         - "-tag-directory-addr=$(TAG_SVC_ADDR)"
         env:
+        - name: HOST
+          value: cohesiv.io
         - name: SECRET_AUTH_JWT
           value: fgL8y7-ABYLZyudHBxwUXQaNsNdzJtfYjsUw_cBefJQj8s8G9s1ZWJDmNmmgG1qy
         - name: TAG_SVC_ADDR
@@ -37,14 +35,6 @@ spec:
             configMapKeyRef:
               name: cohesiv
               key: hosts.tagdirectory
-        - name: TLS_KEY_PATH
-          value: /tls/tls.key
-        - name: TLS_CRT_PATH
-          value: /tls/tls.crt
-        volumeMounts:
-        - mountPath: /tls/
-          name: tls
-          readOnly: true
         resources:
           requests:
             cpu: 100m

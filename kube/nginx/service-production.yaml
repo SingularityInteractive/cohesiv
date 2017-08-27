@@ -1,16 +1,18 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: ingress-nginx
+  name: ingress-nginx-service
   namespace: nginx-ingress
   labels:
     k8s-addon: ingress-nginx.addons.k8s.io
   annotations:
+    external-dns.alpha.kubernetes.io/hostname: cohesiv.io.
     service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: 1800
 spec:
   type: LoadBalancer
   selector:
-    app: ingress-nginx
+    app: nginx-ingress-controller
   ports:
   - name: http
     port: 80
@@ -18,18 +20,3 @@ spec:
   - name: https
     port: 443
     targetPort: https
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: nginx-default-backend
-  namespace: nginx-ingress
-  labels:
-    k8s-addon: ingress-nginx.addons.k8s.io
-spec:
-  ports:
-  - port: 80
-    targetPort: http
-  selector:
-    app: nginx-default-backend

@@ -45,8 +45,6 @@ deployment:
   #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
   #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
   #     - make authorize-circle-ip
-  #     - kubectl apply -f kube/nginx
-  #     - kubectl apply -f kube/lego
   #     - kubectl apply -f kube/production
   #     - make deauthorize-circle-ip
   staging:
@@ -59,7 +57,5 @@ deployment:
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
       - make authorize-stage-circle-ip
-      - kubectl apply -f kube/nginx
-      - kubectl apply -f kube/lego
       - kubectl apply -f kube/stage
       - make deauthorize-stage-circle-ip
