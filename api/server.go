@@ -16,6 +16,12 @@ type server struct {
 	tagSvc pb.TagDirectoryClient
 }
 
+func (s *server) Status(w http.ResponseWriter, r *http.Request) {
+	respondJSON(w, http.StatusOK, map[string]string{
+		"status": "ok",
+	})
+}
+
 func errorCode(w http.ResponseWriter, code int, msg string, err error) {
 	log.WithField("http.status", code).WithField("error", err).Warn(msg)
 	w.WriteHeader(code)

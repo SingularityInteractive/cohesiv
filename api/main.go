@@ -96,6 +96,7 @@ func main() {
 
 	// set up server
 	r := mux.NewRouter()
+	r.HandleFunc("/health", s.Status).Methods(http.MethodGet)
 	r.HandleFunc("/entity/{relationID}/tags", s.GetTags).Methods(http.MethodGet)
 	r.HandleFunc("/tags", s.CreateTags).Methods(http.MethodPost)
 	r.HandleFunc("/tags/{name}/entities", s.GetEntitiesByTagName).Methods(http.MethodGet)
@@ -122,24 +123,12 @@ func main() {
 			Cache:      autocert.DirCache("certs"),   //folder for storing certificates
 		}
 
-		cfg := &tls.Config{
-			MinVersion:               tls.VersionTLS12,
-			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
-			PreferServerCipherSuites: true,
-			GetCertificate:           certManager.GetCertificate,
-			CipherSuites: []uint16{
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-			},
-		}
-
 		srv := http.Server{
-			Addr:         *addr, // TODO make configurable
-			Handler:      handler,
-			TLSConfig:    cfg,
-			TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+			Addr:    *addr, // TODO make configurable
+			Handler: handler,
+			TLSConfig: &tls.Config{
+				GetCertificate: certManager.GetCertificate,
+			},
 		}
 
 		log.WithFields(logrus.Fields{"addr": *addr,
