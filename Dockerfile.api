@@ -1,7 +1,4 @@
-FROM alpine
-RUN apk add --update ca-certificates && \
-      rm -rf /var/cache/apk/* /tmp/*
-
+FROM scratch
 COPY ./gopath/bin/api ./api
 ENTRYPOINT ["./api"]
 EXPOSE 8000

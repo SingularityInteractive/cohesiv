@@ -1,0 +1,58 @@
+version: '2.1'
+
+services:
+  postgres:
+    image: postgres:alpine
+    # Map to non default port as to not conflict with host postgres
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "base"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  api:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    # Expose ports [HOST:CONTAINER}
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_AUTH_JWT: fgL8y7-ABYLZyudHBxwUXQaNsNdzJtfYjsUw_cBefJQj8s8G9s1ZWJDmNmmgG1qy
+    entrypoint:
+      - ./api
+      - --addr=:8000
+      - --tag-directory-addr=tagdirectory:8001
+    # Link to containers in another service.
+    # Links also express dependency between services in the same way as depends_on,
+    # so they determine the order of service startup.
+    links:
+      - tagdirectory
+    depends_on:
+      - tagdirectory
+  tagdirectory:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.tagdirectory
+    # Expose ports [HOST:CONTAINER}
+    ports:
+      - "8001:8001"
+    environment:
+      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/base?sslmode=disable
+    entrypoint:
+      - ./tagdirectory
+      - --addr=:8001
+    # Link to containers in another service.
+    # Links also express dependency between services in the same way as depends_on,
+    # so they determine the order of service startup.
+    links:
+      - postgres
+    depends_on:
+      postgres:
+        condition: service_healthy

@@ -14,7 +14,7 @@ binaries:
 	@echo "Building statically compiled linux/amd64 binaries"
 	rm -rf ${BIN_DIR} && mkdir -p ${BIN_DIR}
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
-	  GOOS=linux GOARCH=amd64 go build -tags netgo -o ${BIN_DIR}/$$b ./$$b ;\
+		CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o  ${BIN_DIR}/$$b ./$$b ;\
 	done
 docker-push-ecr: configure_aws_cli
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
