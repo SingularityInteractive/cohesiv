@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  use-proxy-protocol: "true"
+  proxy-connect-timeout: "15"
+  proxy-read-timeout: "600"
+  proxy-send-timeout: "600"
+  hsts-include-subdomains: "false"
+  body-size: "64m"
+  server-name-hash-bucket-size: "256"
+kind: ConfigMap
+metadata:
+  namespace: nginx-ingress
+  name: nginx
+  labels:
+    k8s-addon: ingress-nginx.addons.k8s.io

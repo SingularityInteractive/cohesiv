@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   description: "API for the Cohesiv suite of services."
   version: "1.0.0"
-  title: "Adhesive"
+  title: "Cohesiv"
   termsOfService: ""
   contact:
     email: "smccord@singularity-interactive.com"

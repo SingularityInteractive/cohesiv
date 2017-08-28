@@ -1,6 +1,6 @@
 # Set up Cloud Datastore
 
-Adhesive uses [Google Cloud Datastore](https://cloud.google.com/datastore) as its
+Cohesiv uses [Google Cloud Datastore](https://cloud.google.com/datastore) as its
 NoSQL database.
 
 Visit [Google Cloud Console &rarr; Datastore](https://console.cloud.google.com/datastore/)
@@ -13,7 +13,7 @@ the application:
 
 # Set up Cloud Storage
 
-Adhesive uses [Google Cloud Storage](https://cloud.google.com/storage) to store pictures
+Cohesiv uses [Google Cloud Storage](https://cloud.google.com/storage) to store pictures
 uploaded by users and to serve them on the website.
 
 Create a new storage bucket with the NAME of your choosing and make it publicly readable:

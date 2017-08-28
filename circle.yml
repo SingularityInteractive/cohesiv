@@ -1,50 +1,62 @@
 machine:
   services:
     - docker
+  environment:
+    GOROOT: ""
+    GOPATH: "${HOME}/.go_project"
+    PATH: "${GOPATH}/bin:${PATH}"
+    BUILD_PATH: "${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
 
 dependencies:
   pre:
+    - go get -u github.com/golang/dep/cmd/dep
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - sudo mv ./kubectl /usr/local/bin/kubectl
     - wget https://github.com/kubernetes/kops/releases/download/1.6.1/kops-linux-amd64
     - chmod +x kops-linux-amd64
-    - mv kops-linux-amd64 /usr/local/bin/kops
+    - sudo mv kops-linux-amd64 /usr/local/bin/kops
+  override:
+    - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${BUILD_PATH}
+    - cd $BUILD_PATH && dep ensure
   post:
-    - make docker-images
+    - kops version
+    - go version
+
+compile:
+  override:
+    - cd $BUILD_PATH && make docker-images
+  post:
+    - docker images
 
 test:
-  post:
-    - echo "noop"
+  override:
+    - cd $BUILD_PATH && go vet $(go list ./... | grep -v /vendor/)
 
 deployment:
-  development:
-    branch: development
-    commands:
-      - make docker-push-ecr
-      - kops get cluster --name=development.cohesiv.io
-      - kops export kubecfg --name=development.cohesiv.io --state=s3://clusters.cohesiv.io
-      - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/development/deployment.yaml
-      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-      - kubectl apply -f misc/kube/
-      - kubectl apply -f misc/development
-  staging:
-    branch: staging
-    commands:
-      - make docker-push-ecr
-      - kops get cluster --name=staging.cohesiv.io
-      - kops export kubecfg --name=staging.cohesiv.io --state=s3://clusters.cohesiv.io
-      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-      - kubectl apply -f misc/kube/
-      - kubectl apply -f misc/staging
   # production:
   #   branch: master
   #   commands:
-  #     - sudo /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials production --zone ${CLOUDSDK_COMPUTE_ZONE}
-  #     - sed -i "s/:latest/:$CIRCLE_SHA1/g" misc/production/deployment.yaml
+  #     - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+  #     - make docker-push-ecr
+  #     - kops get cluster --name=cohesiv.io
+  #     - kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
   #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
   #     - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-  #     - kubectl apply -f misc/kube/
-  #     - kubectl apply -f misc/production
+  #     - make authorize-circle-ip
+  #     - kubectl apply -f kube/production
+  #     - make deauthorize-circle-ip
+  staging:
+    branch: staging
+    commands:
+      - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+      - make docker-push-ecr
+      - kops get cluster --name=staging.cohesiv.io
+      - kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
+      - sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
+      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+      - sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+      - make authorize-stage-circle-ip
+      - kubectl apply -f kube/staging
+      - make deauthorize-stage-circle-ip
