@@ -15,12 +15,9 @@
 package main
 
 import (
-	"crypto/tls"
 	"flag"
 	"net/http"
 	"os"
-
-	"golang.org/x/crypto/acme/autocert"
 
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
 	"github.com/SingularityInteractive/cohesiv/version"
@@ -70,11 +67,6 @@ func main() {
 		tagSvcConn.Close()
 	}()
 
-	host := os.Getenv("HOST")
-	if host == "" {
-		log.Fatal("HOST environment variable is not set")
-	}
-
 	secretAuthJWT := os.Getenv("SECRET_AUTH_JWT")
 	if secretAuthJWT == "" {
 		log.Fatal("SECRET_AUTH_JWT environment variable is not set")
@@ -97,9 +89,9 @@ func main() {
 	// set up server
 	r := mux.NewRouter()
 	r.HandleFunc("/health", s.Status).Methods(http.MethodGet)
-	r.HandleFunc("/entity/{relationID}/tags", s.GetTags).Methods(http.MethodGet)
-	r.HandleFunc("/tags", s.CreateTags).Methods(http.MethodPost)
-	r.HandleFunc("/tags/{name}/entities", s.GetEntitiesByTagName).Methods(http.MethodGet)
+	r.HandleFunc("/v1/entity/{relationID}/tags", s.GetTags).Methods(http.MethodGet)
+	r.HandleFunc("/v1/tags", s.CreateTags).Methods(http.MethodPost)
+	r.HandleFunc("/v1/tags/{name}/entities", s.GetEntitiesByTagName).Methods(http.MethodGet)
 
 	handler := handlers.CompressHandler(
 		logHandler(
@@ -107,33 +99,13 @@ func main() {
 		),
 	)
 
-	if host == "localhost" {
-		srv := http.Server{
-			Addr:    *addr, // TODO make configurable
-			Handler: handler,
-		}
-
-		log.WithFields(logrus.Fields{"addr": *addr,
-			"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
-		log.Fatal(errors.Wrap(srv.ListenAndServe(), "failed to listen/serve"))
-	} else {
-		certManager := autocert.Manager{
-			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist(host), //your domain here
-			Cache:      autocert.DirCache("certs"),   //folder for storing certificates
-		}
-
-		srv := http.Server{
-			Addr:    *addr, // TODO make configurable
-			Handler: handler,
-			TLSConfig: &tls.Config{
-				GetCertificate: certManager.GetCertificate,
-			},
-		}
-
-		log.WithFields(logrus.Fields{"addr": *addr,
-			"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
-		log.Fatal(errors.Wrap(srv.ListenAndServeTLS("", ""), "failed to listen/serve"))
+	srv := http.Server{
+		Addr:    *addr, // TODO make configurable
+		Handler: handler,
 	}
+
+	log.WithFields(logrus.Fields{"addr": *addr,
+		"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
+	log.Fatal(errors.Wrap(srv.ListenAndServe(), "failed to listen/serve"))
 
 }

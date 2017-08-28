@@ -10,13 +10,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - stage.cohesiv.io
+    - api.stage.cohesiv.io
     secretName: cohesiv-tls
   rules:
-  - host: "stage.cohesiv.io"
+  - host: "api.stage.cohesiv.io"
     http:
       paths:
-      - path: /api
+      - path: /
         backend:
           serviceName: api
-          servicePort: 8080
+          servicePort: 80

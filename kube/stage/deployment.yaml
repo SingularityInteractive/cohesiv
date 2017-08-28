@@ -28,8 +28,6 @@ spec:
         env:
         - name: SECRET_AUTH_JWT
           value: fgL8y7-ABYLZyudHBxwUXQaNsNdzJtfYjsUw_cBefJQj8s8G9s1ZWJDmNmmgG1qy
-        - name: HOST
-          value: stage.cohesiv.io
         - name: TAG_SVC_ADDR
           valueFrom:
             configMapKeyRef:
