@@ -14,15 +14,16 @@ type server struct {
 }
 
 func (s *server) Route(e *echo.Echo) {
+	api := e.Group("/api")
 	// Mount a healthcheck endpoint
-	e.GET("/health", health)
+	api.GET("/health", health)
 	// Separate api endpoints for middleware
-	api := e.Group("/v1")
-	api.Use(middleware.JWT([]byte(secretAuthJWT)))
+	v1 := e.Group("/v1")
+	v1.Use(middleware.JWT([]byte(secretAuthJWT)))
 	// Tags
-	api.GET("/entity/:relationID/tags", s.GetTags)
-	api.POST("/tags", s.CreateTags)
-	api.GET("/tags/:name/entities", s.GetEntitiesByTagName)
+	v1.GET("/entity/:relationID/tags", s.GetTags)
+	v1.POST("/tags", s.CreateTags)
+	v1.GET("/tags/:name/entities", s.GetEntitiesByTagName)
 }
 
 func health(c echo.Context) error {
