@@ -38,9 +38,9 @@ set-ip:
   	@echo "Got IP address of ${IP_ADDRESS}" ;\
   fi
 authorize-stage-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGE_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
 deauthorize-stage-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGE_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
 authorize-master-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
 deauthorize-master-circle-ip: set-ip

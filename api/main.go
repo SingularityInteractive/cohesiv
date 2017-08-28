@@ -16,15 +16,13 @@ package main
 
 import (
 	"flag"
-	"net/http"
 	"os"
+
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
 	"github.com/SingularityInteractive/cohesiv/version"
-	"github.com/auth0/go-jwt-middleware"
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	logrus "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -34,6 +32,7 @@ import (
 var (
 	addr                = flag.String("addr", ":8000", "[host]:port to listen")
 	tagDirectoryBackend = flag.String("tag-directory-addr", "", "address of tag directory backend")
+	secretAuthJWT       string
 )
 
 var log *logrus.Entry
@@ -67,45 +66,23 @@ func main() {
 		tagSvcConn.Close()
 	}()
 
-	secretAuthJWT := os.Getenv("SECRET_AUTH_JWT")
+	secretAuthJWT = os.Getenv("SECRET_AUTH_JWT")
 	if secretAuthJWT == "" {
 		log.Fatal("SECRET_AUTH_JWT environment variable is not set")
 	}
 
-	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
-		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-			return []byte(secretAuthJWT), nil
-		},
-		// When set, the middleware verifies that tokens are signed with the specific signing algorithm
-		// If the signing method is not constant the ValidationKeyGetter callback can be used to implement additional checks
-		// Important to avoid security issues described here: https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/
-		SigningMethod: jwt.SigningMethodHS256,
-	})
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	s := &server{
 		tagSvc: pb.NewTagDirectoryClient(tagSvcConn),
 	}
 
-	// set up server
-	r := mux.NewRouter()
-	r.HandleFunc("/health", s.Status).Methods(http.MethodGet)
-	r.HandleFunc("/v1/entity/{relationID}/tags", s.GetTags).Methods(http.MethodGet)
-	r.HandleFunc("/v1/tags", s.CreateTags).Methods(http.MethodPost)
-	r.HandleFunc("/v1/tags/{name}/entities", s.GetEntitiesByTagName).Methods(http.MethodGet)
-
-	handler := handlers.CompressHandler(
-		logHandler(
-			jwtMiddleware.Handler(r),
-		),
-	)
-
-	srv := http.Server{
-		Addr:    *addr, // TODO make configurable
-		Handler: handler,
-	}
+	s.Route(e)
 
 	log.WithFields(logrus.Fields{"addr": *addr,
 		"tagdirectory": *tagDirectoryBackend}).Info("starting to listen on http")
-	log.Fatal(errors.Wrap(srv.ListenAndServe(), "failed to listen/serve"))
+	e.Logger.Fatal(e.Start(*addr))
 
 }

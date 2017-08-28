@@ -1,14 +1,11 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
 
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 type server struct {
@@ -16,51 +13,18 @@ type server struct {
 	tagSvc pb.TagDirectoryClient
 }
 
-func (s *server) Status(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusOK, map[string]string{
-		"status": "ok",
-	})
+func (s *server) Route(e *echo.Echo) {
+	// Mount a healthcheck endpoint
+	e.GET("/health", health)
+	// Separate api endpoints for middleware
+	api := e.Group("/v1")
+	api.Use(middleware.JWT([]byte(secretAuthJWT)))
+	// Tags
+	api.GET("/entity/:relationID/tags", s.GetTags)
+	api.POST("/tags", s.CreateTags)
+	api.GET("/tags/:name/entities", s.GetEntitiesByTagName)
 }
 
-func errorCode(w http.ResponseWriter, code int, msg string, err error) {
-	log.WithField("http.status", code).WithField("error", err).Warn(msg)
-	w.WriteHeader(code)
-	fmt.Fprint(w, errors.Wrap(err, msg))
-}
-
-func unauthorized(w http.ResponseWriter, err error) {
-	errorCode(w, http.StatusUnauthorized, "unauthorized", err)
-}
-
-func badRequest(w http.ResponseWriter, err error) {
-	errorCode(w, http.StatusBadRequest, "bad request", err)
-}
-
-func serverError(w http.ResponseWriter, err error) {
-	errorCode(w, http.StatusInternalServerError, "server error", err)
-}
-
-func respondJSON(w http.ResponseWriter, status int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		errorCode(w, http.StatusBadRequest, "bad request", err)
-	}
-}
-
-func logHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		e := log.WithFields(logrus.Fields{
-			"method": r.Method,
-			"path":   r.URL.Path,
-		})
-		e.Debug("request accepted")
-		start := time.Now()
-		defer func() {
-			e.WithFields(logrus.Fields{
-				"elapsed": time.Now().Sub(start).String(),
-			}).Debug("request completed")
-		}()
-		h.ServeHTTP(w, r) // call original
-	})
+func health(c echo.Context) error {
+	return c.String(http.StatusOK, "OK")
 }

@@ -1,10 +1,4 @@
-kind: ConfigMap
 apiVersion: v1
-metadata:
-  name: nginx-config
-  namespace: nginx-ingress
-  labels:
-    k8s-addon: ingress-nginx.addons.k8s.io
 data:
   use-proxy-protocol: "true"
   proxy-connect-timeout: "15"
@@ -13,4 +7,9 @@ data:
   hsts-include-subdomains: "false"
   body-size: "64m"
   server-name-hash-bucket-size: "256"
-  enable-sticky-sessions: "true"
+kind: ConfigMap
+metadata:
+  namespace: nginx-ingress
+  name: nginx
+  labels:
+    k8s-addon: ingress-nginx.addons.k8s.io

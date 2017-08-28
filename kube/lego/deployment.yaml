@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kube-lego
-  namespace: cohesiv
+  namespace: kube-lego
 spec:
   replicas: 1
   template:
@@ -35,8 +35,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        - name: LEGO_SECRET_NAME
-          value: cohesiv-tls
         readinessProbe:
           httpGet:
             path: /healthz
