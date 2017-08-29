@@ -1,31 +1,51 @@
 # Set up service credentials
 
-## Create a [Service Account](https://cloud.google.com/compute/docs/access/service-accounts)
+## Create an [IAM Group](https://console.aws.amazon.com/iam/home?region=us-east-1#/groups)
 
-This gives the microservices access to use the Google Cloud APIs.
+This gives kops all the permissions it needs to manage your k8s cluster.
 
-- Visit [Service Accounts] on Cloud Console(https://console.cloud.google.com/iam-admin/serviceaccounts)
-- Click "Create Service Account"
-- Give it a name, and choose roles:
-  - [x] Datastore User
-  - [x] Storage Admin
-- Click "Furnish new private key" with type=JSON.
-- Click "Create" and save the private key file.
+- Click "Create New Group"
+- Give it a name like 'kops', and choose policies:
+  - [x] AmazonEC2FullAccess
+  - [x] IAMFullAccess
+  - [x] AmazonS3FullAccess
+  - [x] AmazonVPCFullAccess
+  - [x] AmazonRoute53FullAccess
 
-You will use this file in "Set up a Kubernetes cluster" section later.
+Add your user to this group so kops can manage clusters on your behalf.
 
-## Create an OAuth2 client
+## Create an [IAM Policy](https://console.aws.amazon.com/iam/home?region=us-east-1#/policies)
 
-This is used for users with Google accounts to authenticate to the app.
+You'll need to create a custom route53 policy so your Kubernetes cluster can change DNS records as you modify external facing services.
 
-- Visit [API Manager](https://console.cloud.google.com/apis/dashboard) on Cloud
-  Console.
-- Click "Credentials" &rarr; "Create credentials" &rarr; choose "OAuth client
-  ID"
-- Choose "Web application" on the next screen.
-- Give it a name, and specify the callback URI as
-  `http://localhost/oauth2callback`. You will change it once you have a domain
-  name.
+You will use this policy in "Set up a Kubernetes cluster" section later.
 
-You will use this file in "Set up a Kubernetes cluster" section later.
+- Click "Create Policy"
+- Give it a name like 'Kube-External-DNS', and paste in:
 
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": [
+                "arn:aws:route53:::hostedzone/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ListHostedZones",
+                "route53:ListResourceRecordSets"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+````

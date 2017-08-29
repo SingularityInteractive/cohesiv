@@ -1,24 +1,14 @@
-# Set up Cloud Datastore
+# Set up AWS RDS
 
-Cohesiv uses [Google Cloud Datastore](https://cloud.google.com/datastore) as its
-NoSQL database.
+Cohesiv uses [AWS RDS](https://aws.amazon.com/rds/) with Postgres as its relational database of choice.
 
-Visit [Google Cloud Console &rarr; Datastore](https://console.cloud.google.com/datastore/)
-and pick a region for the Datastore.
+Before you proceed, you'll want to have a cluster created with KOPS, which has VPC's and security groups set up for you to use with new RDS instances.
 
-Then, create the Cloud Datastore indexes required by
-the application:
+- Visit [RDS Console](https://console.aws.amazon.com/rds/home?region=us-east-1) and click `Launch a DB Instance`
+- Select `PostgreSQL`, then either Production or Dev/Test. (staging.cohesiv.io uses free tier elligible Dev/Test)
+- Use a name like `cohesiv-staging`, and a username like `cohesiv`, then click `Next Step`
 
-    gcloud datastore create-indexes misc/index.yaml
-
-# Set up Cloud Storage
-
-Cohesiv uses [Google Cloud Storage](https://cloud.google.com/storage) to store pictures
-uploaded by users and to serve them on the website.
-
-Create a new storage bucket with the NAME of your choosing and make it publicly readable:
-
-    gsutil mb gs://NAME
-    gsutil defacl ch -u AllUsers:R gs://NAME
-
-You use the name of this bucket in one of the next steps.
+On the Advanced Settings Menu:
+- Under `VPC`, select your `staging.cohesiv.io` VPC, or whatever name you used to create your cluster.
+- Under `VPC Security Goup(s)`, select `nodes.staging.cohesiv.io`, this will allow your k8s deployments/containers to access the instance, but not the masters.
+- When it has successfully spun up, make note of the endpoint and use it to create k8s secrets, which your deployments can then reference in their respective .yaml's.

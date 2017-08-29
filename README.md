@@ -5,7 +5,7 @@ with services useful to third-party clients, without modifying Gloo's core codeb
 
 This is intended to be a cloud-native application, deployed to `AWS` to showcase the best
 practices in application deployment, utilizing a modern stack including `Docker`, `Kubernetes`,
- `Golang`, and `Node`.
+ `GRPC`, `Golang`, and `Node`.
 
 ## Table of Contents
 
@@ -13,10 +13,11 @@ practices in application deployment, utilizing a modern stack including `Docker`
 - [Usage](#usage)
 - [Support](#support)
 - [Contributing](#contributing)
+- [Deploying](#Deploying)
 
 ## Installation
 
-- Clone to `$HOME/go/src/github.com/SingularityInteractive/cohesiv`
+- Clone into `$HOME/go/src/github.com/SingularityInteractive/cohesiv`
 - `$ brew install dep`
 - `dep ensure`
 
@@ -50,38 +51,7 @@ Please [open an issue](https://github.com/SingularityInteractive/base/issues/new
   5. To release to our staging environment, merge `develop` into `staging`, which will trigger a ci deployment.
   6. To release to production, merge `staging` into `master`. 
 
-  ## Locations to Change Product Name
-
-  ```json
-{
-    "package.json" : "No brainer here",
-    "docker-compose.yml" : "Mainly for console log differentiation purposes here",
-    "client/package.json": "Just to keep consistent with the root package.json",
-    ".env" : "The postgres connection url env var is set to use 'base'",
-    "kube/**/*.yaml": "The k8s configs apply under the 'base' namespace, so all references should be changed.",
-    "Makefile": "Change the CONTAINER_NAME variable for the AWS ECR image, and PUBLIC_URL so that it accurately reflects the host"
-}
-```
-
-# cohesiv
-
-
-
-
-Cohesiv is written in [Go](https://golang.org), but can host services in any language with docker, 
-uses [gRPC](https://grpc.io) for communication between microservices. It runs on [Google
-Cloud](https://cloud.google.com) and uses Cloud Datastore, Cloud Storage,
-[Google Container Engine](https://cloud.google.com/container-engine/), [Cloud
-Container Builder](https://cloud.google.com/container-builder/), [Stackdriver
-Logging](https://cloud.google.com/logging/) and [Stackdriver
-Trace](https://cloud.google.com/trace/).
-
-**Local development**
-
-1. [Running services outside containers](docs/run-directly.md)
-1. [Running locally on Minikube](docs/run-minikube.md)
-
-## Setup
+## Deploying
 
 The following steps will walk you through on how to prepare requirements, deploy
 and run this application.
@@ -92,30 +62,5 @@ issue](https://github.com/SingularityInteractive/cohesiv/issues/new).
 1. [Requirements](docs/requirements.md)
 1. [Set up service credentials](docs/set-up-service-credentials.md)
 1. [Set up storage](docs/set-up-storage.md)
-1. [Set up a Kubernetes cluster on Google Container Engine](docs/set-up-storage.md)
-1. [Set up continuous image build on Google Container Builder](docs/set-up-image-build.md)
+1. [Set up a Kubernetes cluster on AWS using KOPS](docs/set-up-cluster.md)
 1. [Set up continuous deployment on CircleCI](docs/set-up-continuous-build.md)
-1. [Try out the application!](docs/try-out.md)
-
-**Monitoring:**
-
-1. :soon: Set up distributed tracing with Stackdriver Trace
-1. :soon: Browse application logs with Stackdriver Logging
-1. :soon: Set up alerting with Stackdriver Monitoring
-
-**Advanced topics:**
-
-1. :soon: Set up a domain name
-1. :soon: Set up TLS with Let’s Encrypt and kube-lego
-1. :soon: Limit access to secrets with Kubernetes Service accounts
-1. :soon: Set up TLS communication between microservices with linkerd
-
-```
-curl -o cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.darwin.amd64
-```
-```
-mv cloud_sql_proxy /usr/local/bin
-```
-```
-./cloud_sql_proxy -instances=polished-bridge-169215:us-central1:development=tcp:3306 -credential_file=./misc/secrets/google/credentials &
-```
