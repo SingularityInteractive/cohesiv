@@ -1,9 +1,17 @@
 syntax = "proto3";
 
+message Resource {
+    string ID = 1;
+}
+
+message Resources {
+    repeated Resource Results = 1;
+}
+
 service TagDirectory {
     rpc GetTags(GetTagsRequest) returns(Tags) {}
     rpc CreateTags(CreateTagsRequest) returns(Tags) {}
-    rpc GetEntitiesByTagName(GetEntitiesByTagNameRequest) returns(Entities) {}
+    rpc GetResourcesByTagName(GetResourcesByTagNameRequest) returns(Resources) {}
 }
 
 message Tag {
@@ -15,26 +23,18 @@ message Tags {
 }
 
 message GetTagsRequest {
-    string RelationID = 1;
+    string ResourceID = 1;
 }
 
-message GetEntitiesByTagNameRequest {
+message GetResourcesByTagNameRequest {
     string Name = 1;
 }
 
 message CreateTagRequest {
-    string RelationID = 1;
+    string ResourceID = 1;
     string Name = 2;
 }
 
 message CreateTagsRequest {
     repeated CreateTagRequest Tags = 1;
-}
-
-message Entity {
-    string ID = 1;
-}
-
-message Entities {
-    repeated Entity Results = 1;
 }

@@ -21,9 +21,9 @@ func (s *server) Route(e *echo.Echo) {
 	v1 := e.Group("/v1")
 	v1.Use(middleware.JWT([]byte(secretAuthJWT)))
 	// Tags
-	v1.GET("/entity/:relationID/tags", s.GetTags)
+	v1.GET("/resource/:resourceID/tags", s.GetTags)
 	v1.POST("/tags", s.CreateTags)
-	v1.GET("/tags/:name/entities", s.GetEntitiesByTagName)
+	v1.GET("/tags/:name/resources", s.GetResourcesByTagName)
 }
 
 func health(c echo.Context) error {

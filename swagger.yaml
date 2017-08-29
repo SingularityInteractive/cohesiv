@@ -5,21 +5,33 @@ info:
   title: "Cohesiv"
   termsOfService: ""
   contact:
-    email: "smccord@singularity-interactive.com"
-host: "104.154.213.108"
-basePath: "/"
+    email: "accounts@singularity-interactive.com"
+host: "cohesiv.io"
+basePath: "/api"
 tags:
 - name: "tag"
-- name: "entity"
-  description: "An entity is anything with an ID that can have tags and visa versa"
+- name: "resource"
+  description: "A resource is anything with an ID that can have tags and visa versa"
 schemes:
 - "http"
+- "https"
 paths:
-  /tags:
+  /health:
+    get:
+      summary: "Check if server is up and healthy"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+            description: "Will be 'OK' if the server is accepting requests"
+        500:
+          description: "Upstream server error"
+  /v1/tags:
     post:
       tags:
       - "tag"
-      summary: "Create tags for an entity"
+      summary: "Create tags for a resource"
       description: ""
       operationId: "createTags"
       consumes:
@@ -44,19 +56,19 @@ paths:
           description: "Upstream server error"
       security:
       - api_key: []
-  /entity/{entityID}/tags:
+  /v1/resource/{resourceID}/tags:
     get:
       tags:
       - "tag"
-      summary: "Find tags given an entity ID"
+      summary: "Find tags given a resource ID"
       description: "Returns a single pet"
-      operationId: "getTagsByEntityID"
+      operationId: "getTagsByResourceID"
       produces:
       - "application/json"
       parameters:
-      - name: "entityID"
+      - name: "resourceID"
         in: "path"
-        description: "ID of entity to query tags by"
+        description: "ID of resource to query tags by"
         required: true
         type: "string"
       responses:
@@ -65,17 +77,17 @@ paths:
           schema:
             $ref: "#/definitions/Tags"
         400:
-          description: "Bad or no entity ID supplied"
+          description: "Bad or no resource ID supplied"
         500:
           description: "Upstream server error"
       security:
       - api_key: []
-  /tags/{tagName}/entities:
+  /v1/tags/{tagName}/resources:
     get:
       tags:
-      - "entity"
-      summary: "Find entities by a tag name"
-      description: "Returns a single pet"
+      - "resource"
+      summary: "Find resources by a tag name"
+      description: "Returns a resources"
       operationId: "getEntitiesByTagName"
       produces:
       - "application/json"
@@ -89,7 +101,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Entities"
+            $ref: "#/definitions/Resources"
         400:
           description: "Bad or no name supplied"
         500:
@@ -103,6 +115,19 @@ securityDefinitions:
     in: "header"
     description: "Authorization: bearer XXXXXXXXXXX"
 definitions:
+  Resource:
+    type: "object"
+    properties:
+      ID:
+        type: "string"
+        description: "Resource ID"
+  Resources:
+    type: "object"
+    properties:
+      Results:
+        type: "array"
+        items:
+          $ref: "#/definitions/Resource"
   Tag:
     type: "object"
     properties:
@@ -127,23 +152,10 @@ definitions:
     properties:
       RelationID:
         type: "string"
-        description: "ID of entity on which to join the tag, entity doesn't have to exist in DB"
+        description: "ID of resource on which to join the tag, resource doesn't have to exist in DB"
       Name:
         type: "string"
         description: "The tag name"
-  Entity:
-    type: "object"
-    properties:
-      ID:
-        type: "string"
-        description: "Any string will do"
-  Entities:
-    type: "object"
-    properties:
-      Results:
-        type: "array"
-        items:
-          $ref: "#/definitions/Entity"
 externalDocs:
   description: "See the GRPC specs"
   url: "https://github.com/SingularityInteractive/cohesiv/blob/master/cohesiv/cohesiv.proto"

@@ -1,11 +1,72 @@
-# cohesiv
+# Cohesiv
 
-Cohesiv is a multi-tier, microservice architecture built to supplement Gloo's monolith
+Cohesiv is a multi-tier, microservice architecture monorepo built to supplement Gloo's monolith
 with services useful to third-party clients, without modifying Gloo's core codebase.
 
-This is intended to be a sample cloud-native application to showcase the best
-practices in application deployment, products of [Google Cloud](https://cloud.google.com)
-and test new features.
+This is intended to be a cloud-native application, deployed to `AWS` to showcase the best
+practices in application deployment, utilizing a modern stack including `Docker`, `Kubernetes`,
+ `Golang`, and `Node`.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Support](#support)
+- [Contributing](#contributing)
+
+## Installation
+
+- Clone to `$HOME/go/src/github.com/SingularityInteractive/cohesiv`
+- `$ brew install dep`
+- `dep ensure`
+
+*__Note:__ This project must exist in your GOPATH to use vscode language features like intellisense. The path above works with a default Golang setup*
+
+## Usage
+
+To run using docker: `docker-compose up --build --abort-on-container-exit`
+
+To run directly: `sh up.sh`
+
+## Support
+
+Please [open an issue](https://github.com/SingularityInteractive/base/issues/new) for feature tracking or support.
+
+## Contributing
+
+ 1. Branch off develop, adding issue number in the branch name
+
+ ![branch](https://s3.amazonaws.com/uploads.intercomcdn.com/i/o/14743103/6b8e946debf9f16748e76893/git-checkout-1.png)
+
+ 2. Push it to your remote
+
+  ![push](https://s3.amazonaws.com/uploads.intercomcdn.com/i/o/14743104/7b7e5017ae107b9a2da384d5/git-push-1.png)
+
+ 3. Add commits
+ 4. Open a pull request into `develop` with the issue number in the title eg `closes #42`
+
+  ![open a pull request](https://s3.amazonaws.com/uploads.intercomcdn.com/i/o/14743110/69258075509958bac8288799/merge-pr.png)
+ 
+  5. To release to our staging environment, merge `develop` into `staging`, which will trigger a ci deployment.
+  6. To release to production, merge `staging` into `master`. 
+
+  ## Locations to Change Product Name
+
+  ```json
+{
+    "package.json" : "No brainer here",
+    "docker-compose.yml" : "Mainly for console log differentiation purposes here",
+    "client/package.json": "Just to keep consistent with the root package.json",
+    ".env" : "The postgres connection url env var is set to use 'base'",
+    "kube/**/*.yaml": "The k8s configs apply under the 'base' namespace, so all references should be changed.",
+    "Makefile": "Change the CONTAINER_NAME variable for the AWS ECR image, and PUBLIC_URL so that it accurately reflects the host"
+}
+```
+
+# cohesiv
+
+
+
 
 Cohesiv is written in [Go](https://golang.org), but can host services in any language with docker, 
 uses [gRPC](https://grpc.io) for communication between microservices. It runs on [Google

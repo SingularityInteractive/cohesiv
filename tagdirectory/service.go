@@ -13,10 +13,10 @@ type service struct {
 	db *gorm.DB
 }
 
-// tag as represented in datastore
+// Tag as represented in datastore
 type tag struct {
-	Name      string   `gorm:"primary_key"`
-	Entities  []entity `gorm:"many2many:tag_entities;"`
+	Name      string     `gorm:"primary_key"`
+	Resources []resource `gorm:"many2many:tag_entities;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
@@ -28,26 +28,27 @@ func (t *tag) toProto() *pb.Tag {
 	}
 }
 
-type entity struct {
+// Resource as represented in datastore
+type resource struct {
 	ID   string `gorm:"primary_key"`
 	Tags []tag  `gorm:"many2many:tag_entities;"`
 }
 
-func (e *entity) toProto() *pb.Entity {
-	return &pb.Entity{
+func (e *resource) toProto() *pb.Resource {
+	return &pb.Resource{
 		ID: e.ID,
 	}
 }
 
 func (s *service) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.Tags, error) {
-	e := log.WithField("q.relationID", req.GetRelationID())
+	e := log.WithField("q.resourceID", req.GetResourceID())
 	e.Debug("querying tags")
 
-	var entity entity
+	var resource resource
 	var tags []tag
-	entity.ID = req.GetRelationID()
+	resource.ID = req.GetResourceID()
 
-	s.db.Model(&entity).Related(&tags, "Tags")
+	s.db.Model(&resource).Related(&tags, "Tags")
 	errs := s.db.GetErrors()
 	if len(errs) > 0 {
 		e.Error(errs)
@@ -75,12 +76,12 @@ func (s *service) CreateTags(ctx context.Context, req *pb.CreateTagsRequest) (*p
 		var tagModel tag
 		s.db.Where(tag{Name: t.GetName()}).FirstOrCreate(&tagModel)
 
-		// Find or create entity
-		var relationModel entity
-		s.db.Where(entity{ID: t.GetRelationID()}).FirstOrCreate(&relationModel)
+		// Find or create resource
+		var relationModel resource
+		s.db.Where(resource{ID: t.GetResourceID()}).FirstOrCreate(&relationModel)
 
 		// Join the two
-		s.db.Model(&tagModel).Association("Entities").Append(&relationModel)
+		s.db.Model(&tagModel).Association("Resources").Append(&relationModel)
 
 		// Fill response
 		response.Results[i] = tagModel.toProto()
@@ -93,26 +94,26 @@ func (s *service) CreateTags(ctx context.Context, req *pb.CreateTagsRequest) (*p
 	return response, nil
 }
 
-func (s *service) GetEntitiesByTagName(ctx context.Context, req *pb.GetEntitiesByTagNameRequest) (*pb.Entities, error) {
+func (s *service) GetResourcesByTagName(ctx context.Context, req *pb.GetResourcesByTagNameRequest) (*pb.Resources, error) {
 
-	e := log.WithField("q.relationID", req.GetName())
+	e := log.WithField("q.tagName", req.GetName())
 	e.Debug("querying tags")
 
 	tag := &tag{Name: req.GetName()}
-	var entities []entity
+	var resources []resource
 
-	s.db.First(tag).Related(&entities, "Entities")
+	s.db.First(tag).Related(&resources, "Resources")
 	errs := s.db.GetErrors()
 	if len(errs) > 0 {
 		e.Error(errs)
 		return nil, errors.Wrap(errs[0], "error retrieving tags")
 	}
-	response := &pb.Entities{
-		Results: make([]*pb.Entity, len(entities)),
+	response := &pb.Resources{
+		Results: make([]*pb.Resource, len(resources)),
 	}
-	for i, e := range entities {
+	for i, e := range resources {
 		response.Results[i] = e.toProto()
 	}
-	e.WithField("count", len(entities)).Debug("results retrieved")
+	e.WithField("count", len(resources)).Debug("results retrieved")
 	return response, nil
 }
