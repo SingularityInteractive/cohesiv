@@ -11,6 +11,7 @@ practices in application deployment, utilizing a modern stack including `Docker`
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Updating GRPC Spec](#updating-proto)
 - [Support](#support)
 - [Contributing](#contributing)
 - [Deploying](#Deploying)
@@ -28,6 +29,19 @@ practices in application deployment, utilizing a modern stack including `Docker`
 To run using docker: `docker-compose up --build --abort-on-container-exit`
 
 To run directly: `sh up.sh`
+
+## Updating GRPC Spec
+
+- Learn about [GRPC](https://grpc.io/)
+- Grab the protoc binary from [here](https://github.com/golang/protobuf), and put it in your $PATH
+- Get the `ts-protoc-gen` typescript generator with `npm install -g ts-protoc-gen`
+- Modify `cohesiv/cohesiv.proto`, and update existing code if necessary.
+- To compile new Go or Typescript code from the proto spec, run:
+
+  # Go types and interfaces
+  protoc -I cohesiv/ cohesiv/cohesiv.proto --go_out=plugins=grpc:cohesiv
+  # TS defintitions and modules
+  protoc --plugin=protoc-gen-ts=$(which protoc-gen-ts) --js_out=import_style=commonjs,binary:cohesiv --ts_out=service=true:cohesiv -I cohesiv/ cohesiv/cohesiv.proto
 
 ## Support
 
@@ -61,6 +75,6 @@ issue](https://github.com/SingularityInteractive/cohesiv/issues/new).
 
 1. [Requirements](docs/requirements.md)
 1. [Set up service credentials](docs/set-up-service-credentials.md)
-1. [Set up storage](docs/set-up-storage.md)
 1. [Set up a Kubernetes cluster on AWS using KOPS](docs/set-up-cluster.md)
+1. [Set up storage](docs/set-up-storage.md)
 1. [Set up continuous deployment on CircleCI](docs/set-up-continuous-build.md)
