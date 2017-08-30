@@ -3,7 +3,7 @@ BINARIES=api tagdirectory
 
 SHELL=/usr/bin/env bash
 
-docker-images: binaries
+docker-images:
 	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
 	  docker build -f=Dockerfile.$$b -t singularity/cohesiv/$$b --rm=false . ;\
 		docker tag singularity/cohesiv/$$b ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
@@ -37,11 +37,15 @@ set-ip:
   else \
   	@echo "Got IP address of ${IP_ADDRESS}" ;\
   fi
-authorize-stage-circle-ip: set-ip
+authorize-staging-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-deauthorize-stage-circle-ip: set-ip
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
+deauthorize-staging-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
 authorize-master-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
 deauthorize-master-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32

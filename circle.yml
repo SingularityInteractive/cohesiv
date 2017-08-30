@@ -26,9 +26,7 @@ dependencies:
 
 compile:
   override:
-    - cd $BUILD_PATH && make docker-images
-  post:
-    - docker images
+    - cd $BUILD_PATH && make binaries
 
 test:
   override:
@@ -38,6 +36,7 @@ deployment:
   # production:
   #   branch: master
   #   commands:
+  #     - cd $BUILD_PATH && make docker-images
   #     - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
   #     - make docker-push-ecr
   #     - kops get cluster --name=cohesiv.io
@@ -50,6 +49,7 @@ deployment:
   staging:
     branch: staging
     commands:
+      - cd $BUILD_PATH && make docker-images
       - eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
       - make docker-push-ecr
       - kops get cluster --name=staging.cohesiv.io
