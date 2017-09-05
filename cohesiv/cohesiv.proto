@@ -1,40 +1,90 @@
 syntax = "proto3";
 
+package cohesiv;
+
+// Begin Namespace Messages
+message Namespace {
+    string name = 1;
+}
+// End Namespace Messages
+
+// Begin Resource Messages
 message Resource {
-    string ID = 1;
+    string id = 1;
+    string namespace = 2;
 }
 
 message Resources {
-    repeated Resource Results = 1;
+    repeated Resource results = 1;
 }
+// End Resource Messages
 
+
+
+// Begin Access Service 
+service Access {
+    rpc Evaluate(AccessRequest) returns (AccessResponse) {}
+    rpc EvaluateMany(ManyAccessRequest) returns (AccessResponse) {}
+}
+// End Access Service
+
+// Begin Access Messages
+message AccessRequest {
+    string namespace = 1;
+    string user_id = 2;
+    ResourceAction action = 3;
+}
+message ManyAccessRequest {
+    string namespace = 1;
+    string user_id = 2;
+    repeated ResourceAction actions = 3;
+}
+message ResourceAction {
+    string action = 3;
+    string resource = 4;
+}
+message AccessResponse {
+    bool valid = 1;
+}
+// End Access Messages
+
+
+
+// Begin Tag Directory 
 service TagDirectory {
     rpc GetTags(GetTagsRequest) returns(Tags) {}
     rpc CreateTags(CreateTagsRequest) returns(Tags) {}
     rpc GetResourcesByTagName(GetResourcesByTagNameRequest) returns(Resources) {}
 }
+// End Tag Directory 
 
+// Begin Tag Messages
 message Tag {
-    string Name = 2;
+    string name = 1;
+    string namespace = 2;
 }
 
 message Tags {
-    repeated Tag Results = 1;
+    repeated Tag results = 1;
 }
 
 message GetTagsRequest {
-    string ResourceID = 1;
+    string resource_id = 1;
+    string namespace = 2;
 }
 
 message GetResourcesByTagNameRequest {
-    string Name = 1;
+    string name = 1;
+    string namespace = 2;
 }
 
 message CreateTagRequest {
-    string ResourceID = 1;
-    string Name = 2;
+    string resource_id = 1;
+    string name = 2;
+    string namespace = 3;
 }
 
 message CreateTagsRequest {
-    repeated CreateTagRequest Tags = 1;
+    repeated CreateTagRequest tags = 1;
 }
+// End Tag Messages

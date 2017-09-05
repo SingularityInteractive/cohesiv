@@ -3,3 +3,35 @@ gopath
 Gopkg.lock
 vendor
 kube/secrets/**/*
+
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.swp
+
+pids
+logs
+results
+tmp
+
+# API keys and secrets
+**/.env
+
+# Dependency directory
+**/node_modules
+
+# Editors
+.idea
+*.iml
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Ignore built ts files
+**/dist/**/*

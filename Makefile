@@ -1,5 +1,5 @@
 BIN_DIR=./gopath/bin
-BINARIES=api tagdirectory
+BINARIES=api tagdirectory access
 
 SHELL=/usr/bin/env bash
 

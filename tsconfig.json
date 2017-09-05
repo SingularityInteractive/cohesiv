@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["access/node_modules/*", "access/src/types/*", "cohesiv/*"]
+    }
+  },
+  "include": ["access/src/**/*", "cohesiv/*"]
+}

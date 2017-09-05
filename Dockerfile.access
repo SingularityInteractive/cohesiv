@@ -1,0 +1,17 @@
+FROM mhart/alpine-node:8
+## git is temporary until react-native-web gets its shit together
+RUN apk add --update git && rm -rf /var/cache/apk/*
+# create app directory in container
+RUN mkdir -p /access/dist
+# set /app directory as default working directory
+WORKDIR /access
+# only copy package.json initially so that `RUN yarn` layer is recreated only
+# if there are changes in package.json
+ADD access/package.json access/yarn.lock cohesiv/cohesiv.proto /access/
+# --pure-lockfile: Don’t generate a yarn.lock lockfile
+RUN yarn --pure-lockfile --production
+# copy build from build stage to /app in container
+COPY ./access/dist ./server/dist
+ENV PROTO_PATH cohesiv.proto
+EXPOSE 8002
+CMD ["node", "dist/access/src/index.js"]

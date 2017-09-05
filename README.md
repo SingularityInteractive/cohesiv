@@ -34,14 +34,21 @@ To run directly: `sh up.sh`
 
 - Learn about [GRPC](https://grpc.io/)
 - Grab the protoc binary from [here](https://github.com/golang/protobuf), and put it in your $PATH
-- Get the `ts-protoc-gen` typescript generator with `npm install -g ts-protoc-gen`
 - Modify `cohesiv/cohesiv.proto`, and update existing code if necessary.
-- To compile new Go or Typescript code from the proto spec, run:
+- To compile new Go interfaces or Typescript definitions from the proto spec, run:
 
+```
+  sh gen-protos.sh
+```
+
+or
+
+```bash
   # Go types and interfaces
   protoc -I cohesiv/ cohesiv/cohesiv.proto --go_out=plugins=grpc:cohesiv
   # TS defintitions and modules
-  protoc --plugin=protoc-gen-ts=$(which protoc-gen-ts) --js_out=import_style=commonjs,binary:cohesiv --ts_out=service=true:cohesiv -I cohesiv/ cohesiv/cohesiv.proto
+  protoc --plugin=protoc-gen-ts=node_modules/protoc-gen-ts/bin/protoc-gen-ts --ts_out=service=true:cohesiv -I cohesiv/ cohesiv/cohesiv.proto
+```
 
 ## Support
 

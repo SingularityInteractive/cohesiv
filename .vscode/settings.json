@@ -1,4 +1,8 @@
 {
+  "typescript.referencesCodeLens.enabled": true,
+  "tslint.ignoreDefinitionFiles": false,
+  "tslint.autoFixOnSave": true,
+  "tslint.exclude": "**/node_modules/**/*",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": true,
@@ -11,7 +15,9 @@
   "prettier.trailingComma": "none",
   "prettier.semi": false,
   "search.exclude": {
+    "node_modules": true,
     "**/node_modules": true,
-    "vendor/**": true
+    "vendor/**": true,
+    "**/dist": true
   }
 }
