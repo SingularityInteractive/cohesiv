@@ -11,7 +11,7 @@ ADD access/package.json access/yarn.lock cohesiv/cohesiv.proto /access/
 # --pure-lockfile: Don’t generate a yarn.lock lockfile
 RUN yarn --pure-lockfile --production
 # copy build from build stage to /app in container
-COPY ./access/dist ./server/dist
+COPY ./access/dist /access/dist
 ENV PROTO_PATH cohesiv.proto
 EXPOSE 8002
-CMD ["node", "dist/access/src/index.js"]
+CMD ["yarn", "serve"]
