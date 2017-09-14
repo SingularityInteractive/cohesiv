@@ -11,7 +11,7 @@ import (
 func (s *server) GetTags(c echo.Context) error {
 	ctx := c.Request().Context()
 	resourceID := c.Param("resourceID")
-	if relationID == "" {
+	if resourceID == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Bad Relation ID")
 	}
 
