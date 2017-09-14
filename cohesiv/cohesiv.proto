@@ -46,6 +46,12 @@ message ResourceAction {
 message AccessResponse {
     bool valid = 1;
 }
+message AccessStatement {
+    string Sid = 1;
+    string Effect = 2;
+    repeated string Action = 3;
+    repeated string Resource = 4;
+}
 // End Access Messages
 
 

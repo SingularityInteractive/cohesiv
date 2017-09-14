@@ -16,12 +16,14 @@
     ]
   },
   "devDependencies": {
+    "@types/sequelize": "^4.0.73",
     "husky": "^0.14.3",
     "lint-staged": "^4.0.4",
-    "prettier": "^1.6.1",
-    "rxjs-grpc": "^0.1.4"
+    "prettier": "^1.6.1"
   },
   "dependencies": {
+    "pg": "^7.3.0",
+    "rxjs-grpc": "^0.1.4",
     "sequelize": "^4.8.0",
     "sequelize-cli": "^2.8.0"
   }

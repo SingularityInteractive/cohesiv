@@ -3,6 +3,7 @@ gopath
 Gopkg.lock
 vendor
 kube/secrets/**/*
+postgres-data
 
 lib-cov
 *.seed

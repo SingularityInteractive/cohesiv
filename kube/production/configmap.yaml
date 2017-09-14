@@ -5,3 +5,4 @@ metadata:
   namespace: cohesiv
 data:
   hosts.tagdirectory: tagdirectory.cohesiv:80
+  hosts.access: access.cohesiv:80

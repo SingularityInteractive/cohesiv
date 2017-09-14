@@ -1,9 +1,8 @@
 package main
 
 import (
-	"time"
-
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
+	"github.com/SingularityInteractive/cohesiv/cohesiv/models"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -13,40 +12,13 @@ type service struct {
 	db *gorm.DB
 }
 
-// Tag as represented in datastore
-type tag struct {
-	Name      string     `gorm:"primary_key"`
-	Resources []resource `gorm:"many2many:tag_entities;"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time
-}
-
-func (t *tag) toProto() *pb.Tag {
-	return &pb.Tag{
-		Name: t.Name,
-	}
-}
-
-// Resource as represented in datastore
-type resource struct {
-	ID   string `gorm:"primary_key"`
-	Tags []tag  `gorm:"many2many:tag_entities;"`
-}
-
-func (e *resource) toProto() *pb.Resource {
-	return &pb.Resource{
-		ID: e.ID,
-	}
-}
-
 func (s *service) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.Tags, error) {
-	e := log.WithField("q.resourceID", req.GetResourceID())
+	e := log.WithField("q.resourceID", req.GetResourceId())
 	e.Debug("querying tags")
 
-	var resource resource
-	var tags []tag
-	resource.ID = req.GetResourceID()
+	var resource models.ResourceModel
+	var tags []models.TagModel
+	resource.ID = req.GetResourceId()
 
 	s.db.Model(&resource).Related(&tags, "Tags")
 	errs := s.db.GetErrors()
@@ -58,7 +30,7 @@ func (s *service) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.Tags
 		Results: make([]*pb.Tag, len(tags)),
 	}
 	for i, t := range tags {
-		response.Results[i] = t.toProto()
+		response.Results[i] = t.ToProto()
 	}
 	e.WithField("count", len(tags)).Debug("results retrieved")
 	return response, nil
@@ -73,18 +45,18 @@ func (s *service) CreateTags(ctx context.Context, req *pb.CreateTagsRequest) (*p
 	}
 	for i, t := range req.GetTags() {
 		// Find or create tag
-		var tagModel tag
-		s.db.Where(tag{Name: t.GetName()}).FirstOrCreate(&tagModel)
+		var tagModel models.TagModel
+		s.db.Where(models.TagModel{Name: t.GetName()}).FirstOrCreate(&tagModel)
 
 		// Find or create resource
-		var relationModel resource
-		s.db.Where(resource{ID: t.GetResourceID()}).FirstOrCreate(&relationModel)
+		var relationModel models.ResourceModel
+		s.db.Where(models.ResourceModel{ID: t.GetResourceId()}).FirstOrCreate(&relationModel)
 
 		// Join the two
 		s.db.Model(&tagModel).Association("Resources").Append(&relationModel)
 
 		// Fill response
-		response.Results[i] = tagModel.toProto()
+		response.Results[i] = tagModel.ToProto()
 	}
 	errs := s.db.GetErrors()
 	if len(errs) > 0 {
@@ -99,8 +71,8 @@ func (s *service) GetResourcesByTagName(ctx context.Context, req *pb.GetResource
 	e := log.WithField("q.tagName", req.GetName())
 	e.Debug("querying tags")
 
-	tag := &tag{Name: req.GetName()}
-	var resources []resource
+	tag := &models.TagModel{Name: req.GetName()}
+	var resources []models.ResourceModel
 
 	s.db.First(tag).Related(&resources, "Resources")
 	errs := s.db.GetErrors()
@@ -112,7 +84,7 @@ func (s *service) GetResourcesByTagName(ctx context.Context, req *pb.GetResource
 		Results: make([]*pb.Resource, len(resources)),
 	}
 	for i, e := range resources {
-		response.Results[i] = e.toProto()
+		response.Results[i] = e.ToProto()
 	}
 	e.WithField("count", len(resources)).Debug("results retrieved")
 	return response, nil

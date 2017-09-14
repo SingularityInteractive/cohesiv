@@ -11,11 +11,11 @@ import (
 func (s *server) GetTags(c echo.Context) error {
 	ctx := c.Request().Context()
 	resourceID := c.Param("resourceID")
-	if relationID == "" {
+	if resourceID == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Bad Relation ID")
 	}
 
-	tags, err := s.tagSvc.GetTags(ctx, &pb.GetTagsRequest{ResourceID: resourceID})
+	tags, err := s.tagSvc.GetTags(ctx, &pb.GetTagsRequest{ResourceId: resourceID})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Wrap(err, "Failed to get tags").Error())
 	}

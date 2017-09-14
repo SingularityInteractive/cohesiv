@@ -195,6 +195,37 @@ export namespace cohesiv {
   }
 
   /**
+     * Constructs a new AccessStatement.
+     * @exports cohesiv.AccessStatement
+     * @interface
+     */
+  export interface AccessStatement {
+    /**
+         * AccessStatement Sid.
+         * @type {string|undefined}
+         */
+    Sid?: string
+
+    /**
+         * AccessStatement Effect.
+         * @type {string|undefined}
+         */
+    Effect?: string
+
+    /**
+         * AccessStatement Action.
+         * @type {Array.<string>|undefined}
+         */
+    Action?: string[]
+
+    /**
+         * AccessStatement Resource.
+         * @type {Array.<string>|undefined}
+         */
+    Resource?: string[]
+  }
+
+  /**
      * Constructs a new TagDirectory service.
      * @exports cohesiv.TagDirectory
      * @interface

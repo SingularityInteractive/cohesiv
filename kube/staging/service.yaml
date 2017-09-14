@@ -13,7 +13,6 @@ spec:
     port: 80
     targetPort: 8080
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,3 +26,17 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: access
+  namespace: cohesiv
+spec:
+  type: ClusterIP
+  selector:
+    app: access
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8002

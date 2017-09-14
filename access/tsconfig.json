@@ -9,8 +9,8 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*", "src/types/*", "../cohesiv/*"]
+      "*": ["node_modules", "../cohesiv/*"]
     }
   },
-  "include": ["src/**/*", "../cohesiv/*"]
+  "include": ["src/**/*", "../cohesiv/**/*", "../cohesiv/models/*"]
 }

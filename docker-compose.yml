@@ -6,9 +6,11 @@ services:
     # Map to non default port as to not conflict with host postgres
     ports:
       - 5433:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: "password"
-      POSTGRES_DB: "base"
+      POSTGRES_DB: "cohesiv"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 30s
@@ -47,7 +49,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/base?sslmode=disable
+      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/cohesiv?sslmode=disable
     entrypoint:
       - ./tagdirectory
       - --addr=:8001
@@ -69,7 +71,7 @@ services:
       - "8002:8002"
     environment:
       NODE_ENV: development
-      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/base?sslmode=disable
+      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/cohesiv?sslmode=disable
     # Link to containers in another service.
     # Links also express dependency between services in the same way as depends_on,
     # so they determine the order of service startup.

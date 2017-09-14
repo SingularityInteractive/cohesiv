@@ -21,14 +21,13 @@ practices in application deployment, utilizing a modern stack including `Docker`
 - Clone into `$HOME/go/src/github.com/SingularityInteractive/cohesiv`
 - `$ brew install dep`
 - `dep ensure`
+- `yarn`
 
 *__Note:__ This project must exist in your GOPATH to use vscode language features like intellisense. The path above works with a default Golang setup*
 
 ## Usage
 
-To run using docker: `docker-compose up --build --abort-on-container-exit`
-
-To run directly: `sh up.sh`
+To build all Go and Typescript services, then docker-compose, run: `sh up.sh`
 
 ## Updating GRPC Spec
 
@@ -47,7 +46,7 @@ or
   # Go types and interfaces
   protoc -I cohesiv/ cohesiv/cohesiv.proto --go_out=plugins=grpc:cohesiv
   # TS defintitions and modules
-  protoc --plugin=protoc-gen-ts=node_modules/protoc-gen-ts/bin/protoc-gen-ts --ts_out=service=true:cohesiv -I cohesiv/ cohesiv/cohesiv.proto
+  ./node_modules/.bin/rxjs-grpc -o cohesiv/cohesiv.ts cohesiv/*.proto
 ```
 
 ## Support

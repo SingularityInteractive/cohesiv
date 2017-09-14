@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/observable/of'
+import AccessStatement from '../../cohesiv/models/access_statement'
 import * as PBAC from 'pbac'
 import { cohesiv as pb } from '../../cohesiv/cohesiv'
 import log from './log'
@@ -83,51 +82,64 @@ const policiesByUserID: { [namespace: string]: Policy } = {
   }
 }
 
-export default class Access implements pb.Access {
+declare interface EvaluateCall {
+  request: pb.AccessRequest
+}
+
+declare interface EvaluateManyCall {
+  request: pb.ManyAccessRequest
+}
+
+export default class Access {
   protected static ValidateAction(policies: Policy[], action: any): boolean {
     return new PBAC(policies).evaluate(action)
   }
-  public evaluate(request: pb.AccessRequest): Observable<pb.AccessResponse> {
+  public evaluate(call: EvaluateCall, callback: (err: Error, res: pb.AccessResponse) => void) {
     const policies: Policy[] = [policiesByNamespace.default]
-    if (policiesByNamespace[request.namespace])
-      policies.push(policiesByNamespace[request.namespace])
-    if (policiesByUserID[request.user_id]) policies.push(policiesByUserID[request.user_id])
+    if (policiesByNamespace[call.request.namespace])
+      policies.push(policiesByNamespace[call.request.namespace])
+    if (policiesByUserID[call.request.user_id])
+      policies.push(policiesByUserID[call.request.user_id])
     const action: Action = {
-      action: request.action.action,
-      resource: request.action.resource,
+      action: call.request.action.action,
+      resource: call.request.action.resource,
       variables: {
         req: {
-          Namespace: request.namespace,
-          UserID: request.user_id
+          Namespace: call.request.namespace,
+          UserID: call.request.user_id
         }
       }
     }
-    return Observable.of({
+    callback(undefined, {
       valid: Access.ValidateAction(policies, action)
     })
   }
 
-  public evaluateMany(request: pb.ManyAccessRequest): Observable<pb.AccessResponse> {
-    const valid = request.actions
+  public evaluateMany(
+    call: EvaluateManyCall,
+    callback: (err: Error, res: pb.AccessResponse) => void
+  ) {
+    const valid = call.request.actions
       .map((resourceAction: pb.ResourceAction) => {
         const policies: Policy[] = [policiesByNamespace.default]
-        if (policiesByNamespace[request.namespace])
-          policies.push(policiesByNamespace[request.namespace])
-        if (policiesByUserID[request.user_id]) policies.push(policiesByUserID[request.user_id])
+        if (policiesByNamespace[call.request.namespace])
+          policies.push(policiesByNamespace[call.request.namespace])
+        if (policiesByUserID[call.request.user_id])
+          policies.push(policiesByUserID[call.request.user_id])
         const action: Action = {
           action: resourceAction.action,
           resource: resourceAction.resource,
           variables: {
             req: {
-              Namespace: request.namespace,
-              UserID: request.user_id
+              Namespace: call.request.namespace,
+              UserID: call.request.user_id
             }
           }
         }
         return Access.ValidateAction(policies, action)
       })
       .every(Boolean)
-    return Observable.of({
+    return callback(undefined, {
       valid
     })
   }

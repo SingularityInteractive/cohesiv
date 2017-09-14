@@ -1,13 +1,19 @@
 BIN_DIR=./gopath/bin
-BINARIES=api tagdirectory access
+BINARIES=api tagdirectory
+TS=access
+IMAGES=api tagdirectory access
 
 SHELL=/usr/bin/env bash
 
 docker-images:
-	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
+	BINS=(${IMAGES}); for b in $${BINS[*]}; do \
 	  docker build -f=Dockerfile.$$b -t singularity/cohesiv/$$b --rm=false . ;\
 		docker tag singularity/cohesiv/$$b ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
 		docker tag singularity/cohesiv/$$b ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
+	done
+tsc:
+	BINS=(${TS}); for b in $${BINS[*]}; do \
+	  cd `pwd`/$$b && yarn build ;\
 	done
 binaries:
 	if [ -z "$$GOPATH" ]; then echo "GOPATH is not set"; exit 1; fi

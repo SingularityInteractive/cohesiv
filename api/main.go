@@ -32,6 +32,7 @@ import (
 var (
 	addr                = flag.String("addr", ":8000", "[host]:port to listen")
 	tagDirectoryBackend = flag.String("tag-directory-addr", "", "address of tag directory backend")
+	accessBackend       = flag.String("access-addr", "", "address of access service")
 	secretAuthJWT       string
 )
 
@@ -61,9 +62,20 @@ func main() {
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "cannot connect tag service"))
 	}
+	if *accessBackend == "" {
+		log.Fatal("tag directory address flag not specified")
+	}
+	accessSvcConn, err := grpc.Dial(*accessBackend,
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "cannot connect access service"))
+	}
 	defer func() {
-		log.Info("closing connection to user directory")
+		log.Info("closing connection to tag directory")
 		tagSvcConn.Close()
+		log.Info("closing connection to access directory")
+		accessSvcConn.Close()
 	}()
 
 	secretAuthJWT = os.Getenv("SECRET_AUTH_JWT")
@@ -76,7 +88,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	s := &server{
-		tagSvc: pb.NewTagDirectoryClient(tagSvcConn),
+		tagSvc:    pb.NewTagDirectoryClient(tagSvcConn),
+		accessSvc: pb.NewAccessClient(accessSvcConn),
 	}
 
 	s.Route(e)
