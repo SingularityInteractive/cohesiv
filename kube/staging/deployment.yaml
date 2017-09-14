@@ -25,6 +25,7 @@ spec:
         args:
         - "-addr=:8080"
         - "-tag-directory-addr=$(TAG_SVC_ADDR)"
+        - "-access-addr=$(ACCESS_SVC_ADDR)"
         env:
         - name: SECRET_AUTH_JWT
           value: fgL8y7-ABYLZyudHBxwUXQaNsNdzJtfYjsUw_cBefJQj8s8G9s1ZWJDmNmmgG1qy
@@ -33,6 +34,11 @@ spec:
             configMapKeyRef:
               name: cohesiv
               key: hosts.tagdirectory
+        - name: ACCESS_SVC_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: cohesiv
+              key: hosts.access
         resources:
           requests:
             cpu: 100m
@@ -85,3 +91,44 @@ spec:
           initialDelaySeconds: 10
           tcpSocket:
             port: 8001
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: cohesiv
+  name: access-deployment
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 40%
+  template:
+    metadata:
+      labels:
+        app: access
+    spec:
+      containers:
+      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/access:latest"
+        name: access
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8002
+        env:
+        - name: PORT
+          value: '8002'
+        - name: DB_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: cohesiv-secrets
+              key: staging-db-connection-string
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        livenessProbe:
+          initialDelaySeconds: 10
+          tcpSocket:
+            port: 8002

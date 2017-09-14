@@ -10,7 +10,8 @@ import (
 
 type server struct {
 	// userSvc pb.UserDirectoryClient
-	tagSvc pb.TagDirectoryClient
+	tagSvc    pb.TagDirectoryClient
+	accessSvc pb.AccessClient
 }
 
 func (s *server) Route(e *echo.Echo) {

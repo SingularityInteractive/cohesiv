@@ -1,0 +1,30 @@
+{
+  "name": "cohesiv",
+  "version": "1.0.0",
+  "description": "A cloud-native, microservice architecture designed to support client monoliths",
+  "main": "index.js",
+  "repository": "https://github.com/SingularityInteractive/cohesiv.git",
+  "author": "Sam McCord <samuel.e.mccord@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "**/src/**/*.ts": [
+      "prettier --print-width 100 --tab-width 2 --single-quote true --jsx-bracket-same-line true --trailing-comma none --no-semi --write",
+      "git add"
+    ]
+  },
+  "devDependencies": {
+    "@types/sequelize": "^4.0.73",
+    "husky": "^0.14.3",
+    "lint-staged": "^4.0.4",
+    "prettier": "^1.6.1"
+  },
+  "dependencies": {
+    "pg": "^7.3.0",
+    "rxjs-grpc": "^0.1.4",
+    "sequelize": "^4.8.0",
+    "sequelize-cli": "^2.8.0"
+  }
+}

@@ -8,8 +8,14 @@ It is generated from these files:
 	cohesiv.proto
 
 It has these top-level messages:
+	Namespace
 	Resource
 	Resources
+	AccessRequest
+	ManyAccessRequest
+	ResourceAction
+	AccessResponse
+	AccessStatement
 	Tag
 	Tags
 	GetTagsRequest
@@ -39,30 +45,56 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+// Begin Namespace Messages
+type Namespace struct {
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *Namespace) Reset()                    { *m = Namespace{} }
+func (m *Namespace) String() string            { return proto.CompactTextString(m) }
+func (*Namespace) ProtoMessage()               {}
+func (*Namespace) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+func (m *Namespace) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+// Begin Resource Messages
 type Resource struct {
-	ID string `protobuf:"bytes,1,opt,name=ID" json:"ID,omitempty"`
+	Id        string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Namespace string `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
 }
 
 func (m *Resource) Reset()                    { *m = Resource{} }
 func (m *Resource) String() string            { return proto.CompactTextString(m) }
 func (*Resource) ProtoMessage()               {}
-func (*Resource) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Resource) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *Resource) GetID() string {
+func (m *Resource) GetId() string {
 	if m != nil {
-		return m.ID
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Resource) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
 	}
 	return ""
 }
 
 type Resources struct {
-	Results []*Resource `protobuf:"bytes,1,rep,name=Results" json:"Results,omitempty"`
+	Results []*Resource `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
 }
 
 func (m *Resources) Reset()                    { *m = Resources{} }
 func (m *Resources) String() string            { return proto.CompactTextString(m) }
 func (*Resources) ProtoMessage()               {}
-func (*Resources) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*Resources) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *Resources) GetResults() []*Resource {
 	if m != nil {
@@ -71,14 +103,161 @@ func (m *Resources) GetResults() []*Resource {
 	return nil
 }
 
+// Begin Access Messages
+type AccessRequest struct {
+	Namespace string          `protobuf:"bytes,1,opt,name=namespace" json:"namespace,omitempty"`
+	UserId    string          `protobuf:"bytes,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
+	Action    *ResourceAction `protobuf:"bytes,3,opt,name=action" json:"action,omitempty"`
+}
+
+func (m *AccessRequest) Reset()                    { *m = AccessRequest{} }
+func (m *AccessRequest) String() string            { return proto.CompactTextString(m) }
+func (*AccessRequest) ProtoMessage()               {}
+func (*AccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *AccessRequest) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
+func (m *AccessRequest) GetUserId() string {
+	if m != nil {
+		return m.UserId
+	}
+	return ""
+}
+
+func (m *AccessRequest) GetAction() *ResourceAction {
+	if m != nil {
+		return m.Action
+	}
+	return nil
+}
+
+type ManyAccessRequest struct {
+	Namespace string            `protobuf:"bytes,1,opt,name=namespace" json:"namespace,omitempty"`
+	UserId    string            `protobuf:"bytes,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
+	Actions   []*ResourceAction `protobuf:"bytes,3,rep,name=actions" json:"actions,omitempty"`
+}
+
+func (m *ManyAccessRequest) Reset()                    { *m = ManyAccessRequest{} }
+func (m *ManyAccessRequest) String() string            { return proto.CompactTextString(m) }
+func (*ManyAccessRequest) ProtoMessage()               {}
+func (*ManyAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *ManyAccessRequest) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
+func (m *ManyAccessRequest) GetUserId() string {
+	if m != nil {
+		return m.UserId
+	}
+	return ""
+}
+
+func (m *ManyAccessRequest) GetActions() []*ResourceAction {
+	if m != nil {
+		return m.Actions
+	}
+	return nil
+}
+
+type ResourceAction struct {
+	Action   string `protobuf:"bytes,3,opt,name=action" json:"action,omitempty"`
+	Resource string `protobuf:"bytes,4,opt,name=resource" json:"resource,omitempty"`
+}
+
+func (m *ResourceAction) Reset()                    { *m = ResourceAction{} }
+func (m *ResourceAction) String() string            { return proto.CompactTextString(m) }
+func (*ResourceAction) ProtoMessage()               {}
+func (*ResourceAction) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *ResourceAction) GetAction() string {
+	if m != nil {
+		return m.Action
+	}
+	return ""
+}
+
+func (m *ResourceAction) GetResource() string {
+	if m != nil {
+		return m.Resource
+	}
+	return ""
+}
+
+type AccessResponse struct {
+	Valid bool `protobuf:"varint,1,opt,name=valid" json:"valid,omitempty"`
+}
+
+func (m *AccessResponse) Reset()                    { *m = AccessResponse{} }
+func (m *AccessResponse) String() string            { return proto.CompactTextString(m) }
+func (*AccessResponse) ProtoMessage()               {}
+func (*AccessResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+func (m *AccessResponse) GetValid() bool {
+	if m != nil {
+		return m.Valid
+	}
+	return false
+}
+
+type AccessStatement struct {
+	Sid      string   `protobuf:"bytes,1,opt,name=Sid" json:"Sid,omitempty"`
+	Effect   string   `protobuf:"bytes,2,opt,name=Effect" json:"Effect,omitempty"`
+	Action   []string `protobuf:"bytes,3,rep,name=Action" json:"Action,omitempty"`
+	Resource []string `protobuf:"bytes,4,rep,name=Resource" json:"Resource,omitempty"`
+}
+
+func (m *AccessStatement) Reset()                    { *m = AccessStatement{} }
+func (m *AccessStatement) String() string            { return proto.CompactTextString(m) }
+func (*AccessStatement) ProtoMessage()               {}
+func (*AccessStatement) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+func (m *AccessStatement) GetSid() string {
+	if m != nil {
+		return m.Sid
+	}
+	return ""
+}
+
+func (m *AccessStatement) GetEffect() string {
+	if m != nil {
+		return m.Effect
+	}
+	return ""
+}
+
+func (m *AccessStatement) GetAction() []string {
+	if m != nil {
+		return m.Action
+	}
+	return nil
+}
+
+func (m *AccessStatement) GetResource() []string {
+	if m != nil {
+		return m.Resource
+	}
+	return nil
+}
+
+// Begin Tag Messages
 type Tag struct {
-	Name string `protobuf:"bytes,2,opt,name=Name" json:"Name,omitempty"`
+	Name      string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Namespace string `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
 }
 
 func (m *Tag) Reset()                    { *m = Tag{} }
 func (m *Tag) String() string            { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()               {}
-func (*Tag) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*Tag) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *Tag) GetName() string {
 	if m != nil {
@@ -87,14 +266,21 @@ func (m *Tag) GetName() string {
 	return ""
 }
 
+func (m *Tag) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
 type Tags struct {
-	Results []*Tag `protobuf:"bytes,1,rep,name=Results" json:"Results,omitempty"`
+	Results []*Tag `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
 }
 
 func (m *Tags) Reset()                    { *m = Tags{} }
 func (m *Tags) String() string            { return proto.CompactTextString(m) }
 func (*Tags) ProtoMessage()               {}
-func (*Tags) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*Tags) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 func (m *Tags) GetResults() []*Tag {
 	if m != nil {
@@ -104,29 +290,38 @@ func (m *Tags) GetResults() []*Tag {
 }
 
 type GetTagsRequest struct {
-	ResourceID string `protobuf:"bytes,1,opt,name=ResourceID" json:"ResourceID,omitempty"`
+	ResourceId string `protobuf:"bytes,1,opt,name=resource_id,json=resourceId" json:"resource_id,omitempty"`
+	Namespace  string `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
 }
 
 func (m *GetTagsRequest) Reset()                    { *m = GetTagsRequest{} }
 func (m *GetTagsRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetTagsRequest) ProtoMessage()               {}
-func (*GetTagsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*GetTagsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
-func (m *GetTagsRequest) GetResourceID() string {
+func (m *GetTagsRequest) GetResourceId() string {
 	if m != nil {
-		return m.ResourceID
+		return m.ResourceId
+	}
+	return ""
+}
+
+func (m *GetTagsRequest) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
 	}
 	return ""
 }
 
 type GetResourcesByTagNameRequest struct {
-	Name string `protobuf:"bytes,1,opt,name=Name" json:"Name,omitempty"`
+	Name      string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Namespace string `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
 }
 
 func (m *GetResourcesByTagNameRequest) Reset()                    { *m = GetResourcesByTagNameRequest{} }
 func (m *GetResourcesByTagNameRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetResourcesByTagNameRequest) ProtoMessage()               {}
-func (*GetResourcesByTagNameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*GetResourcesByTagNameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
 func (m *GetResourcesByTagNameRequest) GetName() string {
 	if m != nil {
@@ -135,19 +330,27 @@ func (m *GetResourcesByTagNameRequest) GetName() string {
 	return ""
 }
 
+func (m *GetResourcesByTagNameRequest) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
 type CreateTagRequest struct {
-	ResourceID string `protobuf:"bytes,1,opt,name=ResourceID" json:"ResourceID,omitempty"`
-	Name       string `protobuf:"bytes,2,opt,name=Name" json:"Name,omitempty"`
+	ResourceId string `protobuf:"bytes,1,opt,name=resource_id,json=resourceId" json:"resource_id,omitempty"`
+	Name       string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	Namespace  string `protobuf:"bytes,3,opt,name=namespace" json:"namespace,omitempty"`
 }
 
 func (m *CreateTagRequest) Reset()                    { *m = CreateTagRequest{} }
 func (m *CreateTagRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateTagRequest) ProtoMessage()               {}
-func (*CreateTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*CreateTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
-func (m *CreateTagRequest) GetResourceID() string {
+func (m *CreateTagRequest) GetResourceId() string {
 	if m != nil {
-		return m.ResourceID
+		return m.ResourceId
 	}
 	return ""
 }
@@ -159,14 +362,21 @@ func (m *CreateTagRequest) GetName() string {
 	return ""
 }
 
+func (m *CreateTagRequest) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
 type CreateTagsRequest struct {
-	Tags []*CreateTagRequest `protobuf:"bytes,1,rep,name=Tags" json:"Tags,omitempty"`
+	Tags []*CreateTagRequest `protobuf:"bytes,1,rep,name=tags" json:"tags,omitempty"`
 }
 
 func (m *CreateTagsRequest) Reset()                    { *m = CreateTagsRequest{} }
 func (m *CreateTagsRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateTagsRequest) ProtoMessage()               {}
-func (*CreateTagsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*CreateTagsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 func (m *CreateTagsRequest) GetTags() []*CreateTagRequest {
 	if m != nil {
@@ -176,14 +386,20 @@ func (m *CreateTagsRequest) GetTags() []*CreateTagRequest {
 }
 
 func init() {
-	proto.RegisterType((*Resource)(nil), "Resource")
-	proto.RegisterType((*Resources)(nil), "Resources")
-	proto.RegisterType((*Tag)(nil), "Tag")
-	proto.RegisterType((*Tags)(nil), "Tags")
-	proto.RegisterType((*GetTagsRequest)(nil), "GetTagsRequest")
-	proto.RegisterType((*GetResourcesByTagNameRequest)(nil), "GetResourcesByTagNameRequest")
-	proto.RegisterType((*CreateTagRequest)(nil), "CreateTagRequest")
-	proto.RegisterType((*CreateTagsRequest)(nil), "CreateTagsRequest")
+	proto.RegisterType((*Namespace)(nil), "cohesiv.Namespace")
+	proto.RegisterType((*Resource)(nil), "cohesiv.Resource")
+	proto.RegisterType((*Resources)(nil), "cohesiv.Resources")
+	proto.RegisterType((*AccessRequest)(nil), "cohesiv.AccessRequest")
+	proto.RegisterType((*ManyAccessRequest)(nil), "cohesiv.ManyAccessRequest")
+	proto.RegisterType((*ResourceAction)(nil), "cohesiv.ResourceAction")
+	proto.RegisterType((*AccessResponse)(nil), "cohesiv.AccessResponse")
+	proto.RegisterType((*AccessStatement)(nil), "cohesiv.AccessStatement")
+	proto.RegisterType((*Tag)(nil), "cohesiv.Tag")
+	proto.RegisterType((*Tags)(nil), "cohesiv.Tags")
+	proto.RegisterType((*GetTagsRequest)(nil), "cohesiv.GetTagsRequest")
+	proto.RegisterType((*GetResourcesByTagNameRequest)(nil), "cohesiv.GetResourcesByTagNameRequest")
+	proto.RegisterType((*CreateTagRequest)(nil), "cohesiv.CreateTagRequest")
+	proto.RegisterType((*CreateTagsRequest)(nil), "cohesiv.CreateTagsRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -193,6 +409,103 @@ var _ grpc.ClientConn
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
+
+// Client API for Access service
+
+type AccessClient interface {
+	Evaluate(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessResponse, error)
+	EvaluateMany(ctx context.Context, in *ManyAccessRequest, opts ...grpc.CallOption) (*AccessResponse, error)
+}
+
+type accessClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewAccessClient(cc *grpc.ClientConn) AccessClient {
+	return &accessClient{cc}
+}
+
+func (c *accessClient) Evaluate(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessResponse, error) {
+	out := new(AccessResponse)
+	err := grpc.Invoke(ctx, "/cohesiv.Access/Evaluate", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accessClient) EvaluateMany(ctx context.Context, in *ManyAccessRequest, opts ...grpc.CallOption) (*AccessResponse, error) {
+	out := new(AccessResponse)
+	err := grpc.Invoke(ctx, "/cohesiv.Access/EvaluateMany", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for Access service
+
+type AccessServer interface {
+	Evaluate(context.Context, *AccessRequest) (*AccessResponse, error)
+	EvaluateMany(context.Context, *ManyAccessRequest) (*AccessResponse, error)
+}
+
+func RegisterAccessServer(s *grpc.Server, srv AccessServer) {
+	s.RegisterService(&_Access_serviceDesc, srv)
+}
+
+func _Access_Evaluate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccessServer).Evaluate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cohesiv.Access/Evaluate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccessServer).Evaluate(ctx, req.(*AccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Access_EvaluateMany_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManyAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccessServer).EvaluateMany(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cohesiv.Access/EvaluateMany",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccessServer).EvaluateMany(ctx, req.(*ManyAccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Access_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "cohesiv.Access",
+	HandlerType: (*AccessServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Evaluate",
+			Handler:    _Access_Evaluate_Handler,
+		},
+		{
+			MethodName: "EvaluateMany",
+			Handler:    _Access_EvaluateMany_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "cohesiv.proto",
+}
 
 // Client API for TagDirectory service
 
@@ -212,7 +525,7 @@ func NewTagDirectoryClient(cc *grpc.ClientConn) TagDirectoryClient {
 
 func (c *tagDirectoryClient) GetTags(ctx context.Context, in *GetTagsRequest, opts ...grpc.CallOption) (*Tags, error) {
 	out := new(Tags)
-	err := grpc.Invoke(ctx, "/TagDirectory/GetTags", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/cohesiv.TagDirectory/GetTags", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +534,7 @@ func (c *tagDirectoryClient) GetTags(ctx context.Context, in *GetTagsRequest, op
 
 func (c *tagDirectoryClient) CreateTags(ctx context.Context, in *CreateTagsRequest, opts ...grpc.CallOption) (*Tags, error) {
 	out := new(Tags)
-	err := grpc.Invoke(ctx, "/TagDirectory/CreateTags", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/cohesiv.TagDirectory/CreateTags", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +543,7 @@ func (c *tagDirectoryClient) CreateTags(ctx context.Context, in *CreateTagsReque
 
 func (c *tagDirectoryClient) GetResourcesByTagName(ctx context.Context, in *GetResourcesByTagNameRequest, opts ...grpc.CallOption) (*Resources, error) {
 	out := new(Resources)
-	err := grpc.Invoke(ctx, "/TagDirectory/GetResourcesByTagName", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/cohesiv.TagDirectory/GetResourcesByTagName", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +572,7 @@ func _TagDirectory_GetTags_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/TagDirectory/GetTags",
+		FullMethod: "/cohesiv.TagDirectory/GetTags",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TagDirectoryServer).GetTags(ctx, req.(*GetTagsRequest))
@@ -277,7 +590,7 @@ func _TagDirectory_CreateTags_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/TagDirectory/CreateTags",
+		FullMethod: "/cohesiv.TagDirectory/CreateTags",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TagDirectoryServer).CreateTags(ctx, req.(*CreateTagsRequest))
@@ -295,7 +608,7 @@ func _TagDirectory_GetResourcesByTagName_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/TagDirectory/GetResourcesByTagName",
+		FullMethod: "/cohesiv.TagDirectory/GetResourcesByTagName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TagDirectoryServer).GetResourcesByTagName(ctx, req.(*GetResourcesByTagNameRequest))
@@ -304,7 +617,7 @@ func _TagDirectory_GetResourcesByTagName_Handler(srv interface{}, ctx context.Co
 }
 
 var _TagDirectory_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "TagDirectory",
+	ServiceName: "cohesiv.TagDirectory",
 	HandlerType: (*TagDirectoryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -327,24 +640,40 @@ var _TagDirectory_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("cohesiv.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 290 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xd1, 0x4a, 0xfb, 0x30,
-	0x18, 0xc5, 0xd7, 0xae, 0xff, 0xbf, 0xf6, 0x53, 0xa7, 0xfb, 0x40, 0xa8, 0x45, 0xc7, 0x88, 0x28,
-	0xf3, 0x26, 0x8c, 0x7a, 0xe7, 0xa5, 0x16, 0xc7, 0x6e, 0xbc, 0x08, 0x7d, 0x81, 0x58, 0x3e, 0xea,
-	0x40, 0xa9, 0x26, 0xa9, 0xb0, 0xf7, 0xf1, 0x41, 0x25, 0x75, 0x49, 0xe7, 0x1c, 0xe2, 0x5d, 0xe9,
-	0x49, 0xcf, 0xef, 0x9c, 0xd3, 0xc0, 0x41, 0x59, 0x3f, 0x91, 0x5e, 0xbc, 0xf3, 0x57, 0x55, 0x9b,
-	0x9a, 0xa5, 0xb0, 0x2b, 0x48, 0xd7, 0x8d, 0x2a, 0x09, 0x07, 0x10, 0xce, 0xf3, 0x24, 0x18, 0x07,
-	0x93, 0x58, 0x84, 0xf3, 0x9c, 0x4d, 0x21, 0x76, 0x9a, 0xc6, 0x73, 0xd8, 0x11, 0xa4, 0x9b, 0x67,
-	0xa3, 0x93, 0x60, 0xdc, 0x9f, 0xec, 0x65, 0x31, 0x77, 0xa2, 0x70, 0x0a, 0x3b, 0x81, 0x7e, 0x21,
-	0x2b, 0x44, 0x88, 0x1e, 0xe4, 0x0b, 0x25, 0x61, 0x6b, 0xd5, 0x3e, 0xb3, 0x4b, 0x88, 0x0a, 0x59,
-	0x69, 0x1c, 0x6d, 0xfa, 0x44, 0xbc, 0x90, 0x55, 0x67, 0x31, 0x85, 0xc1, 0x8c, 0x8c, 0x3d, 0x2a,
-	0xe8, 0xad, 0x21, 0x6d, 0x70, 0x04, 0xe0, 0x48, 0x3e, 0xde, 0xda, 0x1b, 0x96, 0xc1, 0xe9, 0x8c,
-	0x8c, 0x4f, 0x7a, 0xbb, 0x2c, 0x64, 0x65, 0x91, 0xee, 0x7b, 0x97, 0x26, 0x58, 0x4b, 0x73, 0x0f,
-	0x47, 0x77, 0x8a, 0xa4, 0x21, 0xcb, 0xfe, 0x1b, 0x67, 0x6b, 0xab, 0x1b, 0x18, 0x7a, 0x1f, 0x1f,
-	0xf8, 0xe2, 0xab, 0xea, 0xaa, 0xdf, 0x90, 0x6f, 0x92, 0x44, 0x2b, 0x67, 0x1f, 0x01, 0xec, 0x17,
-	0xb2, 0xca, 0x17, 0x8a, 0x4a, 0x53, 0xab, 0xa5, 0x9d, 0x78, 0x55, 0x1d, 0x0f, 0xf9, 0xf7, 0x11,
-	0xd2, 0x7f, 0x76, 0x25, 0xcd, 0x7a, 0x78, 0x05, 0xd0, 0x11, 0x11, 0xf9, 0x0f, 0x7c, 0x77, 0x34,
-	0x87, 0xe3, 0xad, 0xc3, 0xe0, 0x19, 0xff, 0x6d, 0xb0, 0x14, 0xfc, 0x9f, 0xd5, 0xac, 0xf7, 0xf8,
-	0xbf, 0xbd, 0x28, 0xd7, 0x9f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x33, 0x5d, 0x90, 0xd7, 0x39, 0x02,
-	0x00, 0x00,
+	// 550 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4b, 0x6f, 0xd3, 0x40,
+	0x10, 0xae, 0xe3, 0x90, 0xc7, 0xe4, 0x41, 0x33, 0x82, 0xc6, 0x44, 0x95, 0x1a, 0xad, 0x44, 0x15,
+	0x09, 0x11, 0x44, 0x7a, 0xa0, 0x1c, 0x38, 0xa4, 0x34, 0xaa, 0x7a, 0xe0, 0x21, 0xd7, 0xf7, 0x6a,
+	0x71, 0xa6, 0xc6, 0x52, 0x62, 0x07, 0xef, 0x26, 0x28, 0x07, 0xfe, 0x02, 0xbf, 0x8e, 0x1f, 0x84,
+	0xd6, 0xf1, 0x6e, 0x1e, 0x6e, 0x28, 0x48, 0xdc, 0x3c, 0xaf, 0xfd, 0xbe, 0x99, 0xf9, 0xc6, 0xd0,
+	0xf0, 0xe3, 0xaf, 0x24, 0xc2, 0x45, 0x7f, 0x96, 0xc4, 0x32, 0xc6, 0x72, 0x66, 0xb2, 0x13, 0xa8,
+	0x7e, 0xe4, 0x53, 0x12, 0x33, 0xee, 0x13, 0x22, 0x14, 0x23, 0x3e, 0x25, 0xc7, 0xea, 0x5a, 0xbd,
+	0xaa, 0x9b, 0x7e, 0xb3, 0x73, 0xa8, 0xb8, 0x24, 0xe2, 0x79, 0xe2, 0x13, 0x36, 0xa1, 0x10, 0x8e,
+	0xb3, 0x68, 0x21, 0x1c, 0xe3, 0x31, 0x54, 0x23, 0x5d, 0xec, 0x14, 0x52, 0xf7, 0xda, 0xc1, 0xce,
+	0xa1, 0xaa, 0x2b, 0x05, 0xbe, 0x80, 0x72, 0x42, 0x62, 0x3e, 0x91, 0xc2, 0xb1, 0xba, 0x76, 0xaf,
+	0x36, 0x68, 0xf5, 0x35, 0x23, 0x9d, 0xe4, 0xea, 0x0c, 0xf6, 0x1d, 0x1a, 0x43, 0xdf, 0x27, 0x21,
+	0x5c, 0xfa, 0x36, 0x27, 0x21, 0xb7, 0x81, 0xac, 0x1d, 0x20, 0x6c, 0x43, 0x79, 0x2e, 0x28, 0xb9,
+	0x0d, 0xc7, 0x19, 0x89, 0x92, 0x32, 0xaf, 0xc7, 0xf8, 0x0a, 0x4a, 0xdc, 0x97, 0x61, 0x1c, 0x39,
+	0x76, 0xd7, 0xea, 0xd5, 0x06, 0xed, 0x1c, 0xe6, 0x30, 0x0d, 0xbb, 0x59, 0x1a, 0xfb, 0x01, 0xad,
+	0x0f, 0x3c, 0x5a, 0xfe, 0x17, 0xf0, 0xd7, 0x50, 0x5e, 0xbd, 0x2a, 0x1c, 0x3b, 0xed, 0x78, 0x2f,
+	0xba, 0xce, 0x63, 0x97, 0xd0, 0xdc, 0x0e, 0xe1, 0xd1, 0x56, 0x07, 0x55, 0x4d, 0x14, 0x3b, 0x50,
+	0x49, 0xb2, 0x4c, 0xa7, 0x98, 0x46, 0x8c, 0xcd, 0x4e, 0xa1, 0xa9, 0x1b, 0x10, 0xb3, 0x38, 0x12,
+	0x84, 0x4f, 0xe0, 0xd1, 0x82, 0x4f, 0xb2, 0xd5, 0x55, 0xdc, 0x95, 0xc1, 0x62, 0x78, 0xbc, 0xca,
+	0xbb, 0x91, 0x5c, 0xd2, 0x94, 0x22, 0x89, 0x87, 0x60, 0xdf, 0x98, 0x0d, 0xab, 0x4f, 0x45, 0x60,
+	0x74, 0x77, 0x47, 0xbe, 0xd4, 0xdd, 0xad, 0x2c, 0xe5, 0x1f, 0x6a, 0x62, 0xb6, 0xf2, 0x0f, 0x0d,
+	0x31, 0x77, 0x4d, 0x4c, 0x45, 0x8c, 0xcd, 0xde, 0x80, 0xed, 0xf1, 0xe0, 0x3e, 0x95, 0x3d, 0xa0,
+	0xa4, 0x3e, 0x14, 0x3d, 0x1e, 0x08, 0x3c, 0xdd, 0x15, 0x51, 0xdd, 0x8c, 0xd4, 0xe3, 0xc1, 0x5a,
+	0x3f, 0x9f, 0xa0, 0x79, 0x45, 0x52, 0x95, 0xe8, 0x1d, 0x9e, 0x40, 0x4d, 0xcf, 0xe7, 0xd6, 0x34,
+	0x08, 0xda, 0x75, 0xfd, 0x90, 0x94, 0x3f, 0xc3, 0xf1, 0x15, 0x49, 0xa3, 0xe6, 0x8b, 0xa5, 0xc7,
+	0x03, 0x75, 0x36, 0xfa, 0xf9, 0x7f, 0x6f, 0x89, 0xe0, 0xf0, 0x7d, 0x42, 0x5c, 0x92, 0x22, 0xfe,
+	0xb7, 0x24, 0x35, 0x4c, 0x61, 0x1f, 0x8c, 0xbd, 0x0b, 0x73, 0x01, 0x2d, 0x03, 0x63, 0x86, 0xf1,
+	0x12, 0x8a, 0x92, 0x07, 0x7a, 0x86, 0xcf, 0xcc, 0x0c, 0x77, 0x09, 0xb9, 0x69, 0xda, 0xe0, 0xa7,
+	0xa5, 0x76, 0xad, 0x84, 0x82, 0xef, 0xa0, 0x32, 0x5a, 0xf0, 0xc9, 0x9c, 0x4b, 0xc2, 0x23, 0x53,
+	0xb7, 0x75, 0x2e, 0x9d, 0x76, 0xce, 0xbf, 0x52, 0x21, 0x3b, 0xc0, 0x11, 0xd4, 0x75, 0xb9, 0x3a,
+	0x33, 0xec, 0x98, 0xd4, 0xdc, 0xd5, 0xfd, 0xe1, 0x99, 0xc1, 0x2f, 0x0b, 0xea, 0x1e, 0x0f, 0x2e,
+	0xc3, 0x84, 0x7c, 0x19, 0x27, 0x4b, 0x3c, 0x83, 0x72, 0xb6, 0x6f, 0x5c, 0x97, 0x6d, 0x2b, 0xa0,
+	0xd3, 0xd8, 0x94, 0x8a, 0x60, 0x07, 0xf8, 0x16, 0x60, 0x3d, 0x9a, 0x0d, 0x2a, 0xb9, 0x79, 0xe5,
+	0x4b, 0x3d, 0x78, 0x7a, 0xaf, 0x1c, 0xf0, 0xf9, 0x26, 0xfa, 0x5e, 0xb9, 0x74, 0x30, 0xf7, 0x27,
+	0x10, 0xec, 0xe0, 0x4b, 0x29, 0xfd, 0x35, 0x9f, 0xfd, 0x0e, 0x00, 0x00, 0xff, 0xff, 0xe1, 0x26,
+	0xfa, 0x1e, 0xab, 0x05, 0x00, 0x00,
 }

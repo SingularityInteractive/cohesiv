@@ -7,6 +7,7 @@ import (
 	"flag"
 
 	pb "github.com/SingularityInteractive/cohesiv/cohesiv"
+	"github.com/SingularityInteractive/cohesiv/cohesiv/models"
 	"github.com/SingularityInteractive/cohesiv/version"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -50,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "failed to ping db instance"))
 	}
-	db.AutoMigrate(&tag{}, &resource{})
+	db.AutoMigrate(&models.TagModel{}, &models.ResourceModel{})
 
 	lis, err := net.Listen("tcp", *addr)
 	if err != nil {

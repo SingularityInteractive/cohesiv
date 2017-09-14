@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules", "../cohesiv/*"]
+    }
+  },
+  "include": ["src/**/*", "../cohesiv/**/*", "../cohesiv/models/*"]
+}

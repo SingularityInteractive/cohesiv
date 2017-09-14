@@ -1,0 +1,15 @@
+FROM node:8-slim
+# create app directory in container
+RUN mkdir -p /access/dist
+# set /app directory as default working directory
+WORKDIR /access
+# only copy package.json initially so that `RUN yarn` layer is recreated only
+# if there are changes in package.json
+ADD access/package.json access/yarn.lock cohesiv/cohesiv.proto /access/
+# --pure-lockfile: Don’t generate a yarn.lock lockfile
+RUN yarn --pure-lockfile --production
+# copy build from build stage to /app in container
+COPY ./access/dist /access/dist
+ENV PROTO_PATH cohesiv.proto
+EXPOSE 8002
+CMD ["yarn", "serve"]
