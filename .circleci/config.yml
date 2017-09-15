@@ -4,7 +4,7 @@ jobs:
   checkout-code:
     docker:
       - image: circleci/node:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - checkout
       - run:
@@ -13,11 +13,11 @@ jobs:
       - save_cache:
           key: repo-{{ checksum ".circle-sha" }}
           paths:
-            - /go/src/github.com/SingularityInteractive/cohesiv
+            - ~/go/src/github.com/SingularityInteractive/cohesiv
   install-cohesiv-golang-dependencies:
     docker:
       - image: circleci/golang:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -39,7 +39,7 @@ jobs:
   install-cohesiv-node-dependencies:
     docker:
       - image: circleci/node:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -58,7 +58,7 @@ jobs:
   install-mypds-dependencies:
     docker:
       - image: circleci/node:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -77,7 +77,7 @@ jobs:
   build-cohesiv-go:
     docker:
       - image: circleci/golang:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -96,7 +96,7 @@ jobs:
   build-cohesiv-node:
     docker:
       - image: circleci/node:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -115,7 +115,7 @@ jobs:
   build-mypds:
     docker:
       - image: circleci/node:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -138,7 +138,7 @@ jobs:
   test-mypds:
     docker:
       - image: circleci/node:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -156,7 +156,7 @@ jobs:
   build-cohesiv-docker-images:
     docker:
       - image: circleci/golang:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -173,7 +173,7 @@ jobs:
   build-mypds-docker-image:
     docker:
       - image: circleci/golang:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -194,7 +194,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -230,7 +230,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -266,7 +266,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -301,7 +301,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -339,7 +339,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    working_directory: ~/go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
