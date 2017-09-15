@@ -117,7 +117,7 @@ jobs:
             - cohesiv-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build TS Services
-          command: make tsc
+          command: yarn access:build
       - save_cache:
           key: cohesiv-node-build-{{ checksum ".circle-sha" }}
           paths:
