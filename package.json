@@ -22,6 +22,8 @@
     "prettier": "^1.6.1"
   },
   "dependencies": {
+    "@types/joi": "^10.4.2",
+    "@types/winston": "^2.3.5",
     "pg": "^7.3.0",
     "rxjs-grpc": "^0.1.4",
     "sequelize": "^4.8.0",
