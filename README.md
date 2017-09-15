@@ -16,9 +16,14 @@ practices in application deployment, utilizing a modern stack including `Docker`
 - [Contributing](#contributing)
 - [Deploying](#Deploying)
 
+## Dependencies
+- `npm i -g yarn`
+- `yarn global add tslint typescript`
+- Add to ~/.bash_profile, ~/.bashrc, etc. (your shell startup script): `export GOPATH=$HOME/go`
+
 ## Installation
 
-- Clone into `$HOME/go/src/github.com/SingularityInteractive/cohesiv`
+- Clone into `$GOPATH/src/github.com/SingularityInteractive/cohesiv`
 - `$ brew install dep`
 - `dep ensure`
 - `yarn`
