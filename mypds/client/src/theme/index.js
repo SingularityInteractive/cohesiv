@@ -1,9 +1,11 @@
+export const FONT_NAME = 'Roboto'
+
 export const breakpoints = {
   xs: 360,
   sm: 600,
   md: 960,
   lg: 1280,
-  xl: 1920
+  xl: 1920,
 }
 
 export default {
@@ -20,7 +22,7 @@ export default {
       faintBlack: 'rgba(0, 0, 0, 0.12)',
       fullWhite: 'rgba(255, 255, 255, 1)',
       darkWhite: 'rgba(255, 255, 255, 0.87)',
-      lightWhite: 'rgba(255, 255, 255, 0.54)'
+      lightWhite: 'rgba(255, 255, 255, 0.54)',
     },
     type: 'light',
     shades: {
@@ -32,26 +34,26 @@ export default {
           hint: 'rgba(255, 255, 255, 0.5)',
           icon: 'rgba(255, 255, 255, 0.5)',
           divider: 'rgba(255, 255, 255, 0.12)',
-          lightDivider: 'rgba(255, 255, 255, 0.075)'
+          lightDivider: 'rgba(255, 255, 255, 0.075)',
         },
         input: {
           bottomLine: 'rgba(255, 255, 255, 0.7)',
           helperText: 'rgba(255, 255, 255, 0.7)',
           labelText: 'rgba(255, 255, 255, 0.7)',
           inputText: 'rgba(255, 255, 255, 1)',
-          disabled: 'rgba(255, 255, 255, 0.5)'
+          disabled: 'rgba(255, 255, 255, 0.5)',
         },
         action: {
           active: 'rgba(255, 255, 255, 1)',
-          disabled: 'rgba(255, 255, 255, 0.3)'
+          disabled: 'rgba(255, 255, 255, 0.3)',
         },
         background: {
           default: '#303030',
           paper: '#424242',
           appBar: '#212121',
           contentFrame: '#212121',
-          status: '#000'
-        }
+          status: '#000',
+        },
       },
       light: {
         text: {
@@ -61,26 +63,26 @@ export default {
           hint: 'rgba(0, 0, 0, 0.38)',
           icon: 'rgba(0, 0, 0, 0.38)',
           divider: 'rgba(0, 0, 0, 0.12)',
-          lightDivider: 'rgba(0, 0, 0, 0.075)'
+          lightDivider: 'rgba(0, 0, 0, 0.075)',
         },
         input: {
           bottomLine: 'rgba(0, 0, 0, 0.42)',
           helperText: 'rgba(0, 0, 0, 0.54)',
           labelText: 'rgba(0, 0, 0, 0.54)',
           inputText: 'rgba(0, 0, 0, 0.87)',
-          disabled: 'rgba(0, 0, 0, 0.42)'
+          disabled: 'rgba(0, 0, 0, 0.42)',
         },
         action: {
           active: 'rgba(0, 0, 0, 0.54)',
-          disabled: 'rgba(0, 0, 0, 0.26)'
+          disabled: 'rgba(0, 0, 0, 0.26)',
         },
         background: {
           default: '#fafafa',
           paper: '#fff',
           appBar: '#f5f5f5',
-          contentFrame: '#eeeeee'
-        }
-      }
+          contentFrame: '#eeeeee',
+        },
+      },
     },
     text: {
       primary: 'rgba(0, 0, 0, 0.87)',
@@ -89,24 +91,24 @@ export default {
       hint: 'rgba(0, 0, 0, 0.38)',
       icon: 'rgba(0, 0, 0, 0.38)',
       divider: 'rgba(0, 0, 0, 0.12)',
-      lightDivider: 'rgba(0, 0, 0, 0.075)'
+      lightDivider: 'rgba(0, 0, 0, 0.075)',
     },
     input: {
       bottomLine: 'rgba(0, 0, 0, 0.42)',
       helperText: 'rgba(0, 0, 0, 0.54)',
       labelText: 'rgba(0, 0, 0, 0.54)',
       inputText: 'rgba(0, 0, 0, 0.87)',
-      disabled: 'rgba(0, 0, 0, 0.42)'
+      disabled: 'rgba(0, 0, 0, 0.42)',
     },
     action: {
       active: 'rgba(0, 0, 0, 0.54)',
-      disabled: 'rgba(0, 0, 0, 0.26)'
+      disabled: 'rgba(0, 0, 0, 0.26)',
     },
     background: {
       default: '#fafafa',
       paper: '#fff',
       appBar: '#f5f5f5',
-      contentFrame: '#eeeeee'
+      contentFrame: '#eeeeee',
     },
     primary: {
       '50': '#e3f2fd',
@@ -123,7 +125,7 @@ export default {
       A200: '#448aff',
       A400: '#2979ff',
       A700: '#2962ff',
-      contrastDefaultColor: 'light'
+      contrastDefaultColor: 'light',
     },
     accent: {
       '50': '#fce4ec',
@@ -140,7 +142,7 @@ export default {
       A200: '#ff4081',
       A400: '#f50057',
       A700: '#c51162',
-      contrastDefaultColor: 'light'
+      contrastDefaultColor: 'light',
     },
     error: {
       '50': '#ffebee',
@@ -157,10 +159,10 @@ export default {
       A200: '#ff5252',
       A400: '#ff1744',
       A700: '#d50000',
-      contrastDefaultColor: 'light'
+      contrastDefaultColor: 'light',
     },
     warning: {
-      '500': '#f0ad4e'
+      '500': '#f0ad4e',
     },
     grey: {
       '50': '#fafafa',
@@ -177,11 +179,11 @@ export default {
       A200: '#aaaaaa',
       A400: '#303030',
       A700: '#616161',
-      contrastDefaultColor: 'dark'
-    }
+      contrastDefaultColor: 'dark',
+    },
   },
   typography: {
-    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
     fontSize: 14,
     fontWeightLight: 300,
     fontWeightRegular: 400,
@@ -189,84 +191,84 @@ export default {
     display4: {
       fontSize: 112,
       fontWeight: 300,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       letterSpacing: '-.04em',
       lineHeight: 1,
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     display3: {
       fontSize: 56,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       letterSpacing: '-.02em',
       lineHeight: 1.35,
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     display2: {
       fontSize: 45,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: '48px',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     display1: {
       fontSize: 34,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: '40px',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     headline: {
       fontSize: 24,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: '32px',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     title: {
       fontSize: 21,
       fontWeight: 500,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: 1,
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     subheading: {
       fontSize: 16,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: '24px',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     body2: {
       fontSize: 14,
       fontWeight: 500,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: '24px',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     body1: {
       fontSize: 14,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: '20px',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     caption: {
       fontSize: 12,
       fontWeight: 400,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
       lineHeight: 1,
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     button: {
       fontSize: 14,
       textTransform: 'uppercase',
       fontWeight: 500,
-      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif"
-    }
+      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+    },
   },
   spacing: {
-    unit: 8
+    unit: 8,
   },
   zIndex: {
     mobileStepper: 900,
@@ -279,6 +281,6 @@ export default {
     layer: 2000,
     popover: 2100,
     snackbar: 2900,
-    tooltip: 3000
-  }
+    tooltip: 3000,
+  },
 }

@@ -433,9 +433,6 @@ workflows:
       - install-mypds-dependencies:
           requires:
             - checkout-code
-      - test-mypds:
-          requires:
-            - install-mypds-dependencies
       - build-mypds:
           requires:
             - install-mypds-dependencies
