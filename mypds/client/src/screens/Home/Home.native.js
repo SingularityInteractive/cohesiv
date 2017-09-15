@@ -23,11 +23,12 @@ import theme from '../../theme'
 @observer
 export default class Home extends Component {
   static navigationOptions = {
-    tabBarIcon: ({ focused, tintColor }) =>
+    tabBarIcon: ({ focused, tintColor }) => (
       <Icon
         name="home"
         style={{ color: focused ? tintColor : theme.palette.shades.light.text.secondary }}
       />
+    )
   }
 
   componentWillMount() {
@@ -52,7 +53,7 @@ export default class Home extends Component {
           <Separator>
             <Text>My Pages</Text>
           </Separator>
-          {this.props.Pages.pages.map(page =>
+          {this.props.Pages.pages.map(page => (
             <Card>
               <CardItem cardBody>
                 <Image source={{ uri: page.uri }} style={{ height: 200, width: null, flex: 1 }} />
@@ -61,19 +62,15 @@ export default class Home extends Component {
                 <Left>
                   <Thumbnail source={{ uri: 'Image URL' }} />
                   <Body>
-                    <Text>
-                      {page.title}
-                    </Text>
+                    <Text>{page.title}</Text>
                   </Body>
                 </Left>
               </CardItem>
               <CardItem>
-                <Text>
-                  {page.text}
-                </Text>
+                <Text>{page.text}</Text>
               </CardItem>
             </Card>
-          )}
+          ))}
         </Content>
       </Container>
     )

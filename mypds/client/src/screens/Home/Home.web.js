@@ -38,19 +38,17 @@ export default class Home extends Component {
       <div className={classes.root}>
         <Grid container spacing={24}>
           <Grid item xs={12}>
-            {Pages.pages.map((page, i) =>
+            {Pages.pages.map((page, i) => (
               <Card key={i} className={classes.card}>
                 <CardMedia className={classes.media} title="" image={page.uri} />
                 <CardContent>
                   <Typography type="headline" component="h2">
                     {page.title}
                   </Typography>
-                  <Typography component="p">
-                    {page.text}
-                  </Typography>
+                  <Typography component="p">{page.text}</Typography>
                 </CardContent>
               </Card>
-            )}
+            ))}
           </Grid>
           <Grid item xs={12} sm={6}>
             <Paper className={classes.paper}>xs=12 sm=6</Paper>

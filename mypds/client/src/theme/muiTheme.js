@@ -13,5 +13,5 @@ export default {
   mixins: createMixins(bk, theme.spacing),
   spacing: theme.spacing,
   breakpoints: bk,
-  zIndex: theme.zIndex,
+  zIndex: theme.zIndex
 }
