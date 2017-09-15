@@ -19,6 +19,10 @@
     "**/src/**/*.ts": [
       "prettier --print-width 100 --tab-width 2 --single-quote true --jsx-bracket-same-line true --trailing-comma none --no-semi --write",
       "git add"
+    ],
+    "**/src/**/*.js": [
+      "prettier --print-width 100 --tab-width 2 --single-quote true --jsx-bracket-same-line true --trailing-comma none --no-semi --write",
+      "git add"
     ]
   },
   "jest": {

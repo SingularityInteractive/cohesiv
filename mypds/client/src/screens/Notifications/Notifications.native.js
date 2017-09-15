@@ -7,11 +7,12 @@ import theme from '../../theme'
 export default class Notifications extends Component {
   static navigationOptions = {
     title: 'Notifications',
-    tabBarIcon: ({ focused, tintColor }) =>
+    tabBarIcon: ({ focused, tintColor }) => (
       <Icon
         name="notifications-none"
         style={{ color: focused ? tintColor : theme.palette.shades.light.text.secondary }}
       />
+    )
   }
   render() {
     return (

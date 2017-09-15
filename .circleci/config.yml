@@ -4,7 +4,7 @@ jobs:
   checkout-code:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - checkout
       - run:
@@ -13,11 +13,11 @@ jobs:
       - save_cache:
           key: repo-{{ checksum ".circle-sha" }}
           paths:
-            - ~/cohesiv
+            - /go/src/github.com/SingularityInteractive/cohesiv
   install-cohesiv-golang-dependencies:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -25,8 +25,6 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Get dep tool
@@ -41,7 +39,7 @@ jobs:
   install-cohesiv-node-dependencies:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -49,8 +47,6 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
@@ -62,7 +58,7 @@ jobs:
   install-mypds-dependencies:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -70,8 +66,6 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
@@ -83,7 +77,7 @@ jobs:
   build-cohesiv-go:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -91,8 +85,6 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - cohesiv-vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Build Golang Services
@@ -104,7 +96,7 @@ jobs:
   build-cohesiv-node:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -112,12 +104,10 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - cohesiv-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build TS Services
-          command: make tsc
+          command: yarn access:build
       - save_cache:
           key: cohesiv-node-build-{{ checksum ".circle-sha" }}
           paths:
@@ -125,7 +115,7 @@ jobs:
   build-mypds:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -133,24 +123,40 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build Web
-          command: cd mypds && build:web
+          command: cd mypds && yarn build:web
       - run:
           name: Build TS Server
-          command: cd mypds && build:server
+          command: cd mypds && yarn build:server
       - save_cache:
           key: mypds-build-{{ checksum ".circle-sha" }}
           paths:
             - ./mypds/server/dist
             - ./mypds/public
+  test-mypds:
+    docker:
+      - image: circleci/node:latest
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+            - mypds-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - mypds-node_modules-{{ checksum "package.json" }}
+      - run:
+          name: Test TS Server
+          command: cd mypds && yarn test:server
   build-cohesiv-docker-images:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -167,7 +173,7 @@ jobs:
   build-mypds-docker-image:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -188,7 +194,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -210,13 +216,12 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
+            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/develop/deployment.yaml
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-            make authorize-staging-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
-            kubectl apply -f kube/staging
-            make deauthorize-staging-circle-ip
+            make authorize-develop-circle-ip
+            kubectl apply -f kube/develop
+            make deauthorize-develop-circle-ip
   deploy-cohesiv-staging:
     docker:
       - image: devopsil/kops-docker
@@ -225,7 +230,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -251,7 +256,6 @@ jobs:
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-staging-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
             kubectl apply -f kube/staging
             make deauthorize-staging-circle-ip
   deploy-cohesiv-production:
@@ -262,7 +266,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -287,7 +291,6 @@ jobs:
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-master-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${PRODUCTION_DB_CONNECTION_STRING}
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
   deploy-mypds-staging:
@@ -298,7 +301,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -336,7 +339,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
           AWS_REGION: $AWS_DEFAULT_REGION
           KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
@@ -389,8 +392,15 @@ workflows:
           filters:
             branches:
               only:
+                - develop
                 - staging
                 - master
+      - deploy-cohesiv-develop:
+          requires:
+            - build-cohesiv-docker-images
+          filters:
+            branches:
+              only: develop
       - deploy-cohesiv-staging:
           requires:
             - build-cohesiv-docker-images
@@ -409,12 +419,12 @@ workflows:
       - install-mypds-dependencies:
           requires:
             - checkout-code
-      - test-mypds:
-          requires:
-            - install-mypds-dependencies
       - build-mypds:
           requires:
             - install-mypds-dependencies
+      - test-mypds:
+          requires:
+            - build-mypds
       - build-mypds-docker-image:
           requires:
             - build-mypds

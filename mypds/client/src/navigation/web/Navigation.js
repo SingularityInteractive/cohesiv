@@ -86,19 +86,16 @@ class Navigation extends Component {
             value={routeName}
             onChange={this.handleChange}
             showLabels={false}
-            className={classes.end}
-          >
-            {Object.keys(routes).filter(key => !routes[key].hidden).map((key, i) =>
-              <BottomNavigationButton
-                key={i}
-                value={key}
-                icon={
-                  <Icon>
-                    {routes[key].icon}
-                  </Icon>
-                }
-              />
-            )}
+            className={classes.end}>
+            {Object.keys(routes)
+              .filter(key => !routes[key].hidden)
+              .map((key, i) => (
+                <BottomNavigationButton
+                  key={i}
+                  value={key}
+                  icon={<Icon>{routes[key].icon}</Icon>}
+                />
+              ))}
           </BottomNavigation>
         </Small>
       </div>

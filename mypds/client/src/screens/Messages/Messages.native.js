@@ -19,11 +19,12 @@ import theme from '../../theme'
 export default class Messages extends Component {
   static navigationOptions = {
     title: 'Messages',
-    tabBarIcon: ({ focused, tintColor }) =>
+    tabBarIcon: ({ focused, tintColor }) => (
       <Icon
         name="message"
         style={{ color: focused ? tintColor : theme.palette.shades.light.text.secondary }}
       />
+    )
   }
   render() {
     return (

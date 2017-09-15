@@ -43,6 +43,12 @@ set-ip:
   else \
   	@echo "Got IP address of ${IP_ADDRESS}" ;\
   fi
+authorize-develop-circle-ip: set-ip
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
+deauthorize-develop-circle-ip: set-ip
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
 authorize-staging-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32

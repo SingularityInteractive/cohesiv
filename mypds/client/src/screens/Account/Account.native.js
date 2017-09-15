@@ -17,11 +17,12 @@ import theme from '../../theme'
 export default class Account extends Component {
   static navigationOptions = {
     title: 'Account',
-    tabBarIcon: ({ focused, tintColor }) =>
+    tabBarIcon: ({ focused, tintColor }) => (
       <Icon
         name="account-circle"
         style={{ color: focused ? tintColor : theme.palette.shades.light.text.secondary }}
       />
+    )
   }
   render() {
     return (
