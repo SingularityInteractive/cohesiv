@@ -1,6 +1,6 @@
-import createPalette from 'material-ui/styles/palette'
-import createBreakpoints from 'material-ui/styles/breakpoints'
-import createMixins from 'material-ui/styles/mixins'
+import createPalette from 'material-ui/styles/createPalette'
+import createBreakpoints from 'material-ui/styles/createBreakpoints'
+import createMixins from 'material-ui/styles/createMixins'
 
 import theme, { breakpoints } from './index'
 
@@ -13,5 +13,5 @@ export default {
   mixins: createMixins(bk, theme.spacing),
   spacing: theme.spacing,
   breakpoints: bk,
-  zIndex: theme.zIndex
+  zIndex: theme.zIndex,
 }
