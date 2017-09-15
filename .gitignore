@@ -22,7 +22,6 @@ Gopkg.lock
 yarn.lock
 
 # API keys and secrets
-**/.env
 kube/secrets/**/*
 **/kube/secrets/**/*
 
