@@ -7,7 +7,13 @@
   "author": "Sam McCord <samuel.e.mccord@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "access:dev":
+      "yarn run access:build && yarn run concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc -w -p access\" \"nodemon access/dist/access/src/index.js\"",
+    "access:build": "tsc -p access",
+    "access:serve": "node access/dist/access/src/index.js",
+    "access:test": "jest --verbose --forceExit",
+    "tslint": "tslint -c tslint.json '**/src/**/*.ts' -e \"node_modules/**/*\""
   },
   "lint-staged": {
     "**/src/**/*.ts": [
@@ -15,16 +21,48 @@
       "git add"
     ]
   },
+  "jest": {
+    "globals": {
+      "__TS_CONFIG__": "tsconfig.json"
+    },
+    "moduleFileExtensions": ["ts", "js"],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
+    },
+    "testMatch": ["**/test/**/*.test.(ts|js)"],
+    "testEnvironment": "node"
+  },
   "devDependencies": {
+    "@types/dotenv": "^4.0.1",
+    "@types/google-protobuf": "^3.2.7",
+    "@types/jest": "^20.0.8",
+    "@types/joi": "^10.4.2",
+    "@types/node": "^8.0.28",
     "@types/sequelize": "^4.0.73",
+    "@types/supertest": "^2.0.3",
+    "@types/winston": "^2.3.5",
+    "concurrently": "^3.5.0",
     "husky": "^0.14.3",
+    "jest": "^21.1.0",
     "lint-staged": "^4.0.4",
-    "prettier": "^1.6.1"
+    "nodemon": "^1.12.0",
+    "prettier": "^1.6.1",
+    "shelljs": "^0.7.8",
+    "supertest": "^3.0.0",
+    "ts-jest": "^21.0.1",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
   },
   "dependencies": {
+    "dotenv": "^4.0.0",
+    "grpc": "^1.6.0",
+    "joi": "^11.0.1",
+    "lodash": "^4.17.4",
+    "pbac": "^0.1.3",
     "pg": "^7.3.0",
     "rxjs-grpc": "^0.1.4",
-    "sequelize": "^4.8.0",
-    "sequelize-cli": "^2.8.0"
+    "sequelize": "^4.8.3",
+    "sequelize-cli": "^2.8.0",
+    "winston": "^2.3.1"
   }
 }

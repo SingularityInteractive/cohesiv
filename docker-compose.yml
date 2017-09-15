@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   postgres:
-    image: postgres:alpine
+    image: healthcheck/postgres:alpine
     # Map to non default port as to not conflict with host postgres
     ports:
       - 5433:5432
@@ -12,7 +12,6 @@ services:
       POSTGRES_PASSWORD: "password"
       POSTGRES_DB: "cohesiv"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
       interval: 30s
       timeout: 30s
       retries: 3
@@ -78,5 +77,28 @@ services:
     links:
       - postgres
     depends_on:
+      postgres:
+        condition: service_healthy
+  mypds:
+    restart: always
+    build:
+      context: ./mypds
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4040:4040"
+    environment:
+      NODE_ENV: development
+      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/cohesiv?sslmode=disable
+      PORT: '4040'
+      JWT_SECRET: 'abcdefg'
+    links:
+      - tagdirectory
+      - access
+      - postgres
+    depends_on:
+      tagdirectory:
+        condition: service_started
+      access:
+        condition: service_started
       postgres:
         condition: service_healthy
