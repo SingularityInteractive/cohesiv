@@ -147,6 +147,26 @@ jobs:
           paths:
             - ./mypds/server/dist
             - ./mypds/public
+  test-mypds:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - mypds-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - mypds-node_modules-{{ checksum "package.json" }}
+      - run:
+          name: Test TS Server
+          command: cd mypds && yarn test:server
   build-cohesiv-docker-images:
     docker:
       - image: circleci/golang:latest
@@ -419,6 +439,9 @@ workflows:
       - build-mypds:
           requires:
             - install-mypds-dependencies
+      - test-mypds:
+          requires:
+            - build-mypds
       - build-mypds-docker-image:
           requires:
             - build-mypds
