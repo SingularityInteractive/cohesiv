@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - staging.cohesiv.io
+    - develop.cohesiv.io
     secretName: echoserver-tls
   rules:
-  - host: staging.cohesiv.io
+  - host: develop.cohesiv.io
     http:
       paths:
       - path: /
