@@ -138,10 +138,10 @@ jobs:
             - mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build Web
-          command: cd mypds && build:web
+          command: cd mypds && yarn build:web
       - run:
           name: Build TS Server
-          command: cd mypds && build:server
+          command: cd mypds && yarn build:server
       - save_cache:
           key: mypds-build-{{ checksum ".circle-sha" }}
           paths:
