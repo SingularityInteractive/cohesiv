@@ -1,22 +1,22 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: echoserver
-  namespace: echoserver
+  name: app
+  namespace: mypds
   annotations:
-    kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
     ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
 spec:
   tls:
   - hosts:
-    - staging.cohesiv.io
-    secretName: echoserver-tls
+    - mypds.cohesiv.io
+    secretName: mypds-tls
   rules:
-  - host: staging.cohesiv.io
+  - host: "mypds.cohesiv.io"
     http:
       paths:
       - path: /
         backend:
-          serviceName: echoserver
+          serviceName: app
           servicePort: 80

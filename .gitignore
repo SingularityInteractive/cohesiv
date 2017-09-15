@@ -1,9 +1,6 @@
-volumes/**/*
-gopath
-Gopkg.lock
-vendor
-kube/secrets/**/*
+# TMP volumnes
 postgres-data
+volumes/**/*
 
 lib-cov
 *.seed
@@ -20,11 +17,19 @@ logs
 results
 tmp
 
+# Lockfiles
+Gopkg.lock
+yarn.lock
+
 # API keys and secrets
 **/.env
+kube/secrets/**/*
+**/kube/secrets/**/*
 
 # Dependency directory
+node_modules
 **/node_modules
+vendor
 
 # Editors
 .idea
@@ -34,5 +39,7 @@ tmp
 .DS_Store
 Thumbs.db
 
-# Ignore built ts files
+# Ignore build files
 **/dist/**/*
+**/public
+gopath

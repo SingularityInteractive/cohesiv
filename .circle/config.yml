@@ -1,0 +1,437 @@
+version: 2
+
+jobs:
+  checkout-code:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/cohesiv
+    steps:
+      - checkout
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - save_cache:
+          key: repo-{{ checksum ".circle-sha" }}
+          paths:
+            - ~/cohesiv
+  install-cohesiv-golang-dependencies:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - vendor-{{ checksum "Gopkg.toml" }}
+      - run:
+          name: Get dep tool
+          command: go get -u github.com/golang/dep/cmd/dep && go install github.com/golang/dep/cmd/dep
+      - run:
+          name: Install go deps
+          command: dep ensure
+      - save_cache:
+          key: cohesiv-vendor-{{ checksum "Gopkg.toml" }}
+          paths:
+            - vendor
+  install-cohesiv-node-dependencies:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - node_modules-{{ checksum "package.json" }}
+      - run:
+          name: Install node deps
+          command: yarn --pure-lockfile
+      - save_cache:
+          key: cohesiv-node_modules-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+  install-mypds-dependencies:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - mypds-node_modules-{{ checksum "package.json" }}
+      - run:
+          name: Install node deps
+          command: cd mypds && yarn --pure-lockfile
+      - save_cache:
+          key: mypds-node_modules-{{ checksum "package.json" }}
+          paths:
+            - ./mypds/node_modules
+  build-cohesiv-go:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - cohesiv-vendor-{{ checksum "Gopkg.toml" }}
+      - run:
+          name: Build Golang Services
+          command: make binaries
+      - save_cache:
+          key: cohesiv-go-build-{{ checksum ".circle-sha" }}
+          paths:
+            - ./gopath/bin
+  build-cohesiv-node:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - cohesiv-node_modules-{{ checksum "package.json" }}
+      - run:
+          name: Build TS Services
+          command: make tsc
+      - save_cache:
+          key: cohesiv-node-build-{{ checksum ".circle-sha" }}
+          paths:
+            - ./access/dist
+  build-mypds:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - mypds-node_modules-{{ checksum "package.json" }}
+      - run:
+          name: Build Web
+          command: cd mypds && build:web
+      - run:
+          name: Build TS Server
+          command: cd mypds && build:server
+      - save_cache:
+          key: mypds-build-{{ checksum ".circle-sha" }}
+          paths:
+            - ./mypds/server/dist
+            - ./mypds/public
+  build-cohesiv-docker-images:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+            - cohesiv-go-build-{{ checksum ".circle-sha" }}
+            - cohesiv-node-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Build docker images
+          command: make docker-images
+  build-mypds-docker-image:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+            - mypds-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Build docker image
+          command: cd mypds && make docker-image
+  deploy-cohesiv-develop:
+    docker:
+      - image: devopsil/kops-docker
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_REGION: $AWS_DEFAULT_REGION
+          KOPS_STATE_STORE: $KOPS_STATE_STORE
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - run:
+          name: Push to ecr
+          command: |
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            make docker-push-ecr
+      - run:
+          name: Get staging cluster credentials
+          command: |
+            kops get cluster --name=develop.cohesiv.io
+            kops export kubecfg --name=develop.cohesiv.io --state=${KOPS_STATE_STORE}
+      - run:
+          name: Deploy
+          command: |
+            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+            make authorize-staging-circle-ip
+            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
+            kubectl apply -f kube/staging
+            make deauthorize-staging-circle-ip
+  deploy-cohesiv-staging:
+    docker:
+      - image: devopsil/kops-docker
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_REGION: $AWS_DEFAULT_REGION
+          KOPS_STATE_STORE: $KOPS_STATE_STORE
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - run:
+          name: Push to ecr
+          command: |
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            make docker-push-ecr
+      - run:
+          name: Get staging cluster credentials
+          command: |
+            kops get cluster --name=staging.cohesiv.io
+            kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
+      - run:
+          name: Deploy
+          command: |
+            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+            make authorize-staging-circle-ip
+            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
+            kubectl apply -f kube/staging
+            make deauthorize-staging-circle-ip
+  deploy-cohesiv-production:
+    docker:
+      - image: devopsil/kops-docker
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_REGION: $AWS_DEFAULT_REGION
+          KOPS_STATE_STORE: $KOPS_STATE_STORE
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+      - run:
+          name: Push to ecr
+          command: |
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            make docker-push-ecr
+      - run:
+          name: Get staging cluster credentials
+          command: |
+            kops get cluster --name=cohesiv.io
+            kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
+      - run:
+          name: Deploy
+          command: |
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+            make authorize-master-circle-ip
+            node_modules/.bin/sequelize db:migrate --url ${PRODUCTION_DB_CONNECTION_STRING}
+            kubectl apply -f kube/production
+            make deauthorize-master-circle-ip
+  deploy-mypds-staging:
+    docker:
+      - image: devopsil/kops-docker
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_REGION: $AWS_DEFAULT_REGION
+          KOPS_STATE_STORE: $KOPS_STATE_STORE
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+            - mypds-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Push to ecr
+          command: |
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            cd mypds && make docker-push-ecr
+      - run:
+          name: Get staging cluster credentials
+          command: |
+            kops get cluster --name=staging.cohesiv.io
+            kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
+      - run:
+          name: Deploy
+          command: |
+            sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/staging/deployment.yaml
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+            make authorize-staging-circle-ip
+            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
+            kubectl apply -f mypds/kube/staging
+            make deauthorize-staging-circle-ip
+  deploy-mypds-production:
+    docker:
+      - image: devopsil/kops-docker
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_REGION: $AWS_DEFAULT_REGION
+          KOPS_STATE_STORE: $KOPS_STATE_STORE
+    working_directory: ~/cohesiv
+    steps:
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - repo-{{ checksum ".circle-sha" }}
+            - mypds-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Push to ecr
+          command: |
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            cd mypds && make docker-push-ecr
+      - run:
+          name: Get staging cluster credentials
+          command: |
+            kops get cluster --name=cohesiv.io
+            kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
+      - run:
+          name: Deploy
+          command: |
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
+            make authorize-master-circle-ip
+            node_modules/.bin/sequelize db:migrate --url ${PRODUCTION_DB_CONNECTION_STRING}
+            kubectl apply -f mypds/kube/production
+            make deauthorize-master-circle-ip
+workflows:
+  version: 2
+  cohesiv-build-and-deploy:
+    jobs:
+      - checkout-code
+      - install-cohesiv-node-dependencies:
+          requires:
+            - checkout-code
+      - install-cohesiv-golang-dependencies:
+          requires:
+            - checkout-code
+      - build-cohesiv-node:
+          requires:
+            - install-cohesiv-node-dependencies
+      - build-cohesiv-go:
+          requires:
+            - install-cohesiv-golang-dependencies
+      - build-cohesiv-docker-images:
+          requires:
+            - build-cohesiv-go
+            - build-cohesiv-node
+          filters:
+            branches:
+              only:
+                - staging
+                - master
+      - deploy-cohesiv-staging:
+          requires:
+            - build-cohesiv-docker-images
+          filters:
+            branches:
+              only: staging
+      - deploy-cohesiv-production:
+          requires:
+            - build-cohesiv-docker-images
+          filters:
+            branches:
+              only: master
+  mypds-build-and-deploy:
+    jobs:
+      - checkout-code
+      - install-mypds-dependencies:
+          requires:
+            - checkout-code
+      - test-mypds:
+          requires:
+            - install-mypds-dependencies
+      - build-mypds:
+          requires:
+            - install-mypds-dependencies
+      - build-mypds-docker-image:
+          requires:
+            - build-mypds
+          filters:
+            branches:
+              only:
+                - staging
+                - master
+      - deploy-mypds-staging:
+          requires:
+            - build-mypds-docker-image
+          filters:
+            branches:
+              only: staging
+      - deploy-mypds-production:
+          requires:
+            - build-mypds-docker-image
+          filters:
+            branches:
+              only: master

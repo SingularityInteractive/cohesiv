@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cohesiv
+  namespace: cohesiv
+data:
+  hosts.tagdirectory: tagdirectory.cohesiv:80
+  hosts.access: access.cohesiv:80

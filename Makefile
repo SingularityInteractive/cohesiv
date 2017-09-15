@@ -13,7 +13,7 @@ docker-images:
 	done
 tsc:
 	BINS=(${TS}); for b in $${BINS[*]}; do \
-	  cd `pwd`/$$b && yarn build ;\
+		tsc -p $$b ;\
 	done
 binaries:
 	if [ -z "$$GOPATH" ]; then echo "GOPATH is not set"; exit 1; fi
@@ -23,7 +23,7 @@ binaries:
 		CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o  ${BIN_DIR}/$$b ./$$b ;\
 	done
 docker-push-ecr: configure_aws_cli
-	BINS=(${BINARIES}); for b in $${BINS[*]}; do \
+	BINS=(${IMAGES}); for b in $${BINS[*]}; do \
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
 	done
