@@ -210,13 +210,12 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
+            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/develop/deployment.yaml
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
-            make authorize-staging-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
+            make authorize-staging-develop-ip
             kubectl apply -f kube/staging
-            make deauthorize-staging-circle-ip
+            make deauthorize-staging-develop-ip
   deploy-cohesiv-staging:
     docker:
       - image: devopsil/kops-docker
@@ -251,7 +250,6 @@ jobs:
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-staging-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
             kubectl apply -f kube/staging
             make deauthorize-staging-circle-ip
   deploy-cohesiv-production:
@@ -287,7 +285,6 @@ jobs:
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
             sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-master-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${PRODUCTION_DB_CONNECTION_STRING}
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
   deploy-mypds-staging:
@@ -389,8 +386,15 @@ workflows:
           filters:
             branches:
               only:
+                - develop
                 - staging
                 - master
+      - deploy-cohesiv-develop:
+          requires:
+            - build-cohesiv-docker-images
+          filters:
+            branches:
+              only: develop
       - deploy-cohesiv-staging:
           requires:
             - build-cohesiv-docker-images

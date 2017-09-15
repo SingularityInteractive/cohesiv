@@ -80,7 +80,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: cohesiv-secrets
-              key: staging-db-connection-string
+              key: develop-db-connection-string
         resources:
           requests:
             cpu: 100m
@@ -121,7 +121,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: cohesiv-secrets
-              key: staging-db-connection-string
+              key: develop-db-connection-string
         resources:
           requests:
             cpu: 100m
