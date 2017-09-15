@@ -17,7 +17,7 @@ jobs:
   install-cohesiv-golang-dependencies:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -83,7 +83,7 @@ jobs:
   build-cohesiv-go:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
           name: save SHA to a file
@@ -170,7 +170,7 @@ jobs:
   build-cohesiv-docker-images:
     docker:
       - image: circleci/golang:latest
-    working_directory: ~/cohesiv
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
       - run:
