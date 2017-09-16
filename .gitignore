@@ -17,10 +17,6 @@ logs
 results
 tmp
 
-# Lockfiles
-Gopkg.lock
-yarn.lock
-
 # API keys and secrets
 kube/secrets/**/*
 **/kube/secrets/**/*
@@ -29,7 +25,6 @@ kube/secrets/**/*
 node_modules
 **/node_modules
 vendor
-yarn.lock
 
 
 # Editors
