@@ -31,33 +31,21 @@ configure_aws_cli:
 	aws --version
 	aws configure set default.region us-east-1
 	aws configure set default.output json
-set-ip:
-	echo "Getting container/machine IP address..."
-	export IP_ADDRESS=`curl -s icanhazip.com`
-	if [ -z "$IP_ADDRESS" ]; then \
-  		IP_ADDRESS=$(wget -qO- http://checkip.amazonaws.com) ;\
-    if [ -z "$IP_ADDRESS" ]; then \
-    echo "Cannot get IP address, fubar'd" ;\
-    exit 1 ;\
-    fi \
-  else \
-  	echo "Got IP address of ${IP_ADDRESS}" ;\
-  fi
-authorize-develop-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
-deauthorize-develop-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
-authorize-staging-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
-deauthorize-staging-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
-authorize-master-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
-deauthorize-master-circle-ip: set-ip
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
-	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr ${IP_ADDRESS}/32
+authorize-develop-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr `curl -s icanhazip.com`/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr `curl -s icanhazip.com`/32
+deauthorize-develop-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr `curl -s icanhazip.com`/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr `curl -s icanhazip.com`/32
+authorize-staging-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr `curl -s icanhazip.com`/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr `curl -s icanhazip.com`/32
+deauthorize-staging-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr `curl -s icanhazip.com`/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${STAGING_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr `curl -s icanhazip.com`/32
+authorize-master-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr `curl -s icanhazip.com`/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr `curl -s icanhazip.com`/32
+deauthorize-master-circle-ip:
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr `curl -s icanhazip.com`/32
+	aws --region=${AWS_DEFAULT_REGION} ec2 revoke-security-group-ingress --group-id ${MASTER_SECURITY_GROUP_ID} --protocol tcp --port 5432 --cidr `curl -s icanhazip.com`/32
