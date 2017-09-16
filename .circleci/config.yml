@@ -208,7 +208,7 @@ jobs:
           command: cd mypds && make docker-image
   deploy-cohesiv-develop:
     docker:
-      - image: devopsil/kops-docker
+      - image: sammccord/kops-docker
         environment:
           AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -223,8 +223,6 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
-      - run:
-          command: docker -v
       - run:
           name: Push to ecr
           command: |
@@ -246,7 +244,7 @@ jobs:
             make deauthorize-develop-circle-ip
   deploy-cohesiv-staging:
     docker:
-      - image: devopsil/kops-docker
+      - image: sammccord/kops-docker
         environment:
           AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -282,7 +280,7 @@ jobs:
             make deauthorize-staging-circle-ip
   deploy-cohesiv-production:
     docker:
-      - image: devopsil/kops-docker
+      - image: sammccord/kops-docker
         environment:
           AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -317,7 +315,7 @@ jobs:
             make deauthorize-master-circle-ip
   deploy-mypds-staging:
     docker:
-      - image: devopsil/kops-docker
+      - image: sammccord/kops-docker
         environment:
           AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -355,7 +353,7 @@ jobs:
             make deauthorize-staging-circle-ip
   deploy-mypds-production:
     docker:
-      - image: devopsil/kops-docker
+      - image: sammccord/kops-docker
         environment:
           AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
           AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -435,35 +433,35 @@ workflows:
           filters:
             branches:
               only: master
-  mypds-build-and-deploy:
-    jobs:
-      - checkout-code
-      - install-mypds-dependencies:
-          requires:
-            - checkout-code
-      - build-mypds:
-          requires:
-            - install-mypds-dependencies
-      - test-mypds:
-          requires:
-            - build-mypds
-      - build-mypds-docker-image:
-          requires:
-            - build-mypds
-          filters:
-            branches:
-              only:
-                - staging
-                - master
-      - deploy-mypds-staging:
-          requires:
-            - build-mypds-docker-image
-          filters:
-            branches:
-              only: staging
-      - deploy-mypds-production:
-          requires:
-            - build-mypds-docker-image
-          filters:
-            branches:
-              only: master
+  # mypds-build-and-deploy:
+  #   jobs:
+  #     - checkout-code
+  #     - install-mypds-dependencies:
+  #         requires:
+  #           - checkout-code
+  #     - build-mypds:
+  #         requires:
+  #           - install-mypds-dependencies
+  #     - test-mypds:
+  #         requires:
+  #           - build-mypds
+  #     - build-mypds-docker-image:
+  #         requires:
+  #           - build-mypds
+  #         filters:
+  #           branches:
+  #             only:
+  #               - staging
+  #               - master
+  #     - deploy-mypds-staging:
+  #         requires:
+  #           - build-mypds-docker-image
+  #         filters:
+  #           branches:
+  #             only: staging
+  #     - deploy-mypds-production:
+  #         requires:
+  #           - build-mypds-docker-image
+  #         filters:
+  #           branches:
+  #             only: master
