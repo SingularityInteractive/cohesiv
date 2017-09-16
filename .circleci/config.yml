@@ -25,6 +25,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Get dep tool
@@ -47,6 +49,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
@@ -66,6 +70,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
@@ -85,6 +91,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - cohesiv-vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Build Golang Services
@@ -104,6 +112,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - cohesiv-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build TS Services
@@ -123,6 +133,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build Web
@@ -146,6 +158,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - mypds-build-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
@@ -165,6 +179,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - cohesiv-go-build-{{ checksum ".circle-sha" }}
             - cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
@@ -182,6 +198,8 @@ jobs:
       - restore_cache:
           keys:
             - repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - mypds-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
