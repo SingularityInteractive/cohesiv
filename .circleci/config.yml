@@ -170,13 +170,14 @@ jobs:
   deploy-cohesiv-develop:
     docker:
       - image: sammccord/kops-docker
-        environment:
-          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-          AWS_REGION: ${AWS_DEFAULT_REGION}
-          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
+      - run:
+        command: |
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          export AWS_REGION=${AWS_DEFAULT_REGION}
+          export KOPS_STATE_STORE=${KOPS_STATE_STORE}
       - setup_remote_docker
       - run:
           name: save SHA to a file
@@ -215,13 +216,14 @@ jobs:
   deploy-cohesiv-staging:
     docker:
       - image: sammccord/kops-docker
-        environment:
-          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-          AWS_REGION: ${AWS_DEFAULT_REGION}
-          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
+      - run:
+        command: |
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          export AWS_REGION=${AWS_DEFAULT_REGION}
+          export KOPS_STATE_STORE=${KOPS_STATE_STORE}
       - setup_remote_docker
       - run:
           name: save SHA to a file
@@ -260,13 +262,14 @@ jobs:
   deploy-cohesiv-production:
     docker:
       - image: sammccord/kops-docker
-        environment:
-          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-          AWS_REGION: ${AWS_DEFAULT_REGION}
-          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
+      - run:
+        command: |
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          export AWS_REGION=${AWS_DEFAULT_REGION}
+          export KOPS_STATE_STORE=${KOPS_STATE_STORE}
       - setup_remote_docker
       - run:
           name: save SHA to a file
@@ -304,13 +307,14 @@ jobs:
   deploy-mypds-staging:
     docker:
       - image: sammccord/kops-docker
-        environment:
-          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-          AWS_REGION: ${AWS_DEFAULT_REGION}
-          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
+      - run:
+        command: |
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          export AWS_REGION=${AWS_DEFAULT_REGION}
+          export KOPS_STATE_STORE=${KOPS_STATE_STORE}
       - setup_remote_docker
       - run:
           name: save SHA to a file
@@ -347,13 +351,14 @@ jobs:
   deploy-mypds-production:
     docker:
       - image: sammccord/kops-docker
-        environment:
-          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-          AWS_REGION: ${AWS_DEFAULT_REGION}
-          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
+      - run:
+        command: |
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          export AWS_REGION=${AWS_DEFAULT_REGION}
+          export KOPS_STATE_STORE=${KOPS_STATE_STORE}
       - setup_remote_docker
       - run:
           name: save SHA to a file
