@@ -40,7 +40,7 @@ jobs:
             - vendor
   install-cohesiv-node-dependencies:
     docker:
-      - image: node:8-slim
+      - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -61,7 +61,7 @@ jobs:
             - node_modules
   install-mypds-dependencies:
     docker:
-      - image: node:8-slim
+      - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -103,7 +103,7 @@ jobs:
             - ./gopath/bin
   build-cohesiv-node:
     docker:
-      - image: node:8-slim
+      - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -124,7 +124,7 @@ jobs:
             - ./access/dist
   build-mypds:
     docker:
-      - image: node:8-slim
+      - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -149,7 +149,7 @@ jobs:
             - ./mypds/public
   test-mypds:
     docker:
-      - image: node:8-slim
+      - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
