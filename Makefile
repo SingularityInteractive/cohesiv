@@ -33,10 +33,10 @@ configure_aws_cli:
 	aws configure set default.output json
 set-ip:
 	echo "Getting container/machine IP address..."
-  IP_ADDRESS=`curl -s icanhazip.com`
-  if [ -z "$IP_ADDRESS" ];then \
+	IP_ADDRESS=`curl -s icanhazip.com`
+	if [ -z "$IP_ADDRESS" ]; then \
   		IP_ADDRESS=$(wget -qO- http://checkip.amazonaws.com) ;\
-    if [ -z "$IP_ADDRESS" ];then \
+    if [ -z "$IP_ADDRESS" ]; then \
     @echo "Cannot get IP address, fubar'd" ;\
     exit 1 ;\
     fi \
