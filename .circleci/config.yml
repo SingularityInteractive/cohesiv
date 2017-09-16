@@ -184,7 +184,11 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
@@ -225,7 +229,11 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
@@ -266,7 +274,11 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
@@ -306,6 +318,8 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-mypds-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
@@ -347,6 +361,8 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
             - v4-mypds-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
