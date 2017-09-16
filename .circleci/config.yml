@@ -208,8 +208,6 @@ jobs:
           name: Deploy
           command: |
             sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/develop/deployment.yaml
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-develop-circle-ip
             kubectl apply -f kube/develop
             make deauthorize-develop-circle-ip
@@ -254,8 +252,6 @@ jobs:
           name: Deploy
           command: |
             sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-staging-circle-ip
             kubectl apply -f kube/staging
             make deauthorize-staging-circle-ip
@@ -299,8 +295,6 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-master-circle-ip
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
@@ -342,8 +336,6 @@ jobs:
           name: Deploy
           command: |
             sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/staging/deployment.yaml
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-staging-circle-ip
             node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
             kubectl apply -f mypds/kube/staging
@@ -385,8 +377,6 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
             make authorize-master-circle-ip
             node_modules/.bin/sequelize db:migrate --url ${PRODUCTION_DB_CONNECTION_STRING}
             kubectl apply -f mypds/kube/production
