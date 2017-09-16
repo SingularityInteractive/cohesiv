@@ -171,10 +171,10 @@ jobs:
     docker:
       - image: sammccord/kops-docker
         environment:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_REGION: $AWS_DEFAULT_REGION
-          KOPS_STATE_STORE: $KOPS_STATE_STORE
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+          AWS_REGION: ${AWS_DEFAULT_REGION}
+          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
@@ -216,10 +216,10 @@ jobs:
     docker:
       - image: sammccord/kops-docker
         environment:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_REGION: $AWS_DEFAULT_REGION
-          KOPS_STATE_STORE: $KOPS_STATE_STORE
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+          AWS_REGION: ${AWS_DEFAULT_REGION}
+          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
@@ -261,10 +261,10 @@ jobs:
     docker:
       - image: sammccord/kops-docker
         environment:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_REGION: $AWS_DEFAULT_REGION
-          KOPS_STATE_STORE: $KOPS_STATE_STORE
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+          AWS_REGION: ${AWS_DEFAULT_REGION}
+          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
@@ -305,10 +305,10 @@ jobs:
     docker:
       - image: sammccord/kops-docker
         environment:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_REGION: $AWS_DEFAULT_REGION
-          KOPS_STATE_STORE: $KOPS_STATE_STORE
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+          AWS_REGION: ${AWS_DEFAULT_REGION}
+          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
@@ -348,10 +348,10 @@ jobs:
     docker:
       - image: sammccord/kops-docker
         environment:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_REGION: $AWS_DEFAULT_REGION
-          KOPS_STATE_STORE: $KOPS_STATE_STORE
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+          AWS_REGION: ${AWS_DEFAULT_REGION}
+          KOPS_STATE_STORE: ${KOPS_STATE_STORE}
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
