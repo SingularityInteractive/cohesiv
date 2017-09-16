@@ -224,6 +224,8 @@ jobs:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
       - run:
+          command: docker -v
+      - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
