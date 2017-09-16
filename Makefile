@@ -23,7 +23,7 @@ binaries:
 		CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o  ${BIN_DIR}/$$b ./$$b ;\
 	done
 docker-push-ecr: configure_aws_cli
-	BINS=(${IMAGES}); for b in $${BINS[*]}; do \
+	BINS=(${IMAGES}); for b in $${BINS[*]}; do \s
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
 	done
@@ -37,11 +37,11 @@ set-ip:
 	if [ -z "$IP_ADDRESS" ]; then \
   		IP_ADDRESS=$(wget -qO- http://checkip.amazonaws.com) ;\
     if [ -z "$IP_ADDRESS" ]; then \
-    @echo "Cannot get IP address, fubar'd" ;\
+    echo "Cannot get IP address, fubar'd" ;\
     exit 1 ;\
     fi \
   else \
-  	@echo "Got IP address of ${IP_ADDRESS}" ;\
+  	echo "Got IP address of ${IP_ADDRESS}" ;\
   fi
 authorize-develop-circle-ip: set-ip
 	aws --region=${AWS_DEFAULT_REGION} ec2 authorize-security-group-ingress --group-id ${DEVELOP_SECURITY_GROUP_ID} --protocol tcp --port 443 --cidr ${IP_ADDRESS}/32
