@@ -167,9 +167,14 @@ jobs:
       - run:
           name: Test TS Server
           command: cd mypds && yarn test:server
-  build-cohesiv-docker-images:
+  deploy-cohesiv-develop:
     docker:
-      - image: circleci/golang:latest
+      - image: sammccord/kops-docker
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_REGION: $AWS_DEFAULT_REGION
+          KOPS_STATE_STORE: $KOPS_STATE_STORE
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - setup_remote_docker
@@ -188,48 +193,13 @@ jobs:
       - run:
           name: Build docker images
           command: make docker-images
-  build-mypds-docker-image:
-    docker:
-      - image: circleci/golang:latest
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
-    steps:
-      - setup_remote_docker
-      - run:
-          name: save SHA to a file
-          command: echo $CIRCLE_SHA1 > .circle-sha
-      - restore_cache:
-          keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
-            - v4-mypds-build-{{ checksum ".circle-sha" }}
-      - run:
-          name: Build docker image
-          command: cd mypds && make docker-image
-  deploy-cohesiv-develop:
-    docker:
-      - image: sammccord/kops-docker
-        environment:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_REGION: $AWS_DEFAULT_REGION
-          KOPS_STATE_STORE: $KOPS_STATE_STORE
-    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
-    steps:
-      - setup_remote_docker
-      - run:
-          name: save SHA to a file
-          command: echo $CIRCLE_SHA1 > .circle-sha
-      - restore_cache:
-          keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             make docker-push-ecr
       - run:
-          name: Get staging cluster credentials
+          name: Get develop cluster credentials
           command: |
             kops get cluster --name=develop.cohesiv.io
             kops export kubecfg --name=develop.cohesiv.io --state=${KOPS_STATE_STORE}
@@ -259,6 +229,15 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Build docker images
+          command: make docker-images
       - run:
           name: Push to ecr
           command: |
@@ -295,13 +274,22 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Build docker images
+          command: make docker-images
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             make docker-push-ecr
       - run:
-          name: Get staging cluster credentials
+          name: Get production cluster credentials
           command: |
             kops get cluster --name=cohesiv.io
             kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
@@ -332,12 +320,15 @@ jobs:
             - v4-repo-{{ checksum ".circle-sha" }}
             - v4-mypds-build-{{ checksum ".circle-sha" }}
       - run:
+          name: Build docker image
+          command: cd mypds && make docker-image
+      - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             cd mypds && make docker-push-ecr
       - run:
-          name: Get staging cluster credentials
+          name: Get mypds staging cluster credentials
           command: |
             kops get cluster --name=staging.cohesiv.io
             kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
@@ -370,12 +361,15 @@ jobs:
             - v4-repo-{{ checksum ".circle-sha" }}
             - v4-mypds-build-{{ checksum ".circle-sha" }}
       - run:
+          name: Build docker image
+          command: cd mypds && make docker-image
+      - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             cd mypds && make docker-push-ecr
       - run:
-          name: Get staging cluster credentials
+          name: Get mypds production cluster credentials
           command: |
             kops get cluster --name=cohesiv.io
             kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
