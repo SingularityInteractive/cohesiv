@@ -29,6 +29,8 @@ kube/secrets/**/*
 node_modules
 **/node_modules
 vendor
+yarn.lock
+
 
 # Editors
 .idea
