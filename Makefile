@@ -23,7 +23,7 @@ binaries:
 		CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o  ${BIN_DIR}/$$b ./$$b ;\
 	done
 docker-push-ecr: configure_aws_cli
-	BINS=(${IMAGES}); for b in $${BINS[*]}; do \s
+	BINS=(${IMAGES}); for b in $${BINS[*]}; do \
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
 	done
