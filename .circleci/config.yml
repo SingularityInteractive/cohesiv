@@ -184,11 +184,7 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
@@ -229,11 +225,7 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
@@ -274,11 +266,7 @@ jobs:
       - restore_cache:
           keys:
             - v4-repo-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
-      - restore_cache:
-          keys:
             - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
@@ -399,31 +387,24 @@ workflows:
       - build-cohesiv-go:
           requires:
             - install-cohesiv-golang-dependencies
-      - build-cohesiv-docker-images:
+      - deploy-cohesiv-develop:
           requires:
             - build-cohesiv-go
             - build-cohesiv-node
           filters:
             branches:
-              only:
-                - develop
-                - staging
-                - master
-      - deploy-cohesiv-develop:
-          requires:
-            - build-cohesiv-docker-images
-          filters:
-            branches:
               only: develop
       - deploy-cohesiv-staging:
           requires:
-            - build-cohesiv-docker-images
+            - build-cohesiv-go
+            - build-cohesiv-node
           filters:
             branches:
               only: staging
       - deploy-cohesiv-production:
           requires:
-            - build-cohesiv-docker-images
+            - build-cohesiv-go
+            - build-cohesiv-node
           filters:
             branches:
               only: master
