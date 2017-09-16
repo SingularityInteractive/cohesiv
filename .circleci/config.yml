@@ -226,7 +226,7 @@ jobs:
       - run:
           name: Push to ecr
           command: |
-            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             make docker-push-ecr
       - run:
           name: Get staging cluster credentials
@@ -262,7 +262,7 @@ jobs:
       - run:
           name: Push to ecr
           command: |
-            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             make docker-push-ecr
       - run:
           name: Get staging cluster credentials
@@ -298,7 +298,7 @@ jobs:
       - run:
           name: Push to ecr
           command: |
-            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             make docker-push-ecr
       - run:
           name: Get staging cluster credentials
@@ -334,7 +334,7 @@ jobs:
       - run:
           name: Push to ecr
           command: |
-            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             cd mypds && make docker-push-ecr
       - run:
           name: Get staging cluster credentials
@@ -372,7 +372,7 @@ jobs:
       - run:
           name: Push to ecr
           command: |
-            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION})
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             cd mypds && make docker-push-ecr
       - run:
           name: Get staging cluster credentials
