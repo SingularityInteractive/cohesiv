@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'
 import sequelize from '../db'
-import Resource from './Resource'
+import Resource from './resource'
 
 const Tag = sequelize.define(
   'Tag',
