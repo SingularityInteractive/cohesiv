@@ -36,6 +36,6 @@ module.exports = {
     )
   },
   down: function(queryInterface, Sequelize) {
-    return queryInterface.dropTable('accessStatement')
+    return queryInterface.dropTable('access_statements')
   }
 }

@@ -8,8 +8,8 @@ import (
 
 // TagModel as represented in datastore
 type TagModel struct {
-	Name      string          `gorm:"primary_key"`
-	Resources []ResourceModel `gorm:"many2many:tag_resources;"`
+	Name      string          `gorm:"primary_key;column:name"`
+	Resources []ResourceModel `gorm:"many2many:tag_resources;AssociationForeignKey:tag_name"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -9,7 +9,7 @@ import (
 // ResourceModel as represented in datastore
 type ResourceModel struct {
 	ID        string     `gorm:"primary_key;column:id"`
-	Tags      []TagModel `gorm:"many2many:tag_resources;"`
+	Tags      []TagModel `gorm:"many2many:tag_resources;AssociationForeignKey:resource_id"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

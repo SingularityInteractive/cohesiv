@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize'
 import sequelize from '../db'
+import Tag from './tag'
 
 const Resource = sequelize.define(
   'Resource',
@@ -12,6 +13,8 @@ const Resource = sequelize.define(
     underscored: true
   }
 )
+
+Resource.belongsToMany(Tag, { as: 'Tags', through: 'tag_resources', foreignKey: 'resource_id' })
 
 Resource.sync({
   force: process.env.NODE_ENV === 'production' ? false : true

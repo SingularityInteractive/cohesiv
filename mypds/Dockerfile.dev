@@ -2,7 +2,7 @@ FROM mhart/alpine-node:8
 ## git is temporary until react-native-web gets its shit together
 RUN apk add --update git && rm -rf /var/cache/apk/*
 # create app directory in container
-RUN mkdir -p /app/server /app/models /app/public /app/migrations
+RUN mkdir -p /app/server /app/public
 # set /app directory as default working directory
 WORKDIR /app
 # only copy package.json initially so that `RUN yarn` layer is recreated only
@@ -12,10 +12,8 @@ ADD package.json yarn.lock /app/
 RUN yarn --pure-lockfile
 # reproduce project structure
 COPY ./server/ /app/server/
-COPY ./models/ /app/models/
 COPY ./public/ /app/public/
-COPY ./migrations /app/migrations
 # expose port 4040
 EXPOSE 4040
 # cmd to start service
-CMD node_modules/.bin/sequelize db:migrate --url ${DB_CONNECTION_STRING} && yarn start:server
+CMD yarn start:server
