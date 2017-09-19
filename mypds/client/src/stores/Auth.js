@@ -58,7 +58,7 @@ class Auth {
   @action
   async onError(error) {
     this.error = error
-    console.error(error)
+    // console.error(error)
     await this.removeStoredAuthState()
   }
 
