@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "sdkVersion": "20.0.0",
+    "name": "Cohesiv",
+    "slug": "cohesiv",
+    "description": "Cohesiv Client",
+    "icon": "./assets/icons/app-icon.png",
+    "notification": {
+      "icon": "./assets/icons/notification-icon.png",
+      "color": "#000000"
+    },
+    "loading": {
+      "icon": "./assets/icons/loading-icon.png",
+      "hideExponentText": true
+    },
+    "android": {
+      "package": "com.github.SingularityInteractive.cohesiv"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.github.SingularityInteractive.cohesiv",
+      "publishBundlePath": "ios/cohesiv/Supporting/shell-app.bundle",
+      "publishManifestPath": "ios/cohesiv/Supporting/shell-app-manifest.json"
+    },
+    "version": "0.1.0",
+    "isDetached": true,
+    "detach": {
+      "scheme": "exp0f70fdfbae574a2abe3f04d4d1104bc4",
+      "iosExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/ios-v1.19.2-sdk20.0.0-71c3afdd-3b31-4722-9657-bbf07ea645d8.tar.gz",
+      "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v1.19.1-sdk20.0.0-5b613054-1239-439f-9c3a-0aad67cbe39a.tar.gz"
+    }
+  }
+}
