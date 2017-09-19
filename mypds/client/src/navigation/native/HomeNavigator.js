@@ -9,7 +9,7 @@ import Feed from '../../screens/Feed/Feed.native'
 import Messages from '../../screens/Messages/Messages.native'
 import Notifications from '../../screens/Notifications/Notifications.native'
 
-const MainRoutes = {
+const HomeRoutes = {
   Home: {
     ...routes.Home,
     screen: Home,
@@ -37,7 +37,7 @@ const MainRoutes = {
   }
 }
 
-export default TabNavigator(MainRoutes, {
+export default TabNavigator(HomeRoutes, {
   initialRouteName: 'Home',
   tabBarComponent: TabBarBottom,
   tabBarPosition: 'bottom',

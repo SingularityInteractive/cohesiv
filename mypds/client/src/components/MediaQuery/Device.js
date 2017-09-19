@@ -1,4 +1,4 @@
-import { Dimensions } from 'react-native'
+import { Dimensions, AsyncStorage } from 'react-native'
 
 export default class Device {
   static subscribeToDimensionChanges(handler) {

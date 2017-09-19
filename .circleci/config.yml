@@ -298,6 +298,47 @@ jobs:
             make authorize-master-circle-ip
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
+  deploy-mypds-develop:
+    docker:
+      - image: sammccord/kops-docker
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    steps:
+      - run:
+          command: |
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            export AWS_REGION=${AWS_DEFAULT_REGION}
+            export KOPS_STATE_STORE=${KOPS_STATE_STORE}
+      - setup_remote_docker
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - v4-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - v4-mypds-build-{{ checksum ".circle-sha" }}
+      - run:
+          name: Build docker image
+          command: cd mypds && make docker-image
+      - run:
+          name: Push to ecr
+          command: |
+            eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
+            cd mypds && make docker-push-ecr
+      - run:
+          name: Get mypds staging cluster credentials
+          command: |
+            kops get cluster --name=develop.cohesiv.io
+            kops export kubecfg --name=develop.cohesiv.io --state=${KOPS_STATE_STORE}
+      - run:
+          name: Deploy
+          command: |
+            sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/develop/deployment.yaml
+            make authorize-staging-circle-ip
+            kubectl apply -f mypds/kube/develop
+            make deauthorize-staging-circle-ip
   deploy-mypds-staging:
     docker:
       - image: sammccord/kops-docker
@@ -337,7 +378,6 @@ jobs:
           command: |
             sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/staging/deployment.yaml
             make authorize-staging-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${STAGING_DB_CONNECTION_STRING}
             kubectl apply -f mypds/kube/staging
             make deauthorize-staging-circle-ip
   deploy-mypds-production:
@@ -378,7 +418,6 @@ jobs:
           name: Deploy
           command: |
             make authorize-master-circle-ip
-            node_modules/.bin/sequelize db:migrate --url ${PRODUCTION_DB_CONNECTION_STRING}
             kubectl apply -f mypds/kube/production
             make deauthorize-master-circle-ip
 workflows:
@@ -419,35 +458,42 @@ workflows:
           filters:
             branches:
               only: master
-  # mypds-build-and-deploy:
-  #   jobs:
-  #     - checkout-code
-  #     - install-mypds-dependencies:
-  #         requires:
-  #           - checkout-code
-  #     - build-mypds:
-  #         requires:
-  #           - install-mypds-dependencies
-  #     - test-mypds:
-  #         requires:
-  #           - build-mypds
-  #     - build-mypds-docker-image:
-  #         requires:
-  #           - build-mypds
-  #         filters:
-  #           branches:
-  #             only:
-  #               - staging
-  #               - master
-  #     - deploy-mypds-staging:
-  #         requires:
-  #           - build-mypds-docker-image
-  #         filters:
-  #           branches:
-  #             only: staging
-  #     - deploy-mypds-production:
-  #         requires:
-  #           - build-mypds-docker-image
-  #         filters:
-  #           branches:
-  #             only: master
+  mypds-build-and-deploy:
+    jobs:
+      - checkout-code
+      - install-mypds-dependencies:
+          requires:
+            - checkout-code
+      - build-mypds:
+          requires:
+            - install-mypds-dependencies
+      - test-mypds:
+          requires:
+            - build-mypds
+      - build-mypds-docker-image:
+          requires:
+            - build-mypds
+          filters:
+            branches:
+              only:
+                - develop
+                - staging
+                - master
+      - deploy-mypds-develop:
+          requires:
+            - build-mypds-docker-image
+          filters:
+            branches:
+              only: develop
+      - deploy-mypds-staging:
+          requires:
+            - build-mypds-docker-image
+          filters:
+            branches:
+              only: staging
+      - deploy-mypds-production:
+          requires:
+            - build-mypds-docker-image
+          filters:
+            branches:
+              only: master

@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: mypds
-  name: app-deployment
+  namespace: cohesiv
+  name: mypds-deployment
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: app
+        app: mypds
     spec:
       # [START containers]
       containers:

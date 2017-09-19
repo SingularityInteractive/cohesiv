@@ -4,8 +4,8 @@ metadata:
   namespace: cohesiv
   name: mypds-deployment
 spec:
-  revisionHistoryLimit: 5
-  replicas: 3
+  revisionHistoryLimit: 3
+  replicas: 1
   strategy:
     rollingUpdate:
       maxUnavailable: 40%
@@ -17,7 +17,7 @@ spec:
       # [START containers]
       containers:
       - name: mypds
-        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:master"
+        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest"
         imagePullPolicy: Always
         ports:
         - containerPort: 4040
@@ -41,8 +41,8 @@ spec:
         - name: DB_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
-              name: mypds-secrets
-              key: production-db-connection-string
+              name: cohesiv-secrets
+              key: develop-db-connection-string
         resources:
           requests:
             cpu: 100m

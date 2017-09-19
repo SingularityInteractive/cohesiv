@@ -2,7 +2,7 @@ import { StackNavigator } from 'react-navigation'
 import routes from '../index'
 
 import Login from '../../screens/Login/Login.native'
-import MainNavigator from './MainNavigator'
+import HomeNavigator from './HomeNavigator'
 
 const RootRoutes = {
   Login: {
@@ -10,7 +10,7 @@ const RootRoutes = {
     screen: Login
   },
   Main: {
-    screen: MainNavigator,
+    screen: HomeNavigator,
     navigationOptions: {
       gesturesEnabled: false
     }

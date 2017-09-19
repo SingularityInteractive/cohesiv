@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cohesiv
-  namespace: mypds
-data:
-  hosts.tagdirectory: tagdirectory.cohesiv:80
-  access.tagdirectory: access.cohesiv:80

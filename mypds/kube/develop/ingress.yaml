@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - mypds.cohesiv.io
+    - mypds.develop.cohesiv.io
     secretName: cohesiv-tls
   rules:
-  - host: "mypds.cohesiv.io"
+  - host: "mypds.develop.cohesiv.io"
     http:
       paths:
       - path: /

@@ -53,6 +53,7 @@ function login(req: express.Request, res: express.Response, next: express.NextFu
  * @returns {*}
  */
 function getRandomNumber(req: AuthenticatedRequest, res: express.Response) {
+
   // req.user is assigned by jwt middleware if valid token is provided
   return res.json({
     user: req.user,
