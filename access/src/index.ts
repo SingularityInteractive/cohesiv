@@ -1,19 +1,27 @@
-import * as grpc from 'grpc'
+import { Observable } from 'rxjs'
+import { serverBuilder } from 'rxjs-grpc'
 import * as path from 'path'
+import { cohesiv } from '../../cohesiv/cohesiv'
 import db from '../../cohesiv/db'
 import log from './log'
 import config from './config'
 import service from './service'
 
-db
-  .sync()
-  .then(() => log.info('Successfully synced db'))
-  .catch(e => log.error('Failed to sync database', e))
+const protoPath = path.resolve(process.cwd(), config.PROTO_PATH)
 
-const cohesiv = grpc.load(path.resolve(process.cwd(), config.PROTO_PATH)).cohesiv
-const server = new grpc.Server()
-server.addService(cohesiv.Access.service, new service())
-server.bind(`0.0.0.0:${config.PORT}`, grpc.ServerCredentials.createInsecure())
-server.start()
+config.ENV !== 'production' &&
+  db
+    .sync()
+    .then(() => log.info('Successfully synced db'))
+    .catch(e => log.error('Failed to sync database', e))
 
-export default server
+async function main() {
+  type ServerBuilder = cohesiv.ServerBuilder
+  const server = serverBuilder<ServerBuilder>(protoPath, 'cohesiv')
+
+  server.addAccess(new service())
+
+  server.start(`0.0.0.0:${config.PORT}`)
+}
+
+main().catch(error => console.error(error))
