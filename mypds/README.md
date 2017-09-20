@@ -13,8 +13,6 @@ A boilerplate monolith designed to be deployed within a [Cohesiv](https://github
 
 ## Installation
 
-- Fork, or download and `git remote add upstream https://github.com/SingularityInteractive/cohesiv-client.git`
-- `cd` into your new repo, and `yarn`
 - `cd client && yarn`
 
 *__Note:__ react-native is nested in client to prevent mixing native dependencies with web and server*
@@ -84,8 +82,6 @@ echo -n "postgres://user:password@host:5432/cohesiv" | base64
 # And copy into an opaque kubernetes secret called base-secrets at /kube/secrets
 
 kops export kubecfg --name=${NAME} --state=${KOPS_STATE_STORE} # Get kubernetes context for applying config
-kubectl apply -f kube/00-namespace.yaml
-kubectl apply -f kube/secrets.yaml
 kubectl apply -f kube/staging # Applies configs for all files in folder
 ```
 
@@ -116,9 +112,8 @@ Please [open an issue](https://github.com/SingularityInteractive/base/issues/new
   ```json
 {
     "package.json" : "No brainer here",
-    "docker-compose.yml" : "Mainly for console log differentiation purposes here",
+    "../docker-compose.yml" : "Mainly for console log differentiation purposes here",
     "client/package.json": "Just to keep consistent with the root package.json",
-    ".env" : "The postgres connection url env var is set to use 'base'",
     "kube/**/*.yaml": "The k8s configs apply under the 'base' namespace, so all references should be changed.",
     "Makefile": "Change the CONTAINER_NAME variable for the AWS ECR image, and PUBLIC_URL so that it accurately reflects the host"
 }

@@ -25,7 +25,7 @@ spec:
         - name: PORT
           value: "4040"
         - name: NODE_ENV
-          value: development
+          value: production
         - name: JWT_SECRET
           value: fgL8y7-ABYLZyudHBxwUXQaNsNdzJtfYjsUw_cBefJQj8s8G9s1ZWJDmNmmgG1qy
         - name: TAG_SVC_ADDR

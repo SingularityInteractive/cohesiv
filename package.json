@@ -8,7 +8,8 @@
   "license": "MIT",
   "scripts": {
     "precommit": "lint-staged",
-    "access:dev": "yarn run access:build && yarn run concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc -w -p access\" \"nodemon access/dist/access/src/index.js\"",
+    "access:dev":
+      "yarn run access:build && yarn run concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc -w -p access\" \"nodemon access/dist/access/src/index.js\"",
     "access:build": "tsc -p access",
     "access:serve": "node access/dist/access/src/index.js",
     "access:test": "jest --verbose --forceExit",
@@ -26,21 +27,17 @@
   },
   "jest": {
     "globals": {
-      "__TS_CONFIG__": "tsconfig.json"
+      "tsConfigFile": "tsconfig.json"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
     "transform": {
       "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
     },
-    "testMatch": [
-      "**/test/**/*.test.(ts|js)"
-    ],
+    "testMatch": ["**/test/**/*.test.(ts|js)"],
     "testEnvironment": "node"
   },
   "devDependencies": {
+    "@reactivex/rxjs": "^5.4.3",
     "@types/dotenv": "^4.0.1",
     "@types/google-protobuf": "^3.2.7",
     "@types/jest": "^20.0.8",
@@ -63,7 +60,6 @@
   },
   "dependencies": {
     "dotenv": "^4.0.0",
-    "grpc": "^1.6.0",
     "joi": "^11.0.1",
     "lodash": "^4.17.4",
     "pbac": "^0.1.3",
