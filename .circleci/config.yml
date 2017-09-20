@@ -328,7 +328,7 @@ jobs:
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
             cd mypds && make docker-push-ecr
       - run:
-          name: Get mypds staging cluster credentials
+          name: Get mypds develop cluster credentials
           command: |
             kops get cluster --name=develop.cohesiv.io
             kops export kubecfg --name=develop.cohesiv.io --state=${KOPS_STATE_STORE}
@@ -336,9 +336,9 @@ jobs:
           name: Deploy
           command: |
             sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/develop/deployment.yaml
-            make authorize-staging-circle-ip
+            make authorize-develop-circle-ip
             kubectl apply -f mypds/kube/develop
-            make deauthorize-staging-circle-ip
+            make deauthorize-develop-circle-ip
   deploy-mypds-staging:
     docker:
       - image: sammccord/kops-docker

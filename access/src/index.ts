@@ -9,11 +9,10 @@ import service from './service'
 
 const protoPath = path.resolve(process.cwd(), config.PROTO_PATH)
 
-config.ENV !== 'production' &&
-  db
-    .sync()
-    .then(() => log.info('Successfully synced db'))
-    .catch(e => log.error('Failed to sync database', e))
+db
+  .sync()
+  .then(() => log.info('Successfully synced db'))
+  .catch(e => log.error('Failed to sync database', e))
 
 async function main() {
   type ServerBuilder = cohesiv.ServerBuilder
