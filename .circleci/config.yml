@@ -11,7 +11,7 @@ jobs:
           name: save SHA to a file
           command: echo $CIRCLE_SHA1 > .circle-sha
       - save_cache:
-          key: v4-repo-{{ checksum ".circle-sha" }}
+          key: v5-repo-{{ checksum ".circle-sha" }}
           paths:
             - /go/src/github.com/SingularityInteractive/cohesiv
   install-cohesiv-golang-dependencies:
@@ -24,10 +24,10 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-vendor-{{ checksum "Gopkg.toml" }}
+            - v5-vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Get dep tool
           command: go get -u github.com/golang/dep/cmd/dep && go install github.com/golang/dep/cmd/dep
@@ -35,7 +35,7 @@ jobs:
           name: Install go deps
           command: dep ensure
       - save_cache:
-          key: v4-cohesiv-vendor-{{ checksum "Gopkg.toml" }}
+          key: v5-cohesiv-vendor-{{ checksum "Gopkg.toml" }}
           paths:
             - vendor
   install-cohesiv-node-dependencies:
@@ -48,15 +48,15 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-node_modules-{{ checksum "package.json" }}
+            - v5-node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
           command: yarn --pure-lockfile
       - save_cache:
-          key: v4-cohesiv-node_modules-{{ checksum "package.json" }}
+          key: v5-cohesiv-node_modules-{{ checksum "package.json" }}
           paths:
             - node_modules
   install-mypds-dependencies:
@@ -69,15 +69,15 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-node_modules-{{ checksum "package.json" }}
+            - v5-mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
           command: cd mypds && yarn --pure-lockfile
       - save_cache:
-          key: v4-mypds-node_modules-{{ checksum "package.json" }}
+          key: v5-mypds-node_modules-{{ checksum "package.json" }}
           paths:
             - ./mypds/node_modules
   build-cohesiv-go:
@@ -90,15 +90,15 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-vendor-{{ checksum "Gopkg.toml" }}
+            - v5-cohesiv-vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Build Golang Services
           command: make binaries
       - save_cache:
-          key: v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+          key: v5-cohesiv-go-build-{{ checksum ".circle-sha" }}
           paths:
             - ./gopath/bin
   build-cohesiv-node:
@@ -111,15 +111,15 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-node_modules-{{ checksum "package.json" }}
+            - v5-cohesiv-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build TS Services
           command: yarn access:build
       - save_cache:
-          key: v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
+          key: v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
           paths:
             - ./access/dist
   build-mypds:
@@ -132,10 +132,10 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-node_modules-{{ checksum "package.json" }}
+            - v5-mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build Web
           command: cd mypds && yarn build:web
@@ -143,7 +143,7 @@ jobs:
           name: Build TS Server
           command: cd mypds && yarn build:server
       - save_cache:
-          key: v4-mypds-build-{{ checksum ".circle-sha" }}
+          key: v5-mypds-build-{{ checksum ".circle-sha" }}
           paths:
             - ./mypds/server/dist
             - ./mypds/public
@@ -157,13 +157,13 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-mypds-build-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-node_modules-{{ checksum "package.json" }}
+            - v5-mypds-node_modules-{{ checksum "package.json" }}
       - run:
           name: Test TS Server
           command: cd mypds && yarn test:server
@@ -184,13 +184,13 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+            - v5-cohesiv-go-build-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
+            - v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
           command: make docker-images
@@ -228,13 +228,13 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+            - v5-cohesiv-go-build-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
+            - v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
           command: make docker-images
@@ -272,13 +272,13 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-go-build-{{ checksum ".circle-sha" }}
+            - v5-cohesiv-go-build-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-cohesiv-node-build-{{ checksum ".circle-sha" }}
+            - v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker images
           command: make docker-images
@@ -315,10 +315,10 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-mypds-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
           command: cd mypds && make docker-image
@@ -356,10 +356,10 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-mypds-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
           command: cd mypds && make docker-image
@@ -397,10 +397,10 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - v4-repo-{{ checksum ".circle-sha" }}
+            - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v4-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-mypds-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
           command: cd mypds && make docker-image
