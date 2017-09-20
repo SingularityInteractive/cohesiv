@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: app
-  namespace: mypds
+  name: mypds
+  namespace: cohesiv
   annotations:
     kubernetes.io/ingress.class: "nginx"
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -11,12 +11,12 @@ spec:
   tls:
   - hosts:
     - mypds.staging.cohesiv.io
-    secretName: mypds-tls
+    secretName: cohesiv-tls
   rules:
   - host: "mypds.staging.cohesiv.io"
     http:
       paths:
       - path: /
         backend:
-          serviceName: app
+          serviceName: mypds
           servicePort: 80
