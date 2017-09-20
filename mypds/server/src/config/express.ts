@@ -7,7 +7,6 @@ import * as compress from 'compression'
 import * as methodOverride from 'method-override'
 import * as cors from 'cors'
 import * as httpStatus from 'http-status'
-import * as httpsRedirect from 'express-https-redirect'
 import * as expressWinston from 'express-winston'
 import * as expressValidation from 'express-validation'
 import * as helmet from 'helmet'
@@ -48,8 +47,6 @@ if (config.env === 'development') {
   )
 }
 
-// Automatically redirect to https
-if (config.env !== 'test') app.use('/', httpsRedirect())
 // mount a health check
 app.use('/healthcheck', healthCheck())
 // mount all routes on /v1/api path

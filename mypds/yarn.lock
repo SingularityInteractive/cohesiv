@@ -3891,10 +3891,6 @@ express-healthcheck@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/express-healthcheck/-/express-healthcheck-0.1.0.tgz#cabec78129c4cb90cd7fb894dfae21b82e27cb07"
 
-express-https-redirect@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/express-https-redirect/-/express-https-redirect-1.0.0.tgz#d97bbb382cb428dcd8125710dcfc563a645c48e0"
-
 express-jwt@5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/express-jwt/-/express-jwt-5.1.0.tgz#a1c5e3381bc78d2de4d3c51133421c69e004d581"

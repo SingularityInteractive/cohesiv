@@ -11,20 +11,17 @@
   },
   "scripts": {
     "serve": "node server/dist/index.js",
-    "start:server":
-      "cross-env NODE_ENV=development concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch:server\" \"nodemon server/dist/index.js\"",
+    "start:server": "cross-env NODE_ENV=development concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch:server\" \"nodemon server/dist/index.js\"",
     "watch:server": "tsc -p server -w",
     "start:web": "node config/scripts/start.js",
     "build:server": "tsc -p server",
     "build:web": "node config/scripts/build.js",
     "lint": "tslint -c server/tslint.json -p server && eslint *.js client/src config --color",
     "test": "yarn test:server && yarn test:web",
-    "test:coverage":
-      "cross-env NODE_ENV=test ./node_modules/.bin/istanbul cover _mocha -- --ui bdd --reporter spec --colors --compilers js:babel-core/register server/tests --recursive",
+    "test:coverage": "cross-env NODE_ENV=test ./node_modules/.bin/istanbul cover _mocha -- --ui bdd --reporter spec --colors --compilers js:babel-core/register server/tests --recursive",
     "test:check-coverage": "yarn test:coverage && istanbul check-coverage",
     "test:web": "node config/scripts/test.js --env=jsdom",
-    "test:server":
-      "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --compilers js:babel-core/register server/tests --recursive",
+    "test:server": "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --compilers js:babel-core/register server/tests --recursive",
     "report-coverage": "coveralls < ./coverage/lcov.info"
   },
   "keywords": [
@@ -48,7 +45,6 @@
     "dotenv": "^4.0.0",
     "express": "4.14.0",
     "express-healthcheck": "0.1.0",
-    "express-https-redirect": "1.0.0",
     "express-jwt": "5.1.0",
     "express-validation": "1.0.1",
     "express-winston": "2.1.2",
@@ -158,14 +154,20 @@
     }
   },
   "babel": {
-    "presets": ["es2015", "stage-2", "react"],
+    "presets": [
+      "es2015",
+      "stage-2",
+      "react"
+    ],
     "plugins": [
       "add-module-exports",
       "transform-decorators-legacy",
       "transform-async-to-generator",
       "transform-object-rest-spread"
     ],
-    "ignore": ["node_modules"]
+    "ignore": [
+      "node_modules"
+    ]
   },
   "eslintConfig": {
     "env": {
@@ -182,18 +184,36 @@
       },
       "sourceType": "module"
     },
-    "plugins": ["prettier"],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
-      "indent": ["error", 2],
-      "linebreak-style": ["error", "unix"],
-      "quotes": ["error", "single"],
-      "semi": ["error", "never"],
+      "indent": [
+        "error",
+        2
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "never"
+      ],
       "no-unused-vars": "off"
     }
   },
   "jest": {
-    "collectCoverageFrom": ["src/**/*.{js,jsx}"],
-    "setupFiles": ["<rootDir>/config/polyfills.js"],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
+    ],
+    "setupFiles": [
+      "<rootDir>/config/polyfills.js"
+    ],
     "testMatch": [
       "<rootDir>/client/src/**/__tests__/**/*.js?(x)",
       "<rootDir>/client/src/**/?(*.)(spec|test).js?(x)"
@@ -205,13 +225,20 @@
       "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
       "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
     },
-    "transformIgnorePatterns": ["[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"],
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
+    ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "react-native/Libraries/Renderer/shims/ReactNativePropRegistry":
-        "node_modules/react-native-web/dist/modules/ReactNativePropRegistry/index.js",
+      "react-native/Libraries/Renderer/shims/ReactNativePropRegistry": "node_modules/react-native-web/dist/modules/ReactNativePropRegistry/index.js",
       "^react-native-joi$": "joi-browser"
     },
-    "moduleFileExtensions": ["web.js", "js", "json", "web.jsx", "jsx"]
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "json",
+      "web.jsx",
+      "jsx"
+    ]
   }
 }
