@@ -38,8 +38,8 @@ function getServedPath(appPackageJson) {
 module.exports = {
   appBuild: resolveApp('./public'),
   appPublic: resolveApp('./client/assets'),
-  appHtml: resolveApp('./client/assets/index.html'),
-  appIndexJs: resolveApp('./client/src/index.js'),
+  appHtml: resolveApp('./app/assets/index.html'),
+  appIndexJs: resolveApp('./app/src/index.js'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('./client/src'),
   yarnLockFile: resolveApp('yarn.lock'),
