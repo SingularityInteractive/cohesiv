@@ -470,30 +470,21 @@ workflows:
       - test-mypds:
           requires:
             - build-mypds
-      - build-mypds-docker-image:
-          requires:
-            - build-mypds
-          filters:
-            branches:
-              only:
-                - develop
-                - staging
-                - master
       - deploy-mypds-develop:
           requires:
-            - build-mypds-docker-image
+            - build-mypds
           filters:
             branches:
               only: develop
       - deploy-mypds-staging:
           requires:
-            - build-mypds-docker-image
+            - build-mypds
           filters:
             branches:
               only: staging
       - deploy-mypds-production:
           requires:
-            - build-mypds-docker-image
+            - build-mypds
           filters:
             branches:
               only: master
