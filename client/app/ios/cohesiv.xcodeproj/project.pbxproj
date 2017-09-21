@@ -24,7 +24,7 @@
 		2C1548D9E4CB1AEFA5CCAE6D /* Pods-cohesiv.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cohesiv.debug.xcconfig"; path = "Pods/Target Support Files/Pods-cohesiv/Pods-cohesiv.debug.xcconfig"; sourceTree = "<group>"; };
 		A47FE4D7F70906B7DC8CE39B /* Pods-cohesiv.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cohesiv.release.xcconfig"; path = "Pods/Target Support Files/Pods-cohesiv/Pods-cohesiv.release.xcconfig"; sourceTree = "<group>"; };
 		B501732A1DC01252003445D9 /* EXShell.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = EXShell.plist; sourceTree = "<group>"; };
-		B56386411DB9693800A0598C /* cohesiv.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cohesiv.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B56386411DB9693800A0598C /* cohesiv.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cohesiv.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B56386471DB9693800A0598C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B56386481DB9693800A0598C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		B56386501DB9693800A0598C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 				B56386501DB9693800A0598C /* Assets.xcassets */,
 				B563865B1DB96A5E00A0598C /* Supporting */,
 			);
-			path = "cohesiv";
+			path = cohesiv;
 			sourceTree = "<group>";
 		};
 		B563865B1DB96A5E00A0598C /* Supporting */ = {
@@ -132,8 +132,8 @@
 			);
 			dependencies = (
 			);
-			name = "cohesiv";
-			productName = "cohesiv";
+			name = cohesiv;
+			productName = cohesiv;
 			productReference = B56386411DB9693800A0598C /* cohesiv.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -148,7 +148,7 @@
 				TargetAttributes = {
 					B56386401DB9693800A0598C = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = C8D8QTF339;
+						DevelopmentTeam = 5XP23BAJ95;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -359,10 +359,10 @@
 			baseConfigurationReference = 2C1548D9E4CB1AEFA5CCAE6D /* Pods-cohesiv.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = C8D8QTF339;
+				DEVELOPMENT_TEAM = 5XP23BAJ95;
 				INFOPLIST_FILE = "$(SRCROOT)/cohesiv/Supporting/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.SingularityInteractive.cohesiv";
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.SingularityInteractive.cohesiv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -372,10 +372,10 @@
 			baseConfigurationReference = A47FE4D7F70906B7DC8CE39B /* Pods-cohesiv.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = C8D8QTF339;
+				DEVELOPMENT_TEAM = 5XP23BAJ95;
 				INFOPLIST_FILE = "$(SRCROOT)/cohesiv/Supporting/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.SingularityInteractive.cohesiv";
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.SingularityInteractive.cohesiv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
