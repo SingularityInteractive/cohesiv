@@ -245,7 +245,12 @@ func dispatch(command string, platform string, flags Flags) error {
 		case "ios":
 			fallthrough
 		case "android":
-			// deploy expo app
+			expPublish := exec.Command("exp", "publish")
+			expPublish.Dir = "client/app"
+			expPublish.Stdout = os.Stdout
+			expPublish.Stderr = os.Stderr
+			expPublish.Start()
+			expPublish.Wait()
 			break
 		default:
 			return cli.NewExitError("Unrecognized platform", 4)
@@ -277,19 +282,24 @@ func dispatch(command string, platform string, flags Flags) error {
 					// TODO: create AVD wizard
 					return cli.NewExitError("No emulators present, please create one in AVD Manager", 38)
 				}
-				fmt.Println("Pick an emulator")
-				for i := 0; i < numberOfEmulators; i++ {
-					fmt.Printf("%d: %s\n", i+1, emulators[i])
-				}
-				fmt.Printf("Enter a number: ")
-				var input string
-				fmt.Scanln(&input)
-				inputInt, err := strconv.Atoi(strings.TrimSpace(string(input)))
-				if err != nil {
-					return cli.NewExitError("Unable to parse input", 39)
-				}
-				if len(emulators) <= inputInt || inputInt < 1 {
-					return cli.NewExitError("Index out of range", 40)
+				var inputInt int
+				if numberOfEmulators == 1 {
+					inputInt = 1
+				} else {
+					fmt.Println("Pick an emulator")
+					for i := 0; i < numberOfEmulators; i++ {
+						fmt.Printf("%d: %s\n", i+1, emulators[i])
+					}
+					fmt.Printf("Enter a number: ")
+					var input string
+					fmt.Scanln(&input)
+					inputInt, err = strconv.Atoi(strings.TrimSpace(string(input)))
+					if err != nil {
+						return cli.NewExitError("Unable to parse input", 39)
+					}
+					if len(emulators) <= inputInt || inputInt < 1 {
+						return cli.NewExitError("Index out of range", 40)
+					}
 				}
 				fmt.Printf("Chose emulator: %s\n", emulators[inputInt-1])
 				avdRunCmd := exec.Command("bash", "-c", "$ANDROID_SDK/tools/emulator @"+emulators[inputInt-1])
@@ -356,7 +366,7 @@ func dispatch(command string, platform string, flags Flags) error {
 				return cli.NewExitError("Start launching simulator failed", 34)
 			}
 			err = xcrunLaunchSimulator.Wait()
-			/*if err != nil {
+			/*if err != nil { // Don't fail on error, it worked
 				return cli.NewExitError("Launch simulator failed", 35)
 			}*/
 			var appPath string
@@ -389,6 +399,19 @@ func dispatch(command string, platform string, flags Flags) error {
 			}
 		default:
 			return cli.NewExitError("Unrecognized platform", 13)
+		}
+		break
+	case "test":
+		fmt.Println("Test cohesiv")
+		switch platform {
+		case "web":
+			break
+		case "server":
+			break
+		case "android":
+			break
+		case "ios":
+			break
 		}
 		break
 	}
@@ -445,6 +468,12 @@ func info(app *cli.App, flags Flags) {
 			Aliases: []string{"r"},
 			Usage:   "Run cohesiv",
 			Action:  getAction("run"),
+		},
+		{
+			Name:    "test",
+			Aliases: []string{"t"},
+			Usage:   "Test cohesiv",
+			Action:  getAction("test"),
 		},
 	}
 }
