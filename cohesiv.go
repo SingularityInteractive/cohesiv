@@ -166,6 +166,22 @@ func getBootedFlag() (bool, error) {
 	return adbOutputInt == 1, nil
 }
 
+func runClientNpmScript(script string) error {
+	cmd := exec.Command("npm", "run", script)
+	cmd.Dir = "client"
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Start()
+	if err != nil {
+		return cli.NewExitError("Unable to start process", 45)
+	}
+	err = cmd.Wait()
+	if err != nil {
+		return cli.NewExitError("Error while running process", 46)
+	}
+	return nil
+}
+
 func dispatch(command string, platform string, flags Flags) error {
 	fmt.Printf("%s for %s, client: %s\n", command, platform, flags.Client)
 	err, clientConfig := getClientConfig(flags.Client)
@@ -177,7 +193,17 @@ func dispatch(command string, platform string, flags Flags) error {
 	case "build":
 		switch platform {
 		case "server":
+			err := runClientNpmScript("build:server")
+			if err != nil {
+				return err
+			}
+			break
 		case "web":
+			err := runClientNpmScript("build:web")
+			if err != nil {
+				return err
+			}
+			break
 		case "android":
 			cmd := exec.Command("./gradlew", ":app:build")
 			cmd.Stdout = os.Stdout
@@ -233,6 +259,7 @@ func dispatch(command string, platform string, flags Flags) error {
 			}
 			fmt.Printf("deployment configurations found %s", deploymentConfigs)
 			//deploy server using deploymentConfigs
+			fmt.Println("In order to deploy to server, please make a pull request into staging, and then staging into master (production)")
 			break
 		case "web":
 			err, deploymentConfig := getDeploymentConfig(clientConfig, flags.Target)
@@ -241,6 +268,7 @@ func dispatch(command string, platform string, flags Flags) error {
 			}
 			fmt.Printf("deployment configuration found %s", deploymentConfig)
 			//deploy web client using deploymentConfig
+			fmt.Println("In order to deploy to web, please make a pull request into staging, and then staging into master (production)")
 			break
 		case "ios":
 			fallthrough
@@ -259,10 +287,23 @@ func dispatch(command string, platform string, flags Flags) error {
 	case "run":
 		switch platform {
 		case "server":
-			// start localhost server
+			serverStart := exec.Command("sh", "up.sh")
+			serverStart.Stdout = os.Stdout
+			serverStart.Stderr = os.Stderr
+			err := serverStart.Start()
+			if err != nil {
+				return cli.NewExitError("Unable to start server", 47)
+			}
+			err = serverStart.Wait()
+			if err != nil {
+				return cli.NewExitError("Error starting server", 48)
+			}
 			break
 		case "web":
-			// start localhost server
+			err := runClientNpmScript("start:web")
+			if err != nil {
+				return err
+			}
 			break
 		case "android":
 			numberOfDevices, err := getNumberAdbDevices()

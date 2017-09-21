@@ -79,10 +79,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-  mypds:
+  client:
     restart: always
     build:
-      context: ./mypds
+      context: ./client
       dockerfile: Dockerfile.dev
     ports:
       - "4040:4040"
