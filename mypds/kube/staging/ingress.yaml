@@ -11,7 +11,7 @@ spec:
   tls:
   - hosts:
     - mypds.staging.cohesiv.io
-    secretName: cohesiv-tls
+    secretName: mypds-tls
   rules:
   - host: "mypds.staging.cohesiv.io"
     http:

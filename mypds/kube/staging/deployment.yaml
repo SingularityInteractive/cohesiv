@@ -17,7 +17,7 @@ spec:
       # [START containers]
       containers:
       - name: mypds
-        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest"
+        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:staging"
         imagePullPolicy: Always
         ports:
         - containerPort: 4040

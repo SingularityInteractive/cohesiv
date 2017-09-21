@@ -18,6 +18,6 @@ spec:
         - --source=ingress
         - --domain-filter=cohesiv.io # will make ExternalDNS see only the hosted zones matching provided domain, omit to process all available hosted zones
         - --provider=aws
-        - --policy=upsert-only # would prevent ExternalDNS from deleting any records, omit to enable full synchronization
         - --registry=txt
         - --txt-owner-id=singint
+        - --policy=upsert-only # would prevent ExternalDNS from deleting any records, omit to enable full synchronization
