@@ -6,6 +6,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
@@ -135,6 +138,34 @@ func getDeploymentConfigs(clientConfig ClientConfig, target string) (error, []De
 	return cli.NewExitError("target does not exist, valid: develop, staging, production", 10), []DeploymentConfig{DeploymentConfig{}}
 }
 
+func getNumberAdbDevices() (int, error) {
+	adbDevices, err := exec.Command("bash", "-c", "adb devices | grep device | wc -l").Output()
+	if err != nil {
+		return 0, cli.NewExitError("Unable to get number of adb devices", 35)
+	}
+	adbOutputInt, err := strconv.Atoi(strings.TrimSpace(string(adbDevices)))
+	if err != nil {
+		return 0, cli.NewExitError("Unable to parse number of adb devices", 36)
+	}
+	numberOfDevices := adbOutputInt - 1
+	fmt.Printf("Number of adb devices: %d\n", numberOfDevices)
+	return numberOfDevices, nil
+}
+
+func getBootedFlag() (bool, error) {
+	adbBootCheck, err := exec.Command("bash", "-c", "adb shell getprop sys.boot_completed").Output()
+	if err != nil {
+		return false, cli.NewExitError("Unable to get adb boot completed flag", 42)
+	}
+	fmt.Printf("boot flag output: %s\n", adbBootCheck)
+	adbOutputInt, err := strconv.Atoi(strings.TrimSpace(string(adbBootCheck)))
+	if err != nil {
+		return false, nil //output is blank when not booted, so don't return error
+	}
+	fmt.Printf("Boot flag: %d\n", adbOutputInt)
+	return adbOutputInt == 1, nil
+}
+
 func dispatch(command string, platform string, flags Flags) error {
 	fmt.Printf("%s for %s, client: %s\n", command, platform, flags.Client)
 	err, clientConfig := getClientConfig(flags.Client)
@@ -229,11 +260,73 @@ func dispatch(command string, platform string, flags Flags) error {
 			// start localhost server
 			break
 		case "android":
+			numberOfDevices, err := getNumberAdbDevices()
+			if err != nil {
+				return err
+			}
+			if numberOfDevices == 0 {
+				avdCmd := exec.Command("bash", "-c", "$ANDROID_SDK/tools/emulator -list-avds")
+				avdDevices, err := avdCmd.Output()
+				if err != nil {
+					return cli.NewExitError("Unable to get number of avd devices", 37)
+				}
+				emulators := strings.Split(string(avdDevices), "\n")
+				numberOfEmulators := len(emulators) - 1
+				fmt.Printf("Number of avd emulators: %d\n", numberOfEmulators)
+				if numberOfEmulators <= 0 {
+					// TODO: create AVD wizard
+					return cli.NewExitError("No emulators present, please create one in AVD Manager", 38)
+				}
+				fmt.Println("Pick an emulator")
+				for i := 0; i < numberOfEmulators; i++ {
+					fmt.Printf("%d: %s\n", i+1, emulators[i])
+				}
+				fmt.Printf("Enter a number: ")
+				var input string
+				fmt.Scanln(&input)
+				inputInt, err := strconv.Atoi(strings.TrimSpace(string(input)))
+				if err != nil {
+					return cli.NewExitError("Unable to parse input", 39)
+				}
+				if len(emulators) <= inputInt || inputInt < 1 {
+					return cli.NewExitError("Index out of range", 40)
+				}
+				fmt.Printf("Chose emulator: %s\n", emulators[inputInt-1])
+				avdRunCmd := exec.Command("bash", "-c", "$ANDROID_SDK/tools/emulator @"+emulators[inputInt-1])
+				avdRunCmd.Start()
+				for timeoutCounter := 0; timeoutCounter < 20; timeoutCounter++ {
+					numberOfDevices, err = getNumberAdbDevices()
+					if err != nil {
+						return err
+					}
+					if numberOfDevices > 0 {
+						fmt.Println("Waiting for emulator to boot")
+						for bootCounter := 0; bootCounter < 20; bootCounter++ {
+							bootFlag, err := getBootedFlag()
+							if err != nil {
+								return err
+							}
+							if bootFlag == true {
+								break
+							}
+							if bootCounter == 19 {
+								return cli.NewExitError("wait for adb boot flag timeout reached", 44)
+							}
+							time.Sleep(time.Second * 2)
+						}
+						break
+					}
+					if timeoutCounter == 19 {
+						return cli.NewExitError("wait for adb device timeout reached", 41)
+					}
+					time.Sleep(time.Second * 2)
+				}
+			}
 			cmd := exec.Command("./gradlew", ":app:installDebug")
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Dir = "client/app/android"
-			err := cmd.Start()
+			err = cmd.Start()
 			if err != nil {
 				return cli.NewExitError("Start installing on android failed", 17)
 			}
