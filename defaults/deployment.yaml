@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: cohesiv
+  name: mypds-deployment
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 40%
+  template:
+    metadata:
+      labels:
+        app: mypds
+    spec:
+      containers:
+        # ../defaults/container.yaml

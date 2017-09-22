@@ -10,12 +10,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imdario/mergo"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
 
 type Configs struct {
 	Clients []ClientConfig `yaml:"clients"`
+}
+
+type NameKeyPair struct {
+	Name string `yaml:"name"`
+	Key  string `yaml:"key"`
 }
 
 type ContainerConfig struct {
@@ -30,10 +36,8 @@ type ContainerConfig struct {
 		Name      string `yaml:"name"`
 		Value     string `yaml:"value"`
 		ValueFrom struct {
-			ConfigMapKeyRef struct {
-				Name string `yaml:"name"`
-				Key  string `yaml:"key"`
-			} `yaml:"configMapKeyRef"`
+			ConfigMapKeyRef NameKeyPair `yaml:"configMapKeyRef"`
+			SecretKeyRef    NameKeyPair `yaml:"secretKeyRef"`
 		} `yaml:"valueFrom"`
 	} `yaml:"env"`
 	Resources struct {
@@ -44,7 +48,7 @@ type ContainerConfig struct {
 		Limits struct {
 			Memory string `yaml:"memory"`
 		} `yaml:"limits"`
-	} `yaml:"resources`
+	} `yaml:"resources"`
 	LivenessProbe struct {
 		InitialDelaySeconds int `yaml:"initialDelaySeconds"`
 		TCPSocket           struct {
@@ -67,7 +71,7 @@ type DeploymentConfig struct {
 			RollingUpdate struct {
 				MaxUnavailable string `yaml:"maxUnavailable"`
 			} `yaml:"rollingUpdate"`
-		} `yaml"strategy"`
+		} `yaml:"strategy"`
 		Template struct {
 			Metadata struct {
 				Labels struct {
@@ -83,16 +87,10 @@ type DeploymentConfig struct {
 }
 
 type ClientConfig struct {
-	Name   string `yaml:"name"`
-	Server struct {
-		Develop    []DeploymentConfig `yaml:"develop"`
-		Staging    []DeploymentConfig `yaml:"staging"`
-		Production []DeploymentConfig `yaml:"production"`
-	} `yaml:"server"`
-	Client struct {
-		Staging    DeploymentConfig `yaml:"staging"`
-		Production DeploymentConfig `yaml:"production"`
-	} `yaml:"client"`
+	Name       string           `yaml:"name"`
+	Develop    DeploymentConfig `yaml:"develop"`
+	Staging    DeploymentConfig `yaml:"staging"`
+	Production DeploymentConfig `yaml:"production"`
 }
 
 func getClientConfig(client string) (error, ClientConfig) {
@@ -117,25 +115,57 @@ func getClientConfig(client string) (error, ClientConfig) {
 }
 
 func getDeploymentConfig(clientConfig ClientConfig, target string) (error, DeploymentConfig) {
-	switch target {
-	case "staging":
-		return nil, clientConfig.Client.Staging
-	case "production":
-		return nil, clientConfig.Client.Production
+	defaultDeploymentFile, _ := filepath.Abs("./defaults/deployment.yaml")
+	defaultContainerFile, _ := filepath.Abs("./defaults/container.yaml")
+	defaultDeploymentYaml, err := ioutil.ReadFile(defaultDeploymentFile)
+	if err != nil {
+		return cli.NewExitError("unable to read defaults/deployment.yaml", 49), DeploymentConfig{}
 	}
-	return cli.NewExitError("target does not exist, valid: develop, staging, production", 11), DeploymentConfig{}
-}
+	defaultContainerYaml, err := ioutil.ReadFile(defaultContainerFile)
+	if err != nil {
+		return cli.NewExitError("unable to read defaults/container.yaml", 50), DeploymentConfig{}
+	}
+	var defaultDeploymentConfig DeploymentConfig
+	var defaultContainerConfig ContainerConfig
+	err = yaml.Unmarshal(defaultDeploymentYaml, &defaultDeploymentConfig)
+	if err != nil {
+		return cli.NewExitError("unable to parse defaults/deployment.yaml", 51), DeploymentConfig{}
+	}
+	err = yaml.Unmarshal(defaultContainerYaml, &defaultContainerConfig)
+	if err != nil {
+		return cli.NewExitError("unable to parse defaults/container.yaml", 52), DeploymentConfig{}
+	}
+	//fmt.Printf("parsed default deployment config:\n %s\n", defaultDeploymentConfig)
+	//fmt.Printf("parsed default container config:\n %s\n", defaultContainerConfig)
 
-func getDeploymentConfigs(clientConfig ClientConfig, target string) (error, []DeploymentConfig) {
+	//take defaults and overwrite them with clientConfig
+	var newConfig DeploymentConfig
 	switch target {
 	case "develop":
-		return nil, clientConfig.Server.Develop
+		newConfig = clientConfig.Develop
+		break
 	case "staging":
-		return nil, clientConfig.Server.Staging
+		newConfig = clientConfig.Staging
+		break
 	case "production":
-		return nil, clientConfig.Server.Production
+		newConfig = clientConfig.Production
+		break
+	default:
+		return cli.NewExitError("target does not exist, valid: develop, staging, production", 11), DeploymentConfig{}
 	}
-	return cli.NewExitError("target does not exist, valid: develop, staging, production", 10), []DeploymentConfig{DeploymentConfig{}}
+	if err := mergo.MergeWithOverwrite(&defaultDeploymentConfig, newConfig); err != nil {
+		return cli.NewExitError("unable to merge client deployment config for target", 53), DeploymentConfig{}
+	}
+	for i := 0; i < len(newConfig.Spec.Template.Spec.Containers); i++ {
+		newContainer := newConfig.Spec.Template.Spec.Containers[i]
+		var defaultContainerPointer *ContainerConfig = &defaultContainerConfig
+		var defaultContainerCopy = *defaultContainerPointer
+		if err := mergo.MergeWithOverwrite(&defaultContainerCopy, newContainer); err != nil {
+			return cli.NewExitError("unable to merge container config for target", 54), DeploymentConfig{}
+		}
+		defaultDeploymentConfig.Spec.Template.Spec.Containers = append(defaultDeploymentConfig.Spec.Template.Spec.Containers, defaultContainerCopy)
+	}
+	return nil, defaultDeploymentConfig
 }
 
 func getNumberAdbDevices() (int, error) {
@@ -184,11 +214,6 @@ func runClientNpmScript(script string) error {
 
 func dispatch(command string, platform string, flags Flags) error {
 	fmt.Printf("%s for %s, client: %s\n", command, platform, flags.Client)
-	err, clientConfig := getClientConfig(flags.Client)
-	if err != nil {
-		return err
-	}
-	fmt.Println("client configuration found")
 	switch command {
 	case "build":
 		switch platform {
@@ -223,7 +248,7 @@ func dispatch(command string, platform string, flags Flags) error {
 			podCmd.Stdout = os.Stdout
 			podCmd.Stderr = os.Stderr
 			podCmd.Dir = "client/app/ios"
-			err = podCmd.Start()
+			err := podCmd.Start()
 			if err != nil {
 				return cli.NewExitError("Start pod install failed", 21)
 			}
@@ -253,21 +278,9 @@ func dispatch(command string, platform string, flags Flags) error {
 	case "deploy":
 		switch platform {
 		case "server":
-			err, deploymentConfigs := getDeploymentConfigs(clientConfig, flags.Target)
-			if err != nil {
-				return err
-			}
-			fmt.Printf("deployment configurations found %s", deploymentConfigs)
-			//deploy server using deploymentConfigs
 			fmt.Println("In order to deploy to server, please make a pull request into staging, and then staging into master (production)")
 			break
 		case "web":
-			err, deploymentConfig := getDeploymentConfig(clientConfig, flags.Target)
-			if err != nil {
-				return cli.NewExitError("deployment configuration not found", 9)
-			}
-			fmt.Printf("deployment configuration found %s", deploymentConfig)
-			//deploy web client using deploymentConfig
 			fmt.Println("In order to deploy to web, please make a pull request into staging, and then staging into master (production)")
 			break
 		case "ios":
@@ -402,7 +415,7 @@ func dispatch(command string, platform string, flags Flags) error {
 			xcrunLaunchSimulator := exec.Command("xcrun", "instruments", "-w", "iPhone X (11.0)")
 			xcrunLaunchSimulator.Stdout = os.Stdout
 			xcrunLaunchSimulator.Stderr = os.Stderr
-			err = xcrunLaunchSimulator.Start()
+			err := xcrunLaunchSimulator.Start()
 			if err != nil {
 				return cli.NewExitError("Start launching simulator failed", 34)
 			}
@@ -455,6 +468,18 @@ func dispatch(command string, platform string, flags Flags) error {
 			break
 		}
 		break
+	case "generate":
+		err, clientConfig := getClientConfig(flags.Client)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("client configuration found, getting deployment config for: %s\n", flags.Target)
+		err, deploymentConfig := getDeploymentConfig(clientConfig, flags.Target)
+		if err != nil {
+			return cli.NewExitError("deployment configuration not found", 9)
+		}
+		fmt.Printf("deployment configuration found %s", deploymentConfig)
+		// TODO: write deployment configuration yaml to ./client/kube/${flags.Target}/deployment.yaml
 	}
 	return nil
 }
@@ -477,14 +502,14 @@ func info(app *cli.App, flags Flags) {
 		},
 		cli.StringFlag{
 			Name:        "target, t",
-			Value:       "staging",
+			Value:       "develop",
 			Usage:       "Development target (develop, staging, production)",
 			Destination: &flags.Target,
 		},
 	}
 	getAction := func(command string) func(c *cli.Context) error {
 		return func(c *cli.Context) error {
-			if len(c.Args()) == 0 {
+			if len(c.Args()) == 0 && command != "generate" {
 				return cli.NewExitError("No platform specified", 3)
 			}
 			platform := c.Args().Get(0)
@@ -515,6 +540,12 @@ func info(app *cli.App, flags Flags) {
 			Aliases: []string{"t"},
 			Usage:   "Test cohesiv",
 			Action:  getAction("test"),
+		},
+		{
+			Name:    "generate",
+			Aliases: []string{"g"},
+			Usage:   "Generate client deployment files",
+			Action:  getAction("generate"),
 		},
 	}
 }
