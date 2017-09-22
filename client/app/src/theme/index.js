@@ -1,4 +1,4 @@
-export const FONT_NAME = 'Roboto'
+export const FONT_NAME = 'Open Sans'
 
 export const breakpoints = {
   xs: 360,
@@ -183,7 +183,7 @@ export default {
     }
   },
   typography: {
-    fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+    fontFamily: `'${FONT_NAME}', sans-serif`,
     fontSize: 14,
     fontWeightLight: 300,
     fontWeightRegular: 400,
@@ -191,7 +191,7 @@ export default {
     display4: {
       fontSize: 112,
       fontWeight: 300,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       letterSpacing: '-.04em',
       lineHeight: 1,
       color: 'rgba(0, 0, 0, 0.54)'
@@ -199,7 +199,7 @@ export default {
     display3: {
       fontSize: 56,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       letterSpacing: '-.02em',
       lineHeight: 1.35,
       color: 'rgba(0, 0, 0, 0.54)'
@@ -207,56 +207,56 @@ export default {
     display2: {
       fontSize: 45,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '48px',
       color: 'rgba(0, 0, 0, 0.54)'
     },
     display1: {
       fontSize: 34,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '40px',
       color: 'rgba(0, 0, 0, 0.54)'
     },
     headline: {
       fontSize: 24,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '32px',
       color: 'rgba(0, 0, 0, 0.87)'
     },
     title: {
       fontSize: 21,
       fontWeight: 500,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: 1,
       color: 'rgba(0, 0, 0, 0.87)'
     },
     subheading: {
       fontSize: 16,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '24px',
       color: 'rgba(0, 0, 0, 0.87)'
     },
     body2: {
       fontSize: 14,
       fontWeight: 500,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '24px',
       color: 'rgba(0, 0, 0, 0.87)'
     },
     body1: {
       fontSize: 14,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '20px',
       color: 'rgba(0, 0, 0, 0.87)'
     },
     caption: {
       fontSize: 12,
       fontWeight: 400,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`,
+      fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: 1,
       color: 'rgba(0, 0, 0, 0.54)'
     },
@@ -264,7 +264,7 @@ export default {
       fontSize: 14,
       textTransform: 'uppercase',
       fontWeight: 500,
-      fontFamily: `'${FONT_NAME}', 'Helvetica', 'Arial', sans-serif`
+      fontFamily: `'${FONT_NAME}', sans-serif`
     }
   },
   spacing: {
