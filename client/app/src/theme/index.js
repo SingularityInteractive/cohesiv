@@ -105,9 +105,9 @@ export default {
       disabled: 'rgba(0, 0, 0, 0.26)'
     },
     background: {
-      default: '#fafafa',
+      default: '#f8f8f8',
       paper: '#fff',
-      appBar: '#f5f5f5',
+      appBar: '#333333',
       contentFrame: '#eeeeee'
     },
     primary: {
@@ -194,7 +194,7 @@ export default {
       fontFamily: `'${FONT_NAME}', sans-serif`,
       letterSpacing: '-.04em',
       lineHeight: 1,
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: '#444444'
     },
     display3: {
       fontSize: 56,
@@ -202,21 +202,21 @@ export default {
       fontFamily: `'${FONT_NAME}', sans-serif`,
       letterSpacing: '-.02em',
       lineHeight: 1.35,
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: '#444444'
     },
     display2: {
       fontSize: 45,
       fontWeight: 400,
       fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '48px',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: '#444444'
     },
     display1: {
-      fontSize: 34,
+      fontSize: 32,
       fontWeight: 400,
       fontFamily: `'${FONT_NAME}', sans-serif`,
-      lineHeight: '40px',
-      color: 'rgba(0, 0, 0, 0.54)'
+      lineHeight: 1.5,
+      color: '#444444'
     },
     headline: {
       fontSize: 24,

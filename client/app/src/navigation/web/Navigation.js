@@ -5,18 +5,15 @@ import {
   AppBar,
   Toolbar,
   Grid,
-  BottomNavigation,
   Typography,
   Button,
   IconButton,
   Paper,
   Icon,
-  Tabs,
   Avatar
 } from 'material-ui'
-// sub components
-import { BottomNavigationButton } from 'material-ui/BottomNavigation'
-import { Tab } from 'material-ui/Tabs'
+import BottomNavigation, { BottomNavigationButton } from 'material-ui/BottomNavigation'
+import Tabs, { Tab } from 'material-ui/Tabs'
 // icons
 import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
@@ -32,6 +29,11 @@ import routes from './routes'
 import { getRouteNameFromPath } from '../index'
 
 const styles = {
+  root: {
+    backgroundColor: '#f8f8f8',
+    height: '100vh',
+    width: '100vw'
+  },
   end: {
     position: 'fixed',
     width: '100%',
@@ -93,7 +95,7 @@ class Navigation extends Component {
     const { classes, location, history, children } = this.props
     const routeName = getRouteNameFromPath(location.pathname)
     return (
-      <div>
+      <div className={classes.root}>
         <AppBar position="static" color="primary">
           <Small>
             <Toolbar>
@@ -106,15 +108,17 @@ class Navigation extends Component {
             <Toolbar className={classes.toolbar}>
               <Grid container direction="row" align="center">
                 <Grid item xs={4}>
-                  <Button className={classes.navButton} color="contrast" aria-label="Home">
-                    Home
-                  </Button>
-                  <Button className={classes.navButton} color="contrast" aria-label="Dashboard">
-                    Dashboard
-                  </Button>
-                  <Button className={classes.navButton} color="contrast" aria-label="Network">
-                    Network
-                  </Button>
+                  <Grid container wrap="nowrap" direction="row" justify="center" align="center">
+                    <Button className={classes.navButton} color="contrast" aria-label="Home">
+                      Home
+                    </Button>
+                    <Button className={classes.navButton} color="contrast" aria-label="Dashboard">
+                      Dashboard
+                    </Button>
+                    <Button className={classes.navButton} color="contrast" aria-label="Network">
+                      Network
+                    </Button>
+                  </Grid>
                 </Grid>
                 <Grid item xs={4}>
                   <Typography type="title" color="inherit" align="center">
