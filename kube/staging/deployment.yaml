@@ -18,7 +18,7 @@ spec:
       # [START containers]
       containers:
       - name: api
-        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/api:latest"
+        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/api:staging"
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -68,7 +68,7 @@ spec:
         app: tagdirectory
     spec:
       containers:
-      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/tagdirectory:latest"
+      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/tagdirectory:staging"
         name: tagdirectory
         imagePullPolicy: Always
         ports:
@@ -109,7 +109,7 @@ spec:
         app: access
     spec:
       containers:
-      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/access:latest"
+      - image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/cohesiv/access:staging"
         name: access
         imagePullPolicy: Always
         ports:

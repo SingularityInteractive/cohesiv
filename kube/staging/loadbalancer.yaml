@@ -1,8 +1,7 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: nginx
-  namespace: nginx-ingress
+  name: ingress-nginx
   labels:
     k8s-addon: ingress-nginx.addons.k8s.io
   annotations:
@@ -11,10 +10,12 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: 1800
 spec:
   type: LoadBalancer
-  ports:
-  - port: 80
-    name: http
-  - port: 443
-    name: https
   selector:
-    app: nginx
+    app: ingress-nginx
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  - name: https
+    port: 443
+    targetPort: https

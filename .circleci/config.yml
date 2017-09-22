@@ -207,7 +207,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/develop/deployment.yaml
+            sed -i "s/:develop/:$CIRCLE_SHA1/g" kube/develop/deployment.yaml
             make authorize-develop-circle-ip
             kubectl apply -f kube/develop
             make deauthorize-develop-circle-ip
@@ -251,7 +251,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sed -i "s/:latest/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
+            sed -i "s/:staging/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
             make authorize-staging-circle-ip
             kubectl apply -f kube/staging
             make deauthorize-staging-circle-ip
@@ -295,6 +295,7 @@ jobs:
       - run:
           name: Deploy
           command: |
+            sed -i "s/:master/:$CIRCLE_SHA1/g" kube/staging/deployment.yaml
             make authorize-master-circle-ip
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
@@ -335,7 +336,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/develop/deployment.yaml
+            sed -i "s/:develop/:$CIRCLE_SHA1/g" mypds/kube/develop/deployment.yaml
             make authorize-develop-circle-ip
             kubectl apply -f mypds/kube/develop
             make deauthorize-develop-circle-ip
@@ -376,7 +377,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sed -i "s/:latest/:$CIRCLE_SHA1/g" mypds/kube/staging/deployment.yaml
+            sed -i "s/:staging/:$CIRCLE_SHA1/g" mypds/kube/staging/deployment.yaml
             make authorize-staging-circle-ip
             kubectl apply -f mypds/kube/staging
             make deauthorize-staging-circle-ip
@@ -417,6 +418,7 @@ jobs:
       - run:
           name: Deploy
           command: |
+            sed -i "s/:master/:$CIRCLE_SHA1/g" mypds/kube/production/deployment.yaml
             make authorize-master-circle-ip
             kubectl apply -f mypds/kube/production
             make deauthorize-master-circle-ip
