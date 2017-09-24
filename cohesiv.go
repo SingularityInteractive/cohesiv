@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -20,8 +21,8 @@ type Configs struct {
 }
 
 type NameKeyPair struct {
-	Name string `yaml:"name"`
-	Key  string `yaml:"key"`
+	Name string `yaml:"name,omitempty"`
+	Key  string `yaml:"key,omitempty"`
 }
 
 type ContainerConfig struct {
@@ -31,14 +32,14 @@ type ContainerConfig struct {
 	Ports           []struct {
 		ContainerPort int `yaml:"containerPort"`
 	} `yaml:"ports"`
-	Args []string `yaml:"args"`
+	Args []string `yaml:"args,omitempty"`
 	Env  []struct {
 		Name      string `yaml:"name"`
-		Value     string `yaml:"value"`
+		Value     string `yaml:"value,omitempty"`
 		ValueFrom struct {
-			ConfigMapKeyRef NameKeyPair `yaml:"configMapKeyRef"`
-			SecretKeyRef    NameKeyPair `yaml:"secretKeyRef"`
-		} `yaml:"valueFrom"`
+			ConfigMapKeyRef NameKeyPair `yaml:"configMapKeyRef,omitempty"`
+			SecretKeyRef    NameKeyPair `yaml:"secretKeyRef,omitempty"`
+		} `yaml:"valueFrom,omitempty"`
 	} `yaml:"env"`
 	Resources struct {
 		Requests struct {
@@ -58,39 +59,78 @@ type ContainerConfig struct {
 }
 
 type DeploymentConfig struct {
-	APIVersion string `yaml:"apiVersion"`
-	Kind       string `yaml:"kind"`
+	APIVersion string `yaml:"apiVersion,omitempty"`
+	Kind       string `yaml:"kind,omitempty"`
 	Metadata   struct {
-		Namespace string `yaml:"namespace"`
-		Name      string `yaml:"name"`
-	} `yaml:"metadata"`
+		Namespace   string `yaml:"namespace,omitempty"`
+		Name        string `yaml:"name,omitempty"`
+		Annotations struct {
+			IngressClass string `yaml:"kubernetes.io/ingress.class,omitempty"`
+			SSLRedirect  string `yaml:"ingress.kubernetes.io/ssl-redirect,omitempty"`
+			TLSAcme      string `yaml:"kubernetes.io/tls-acme,omitempty"`
+		} `yaml:"annotations,omitempty"`
+		Labels struct {
+			Application string `yaml:"application,omitempty"`
+		} `yaml:"labels,omitempty"`
+	} `yaml:"metadata,omitempty"`
 	Spec struct {
-		RevisionHistoryLimit int `yaml:"revisionHistoryLimit"`
-		Replicas             int `yaml:"replicas"`
+		RevisionHistoryLimit int `yaml:"revisionHistoryLimit,omitempty"`
+		Replicas             int `yaml:"replicas,omitempty"`
 		Strategy             struct {
 			RollingUpdate struct {
-				MaxUnavailable string `yaml:"maxUnavailable"`
-			} `yaml:"rollingUpdate"`
-		} `yaml:"strategy"`
+				MaxUnavailable string `yaml:"maxUnavailable,omitempty"`
+			} `yaml:"rollingUpdate,omitempty"`
+		} `yaml:"strategy,omitempty"`
 		Template struct {
 			Metadata struct {
 				Labels struct {
-					App string `yaml:"app"`
-				} `yaml:"labels"`
-			} `yaml:"metadata"`
+					App string `yaml:"app,omitempty"`
+				} `yaml:"labels,omitempty"`
+			} `yaml:"metadata,omitempty"`
 			Spec struct {
-				Containers []ContainerConfig `yaml:"containers"`
-			} `yaml:"spec"`
-		} `yaml:"template"`
+				Containers []ContainerConfig `yaml:"containers,omitempty"`
+			} `yaml:"spec,omitempty"`
+		} `yaml:"template,omitempty"`
+		TLS []struct {
+			Hosts      []string `yaml:"hosts,omitempty"`
+			SecretName string   `yaml:"secretName,omitempty"`
+		} `yaml:"tls,omitempty"`
+		Rules []struct {
+			Host string `yaml:"host,omitempty"`
+			Http struct {
+				Paths []struct {
+					Path    string `yaml:"path,omitempty"`
+					Backend struct {
+						ServiceName string `yaml:"serviceName,omitempty"`
+						ServicePort int    `yaml:"servicePort,omitempty"`
+					} `yaml:"backend,omitempty"`
+				} `yaml:"paths,omitempty"`
+			} `yaml:"http,omitempty"`
+		} `yaml:"rules,omitempty"`
+		Type     string `yaml:"type,omitempty"`
+		Selector struct {
+			App string `yaml:"app,omitempty"`
+		} `yaml:"selector,omitempty"`
+		Ports []struct {
+			Protocol   string `yaml:"protocol,omitempty"`
+			Port       int    `yaml:"port,omitempty"`
+			TargetPort int    `yaml:"targetPort,omitempty"`
+		} `yaml:"ports,omitempty"`
 		//... continue
-	} `yaml:"spec"`
+	} `yaml:"spec,omitempty"`
+}
+
+type TargetConfig struct {
+	Deployment DeploymentConfig `yaml:"deployment,omitempty"`
+	Ingress    DeploymentConfig `yaml:"ingress,omitempty"`
+	Service    DeploymentConfig `yaml:"service,omitempty"`
 }
 
 type ClientConfig struct {
-	Name       string           `yaml:"name"`
-	Develop    DeploymentConfig `yaml:"develop"`
-	Staging    DeploymentConfig `yaml:"staging"`
-	Production DeploymentConfig `yaml:"production"`
+	Name       string       `yaml:"name"`
+	Develop    TargetConfig `yaml:"develop"`
+	Staging    TargetConfig `yaml:"staging"`
+	Production TargetConfig `yaml:"production"`
 }
 
 func getClientConfig(client string) (error, ClientConfig) {
@@ -114,58 +154,99 @@ func getClientConfig(client string) (error, ClientConfig) {
 	return cli.NewExitError("client not found in configs", 7), ClientConfig{}
 }
 
-func getDeploymentConfig(clientConfig ClientConfig, target string) (error, DeploymentConfig) {
-	defaultDeploymentFile, _ := filepath.Abs("./defaults/deployment.yaml")
-	defaultContainerFile, _ := filepath.Abs("./defaults/container.yaml")
-	defaultDeploymentYaml, err := ioutil.ReadFile(defaultDeploymentFile)
-	if err != nil {
-		return cli.NewExitError("unable to read defaults/deployment.yaml", 49), DeploymentConfig{}
-	}
-	defaultContainerYaml, err := ioutil.ReadFile(defaultContainerFile)
-	if err != nil {
-		return cli.NewExitError("unable to read defaults/container.yaml", 50), DeploymentConfig{}
-	}
-	var defaultDeploymentConfig DeploymentConfig
-	var defaultContainerConfig ContainerConfig
-	err = yaml.Unmarshal(defaultDeploymentYaml, &defaultDeploymentConfig)
-	if err != nil {
-		return cli.NewExitError("unable to parse defaults/deployment.yaml", 51), DeploymentConfig{}
-	}
-	err = yaml.Unmarshal(defaultContainerYaml, &defaultContainerConfig)
-	if err != nil {
-		return cli.NewExitError("unable to parse defaults/container.yaml", 52), DeploymentConfig{}
-	}
-	//fmt.Printf("parsed default deployment config:\n %s\n", defaultDeploymentConfig)
-	//fmt.Printf("parsed default container config:\n %s\n", defaultContainerConfig)
+type YamlVars struct {
+	Find    []string
+	Replace []string
+}
 
-	//take defaults and overwrite them with clientConfig
-	var newConfig DeploymentConfig
-	switch target {
-	case "develop":
-		newConfig = clientConfig.Develop
-		break
-	case "staging":
-		newConfig = clientConfig.Staging
-		break
-	case "production":
-		newConfig = clientConfig.Production
-		break
-	default:
-		return cli.NewExitError("target does not exist, valid: develop, staging, production", 11), DeploymentConfig{}
+func getReplacedBytes(data []byte, client string, target string) []byte {
+	hostTarget := ""
+	if target != "production" {
+		hostTarget = fmt.Sprintf("%s.", target)
 	}
-	if err := mergo.MergeWithOverwrite(&defaultDeploymentConfig, newConfig); err != nil {
-		return cli.NewExitError("unable to merge client deployment config for target", 53), DeploymentConfig{}
+	vars := YamlVars{[]string{
+		"${CLIENT}",
+		"${TARGET}",
+		"${HOST_TARGET}"},
+		[]string{
+			client,
+			target,
+			hostTarget}}
+	for i := 0; i < len(vars.Find); i++ {
+		data = bytes.Replace(data, []byte(vars.Find[i]), []byte(vars.Replace[i]), -1)
 	}
-	for i := 0; i < len(newConfig.Spec.Template.Spec.Containers); i++ {
-		newContainer := newConfig.Spec.Template.Spec.Containers[i]
-		var defaultContainerPointer *ContainerConfig = &defaultContainerConfig
-		var defaultContainerCopy = *defaultContainerPointer
-		if err := mergo.MergeWithOverwrite(&defaultContainerCopy, newContainer); err != nil {
-			return cli.NewExitError("unable to merge container config for target", 54), DeploymentConfig{}
+	return data
+}
+
+func getDeploymentConfig(clientConfig ClientConfig, target string, script string, client string) (error, DeploymentConfig) {
+	defaultsFilePath, _ := filepath.Abs(fmt.Sprintf("./defaults/%s.yaml", script))
+	defaultsYaml, err := ioutil.ReadFile(defaultsFilePath)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("unable to read defaults/%s.yaml", script), 50), DeploymentConfig{}
+	}
+	var defaultsConfig DeploymentConfig
+	if err := yaml.Unmarshal(getReplacedBytes(defaultsYaml, client, target), &defaultsConfig); err != nil {
+		return cli.NewExitError(fmt.Sprintf("unable to parse defaults/%s.yaml", script), 51), DeploymentConfig{}
+	}
+
+	if script == "deployment" {
+		defaultContainerFile, _ := filepath.Abs("./defaults/container.yaml")
+		defaultContainerYaml, err := ioutil.ReadFile(defaultContainerFile)
+		if err != nil {
+			return cli.NewExitError("unable to read defaults/container.yaml", 50), DeploymentConfig{}
 		}
-		defaultDeploymentConfig.Spec.Template.Spec.Containers = append(defaultDeploymentConfig.Spec.Template.Spec.Containers, defaultContainerCopy)
+		var defaultContainerConfig ContainerConfig
+		err = yaml.Unmarshal(getReplacedBytes(defaultContainerYaml, client, target), &defaultContainerConfig)
+		if err != nil {
+			return cli.NewExitError("unable to parse defaults/container.yaml", 52), DeploymentConfig{}
+		}
+		//take defaults and overwrite them with clientConfig
+		var newConfig DeploymentConfig
+		switch target {
+		case "develop":
+			newConfig = clientConfig.Develop.Deployment
+			break
+		case "staging":
+			newConfig = clientConfig.Staging.Deployment
+			break
+		case "production":
+			newConfig = clientConfig.Production.Deployment
+			break
+		default:
+			return cli.NewExitError("target does not exist, valid: develop, staging, production", 11), DeploymentConfig{}
+		}
+		if err := mergo.MergeWithOverwrite(&defaultsConfig, newConfig); err != nil {
+			return cli.NewExitError("unable to merge client deployment config for target", 53), DeploymentConfig{}
+		}
+		for i := 0; i < len(newConfig.Spec.Template.Spec.Containers); i++ {
+			newContainer := newConfig.Spec.Template.Spec.Containers[i]
+			var defaultContainerPointer *ContainerConfig = &defaultContainerConfig
+			var defaultContainerCopy = *defaultContainerPointer
+			for k := 0; k < len(newContainer.Env); k++ {
+				found := false
+				for j := 0; j < len(defaultContainerCopy.Env); j++ {
+					if newContainer.Env[k].Name == defaultContainerCopy.Env[j].Name {
+						defaultContainerCopy.Env[j] = newContainer.Env[k]
+						found = true
+					}
+				}
+				if !found {
+					defaultContainerCopy.Env = append(defaultContainerCopy.Env, newContainer.Env[k])
+				}
+			}
+			newContainer.Env = defaultContainerCopy.Env
+			if err := mergo.MergeWithOverwrite(&defaultContainerCopy, newContainer); err != nil {
+				return cli.NewExitError("unable to merge container config for target", 54), DeploymentConfig{}
+			}
+			if i == 0 {
+				defaultsConfig.Spec.Template.Spec.Containers = []ContainerConfig{defaultContainerCopy}
+			} else {
+				defaultsConfig.Spec.Template.Spec.Containers = append(defaultsConfig.Spec.Template.Spec.Containers, defaultContainerCopy)
+			}
+		}
 	}
-	return nil, defaultDeploymentConfig
+	return nil, defaultsConfig
+
 }
 
 func getNumberAdbDevices() (int, error) {
@@ -473,13 +554,26 @@ func dispatch(command string, platform string, flags Flags) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("client configuration found, getting deployment config for: %s\n", flags.Target)
-		err, deploymentConfig := getDeploymentConfig(clientConfig, flags.Target)
-		if err != nil {
-			return cli.NewExitError("deployment configuration not found", 9)
+		var targets []string = []string{"develop", "staging", "production"}
+		var scripts []string = []string{"deployment", "ingress", "service"}
+		for _, target := range targets {
+			for _, script := range scripts {
+				err, config := getDeploymentConfig(clientConfig, target, script, flags.Client)
+				if err != nil {
+					return cli.NewExitError(fmt.Sprintf("%s configuration not found", script), 9)
+				}
+				file, err := yaml.Marshal(&config)
+				if err != nil {
+					return cli.NewExitError(fmt.Sprintf("unable to parse %s config into yaml", script), 60)
+				}
+				path := fmt.Sprintf("./client/kube/%s/%s.yaml", target, script)
+				if err := ioutil.WriteFile(path, file, 0644); err != nil {
+					fmt.Println(err)
+					return cli.NewExitError(fmt.Sprintf("unable to write %s yaml to file", script), 61)
+				}
+				fmt.Printf("Wrote to %s\n", path)
+			}
 		}
-		fmt.Printf("deployment configuration found %s", deploymentConfig)
-		// TODO: write deployment configuration yaml to ./client/kube/${flags.Target}/deployment.yaml
 	}
 	return nil
 }

@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   namespace: cohesiv
-  name: mypds-deployment
+  name: ${CLIENT}-deployment
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: mypds
+        app: ${CLIENT}
     spec:
       containers:
         # ../defaults/container.yaml

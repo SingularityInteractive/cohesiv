@@ -3,61 +3,63 @@ clients:
  -
   name: cohesiv
   develop:
+    deployment:
+    ingress:
+    service:
   staging:
+    deployment:
+    ingress:
+    service:
   production:
+    deployment:
+    ingress:
+    service:
  -
   name: mypds
   develop:
-    spec:
-      template:
-        spec:
-          containers:
-          -
-            name: mypds
-            image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest"
-            env:
+    deployment:
+      spec:
+        template:
+          spec:
+            containers:
             -
-              name: DB_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: cohesiv-secrets
-                  key: develop-db-connection-string
+              image: 750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest
+    ingress:
+    service:
   staging:
-    spec:
-      template:
-        spec:
-          containers:
-          -
-            name: mypds
-            image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest"
-            env:
+    deployment:
+      spec:
+        template:
+          spec:
+            containers:
             -
-              name: DB_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: mypds-secrets
-                  key: staging-db-connection-string
+              image: 750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest
+    ingress:
+    service:
   production:
-    spec:
-      revisionHistoryLimit: 5
-      replicas: 3
-      template:
-        spec:
-          containers:
-          -
-            name: mypds
-            image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:master"
-            env:
+    deployment:
+      spec:
+        revisionHistoryLimit: 5
+        replicas: 3
+        template:
+          spec:
+            containers:
             -
-              name: DB_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: mypds-secrets
-                  key: production-db-connection-string
-
+              image: 750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:master
+    ingress:
+    service:
  -
   name: asu
   develop:
+    deployment:
+    ingress:
+    service:
   staging:
+    deployment:
+    ingress:
+    service:
   production:
+    deployment:
+    ingress:
+    service:
   
