@@ -249,6 +249,22 @@ func getDeploymentConfig(clientConfig ClientConfig, target string, script string
 
 }
 
+func replaceVars(inputFilepath string, outputFilepath string, client string, target string) error {
+	inputPath, _ := filepath.Abs(inputFilepath)
+	inputFile, err := ioutil.ReadFile(inputPath)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("unable to read %s", inputPath), 50)
+	}
+	outputFile := getReplacedBytes(inputFile, client, target)
+	outputPath, _ := filepath.Abs(outputFilepath)
+	if err := ioutil.WriteFile(outputPath, outputFile, 0644); err != nil {
+		fmt.Println(err)
+		return cli.NewExitError(fmt.Sprintf("unable to write to %s", outputPath), 61)
+	}
+	fmt.Printf("Wrote to %s\n", outputFilepath)
+	return nil
+}
+
 func getNumberAdbDevices() (int, error) {
 	adbDevices, err := exec.Command("bash", "-c", "adb devices | grep device | wc -l").Output()
 	if err != nil {
@@ -553,6 +569,9 @@ func dispatch(command string, platform string, flags Flags) error {
 		err, clientConfig := getClientConfig(flags.Client)
 		if err != nil {
 			return err
+		}
+		if err := replaceVars("./defaults/Makefile", "./client/Makefile", flags.Client, flags.Target); err != nil {
+			return cli.NewExitError("unable to generate client Makefile", 55)
 		}
 		var targets []string = []string{"develop", "staging", "production"}
 		var scripts []string = []string{"deployment", "ingress", "service"}
