@@ -30,6 +30,16 @@ const styles = {
     marginBottom: 48,
     // puts the 'border' under the tab indicator
     boxShadow: 'inset 0 -1px 1px -1px #cccccc'
+  },
+  tabRoot: {
+    minWidth: 40
+  },
+  tabLabel: {
+    textTransform: 'none'
+  },
+  tabLabelContainer: {
+    paddingLeft: 0,
+    paddingRight: 0
   }
 }
 
@@ -75,10 +85,20 @@ export default class Home extends Component {
                   value={currentRoute}
                   onChange={this._handleTabChange}
                   indicatorColor="primary"
-                  textColor="primary"
-                  fullWidth>
+                  textColor="primary">
                   {map(this.subRoutes, ({ value, label }) => (
-                    <Tab key={value} label={label} value={value} style={{ textAlign: 'left' }} />
+                    <Tab
+                      key={value}
+                      label={label}
+                      value={value}
+                      classes={{
+                        root: classes.tabRoot,
+                        label: classes.tabLabel,
+                        labelContainer: classes.tabLabelContainer
+                      }}
+                      disableRipple={true}
+                      style={{ marginRight: 40 }}
+                    />
                   ))}
                 </Tabs>
                 {Pages.pages.map((page, i) => (
