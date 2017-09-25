@@ -59,7 +59,7 @@ jobs:
           key: v5-cohesiv-node_modules-{{ checksum "package.json" }}
           paths:
             - node_modules
-  install-mypds-dependencies:
+  install-client-dependencies:
     docker:
       - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -72,14 +72,14 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-node_modules-{{ checksum "package.json" }}
+            - v5-client-node_modules-{{ checksum "package.json" }}
       - run:
           name: Install node deps
-          command: cd mypds && yarn --pure-lockfile
+          command: cd client && yarn --pure-lockfile
       - save_cache:
-          key: v5-mypds-node_modules-{{ checksum "package.json" }}
+          key: v5-client-node_modules-{{ checksum "package.json" }}
           paths:
-            - ./mypds/node_modules
+            - ./client/node_modules
   build-cohesiv-go:
     docker:
       - image: circleci/golang:latest
@@ -122,7 +122,7 @@ jobs:
           key: v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
           paths:
             - ./access/dist
-  build-mypds:
+  build-client:
     docker:
       - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -135,19 +135,19 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-node_modules-{{ checksum "package.json" }}
+            - v5-client-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build Web
-          command: cd mypds && yarn build:web
+          command: cd client && yarn build:web
       - run:
           name: Build TS Server
-          command: cd mypds && yarn build:server
+          command: cd client && yarn build:server
       - save_cache:
-          key: v5-mypds-build-{{ checksum ".circle-sha" }}
+          key: v5-client-build-{{ checksum ".circle-sha" }}
           paths:
-            - ./mypds/server/dist
-            - ./mypds/public
-  test-mypds:
+            - ./client/server/dist
+            - ./client/public
+  test-client:
     docker:
       - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -160,13 +160,13 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-client-build-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-node_modules-{{ checksum "package.json" }}
+            - v5-client-node_modules-{{ checksum "package.json" }}
       - run:
           name: Test TS Server
-          command: cd mypds && yarn test:server
+          command: cd client && yarn test:server
   deploy-cohesiv-develop:
     docker:
       - image: sammccord/kops-docker
@@ -299,7 +299,7 @@ jobs:
             make authorize-master-circle-ip
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
-  deploy-mypds-develop:
+  deploy-client-develop:
     docker:
       - image: sammccord/kops-docker
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -319,28 +319,28 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-client-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
-          command: cd mypds && make docker-image
+          command: cd client && make docker-image
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
-            cd mypds && make docker-push-ecr
+            cd client && make docker-push-ecr
       - run:
-          name: Get mypds develop cluster credentials
+          name: Get client develop cluster credentials
           command: |
             kops get cluster --name=develop.cohesiv.io
             kops export kubecfg --name=develop.cohesiv.io --state=${KOPS_STATE_STORE}
       - run:
           name: Deploy
           command: |
-            sed -i "s/:develop/:$CIRCLE_SHA1/g" mypds/kube/develop/deployment.yaml
+            sed -i "s/:develop/:$CIRCLE_SHA1/g" client/kube/develop/deployment.yaml
             make authorize-develop-circle-ip
-            kubectl apply -f mypds/kube/develop
+            kubectl apply -f client/kube/develop
             make deauthorize-develop-circle-ip
-  deploy-mypds-staging:
+  deploy-client-staging:
     docker:
       - image: sammccord/kops-docker
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -360,28 +360,28 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-client-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
-          command: cd mypds && make docker-image
+          command: cd client && make docker-image
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
-            cd mypds && make docker-push-ecr
+            cd client && make docker-push-ecr
       - run:
-          name: Get mypds staging cluster credentials
+          name: Get client staging cluster credentials
           command: |
             kops get cluster --name=staging.cohesiv.io
             kops export kubecfg --name=staging.cohesiv.io --state=${KOPS_STATE_STORE}
       - run:
           name: Deploy
           command: |
-            sed -i "s/:staging/:$CIRCLE_SHA1/g" mypds/kube/staging/deployment.yaml
+            sed -i "s/:staging/:$CIRCLE_SHA1/g" client/kube/staging/deployment.yaml
             make authorize-staging-circle-ip
-            kubectl apply -f mypds/kube/staging
+            kubectl apply -f client/kube/staging
             make deauthorize-staging-circle-ip
-  deploy-mypds-production:
+  deploy-client-production:
     docker:
       - image: sammccord/kops-docker
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -401,26 +401,26 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-mypds-build-{{ checksum ".circle-sha" }}
+            - v5-client-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
-          command: cd mypds && make docker-image
+          command: cd client && make docker-image
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
-            cd mypds && make docker-push-ecr
+            cd client && make docker-push-ecr
       - run:
-          name: Get mypds production cluster credentials
+          name: Get client production cluster credentials
           command: |
             kops get cluster --name=cohesiv.io
             kops export kubecfg --name=cohesiv.io --state=${KOPS_STATE_STORE}
       - run:
           name: Deploy
           command: |
-            sed -i "s/:master/:$CIRCLE_SHA1/g" mypds/kube/production/deployment.yaml
+            sed -i "s/:master/:$CIRCLE_SHA1/g" client/kube/production/deployment.yaml
             make authorize-master-circle-ip
-            kubectl apply -f mypds/kube/production
+            kubectl apply -f client/kube/production
             make deauthorize-master-circle-ip
 workflows:
   version: 2
@@ -460,33 +460,33 @@ workflows:
           filters:
             branches:
               only: master
-  mypds-build-and-deploy:
+  client-build-and-deploy:
     jobs:
       - checkout-code
-      - install-mypds-dependencies:
+      - install-client-dependencies:
           requires:
             - checkout-code
-      - build-mypds:
+      - build-client:
           requires:
-            - install-mypds-dependencies
-      - test-mypds:
+            - install-client-dependencies
+      - test-client:
           requires:
-            - build-mypds
-      - deploy-mypds-develop:
+            - build-client
+      - deploy-client-develop:
           requires:
-            - build-mypds
+            - build-client
           filters:
             branches:
               only: develop
-      - deploy-mypds-staging:
+      - deploy-client-staging:
           requires:
-            - build-mypds
+            - build-client
           filters:
             branches:
               only: staging
-      - deploy-mypds-production:
+      - deploy-client-production:
           requires:
-            - build-mypds
+            - build-client
           filters:
             branches:
               only: master

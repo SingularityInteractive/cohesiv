@@ -14,10 +14,9 @@ spec:
       labels:
         app: mypds
     spec:
-      # [START containers]
       containers:
       - name: mypds
-        image: "750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest"
+        image: 750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 4040
@@ -41,7 +40,7 @@ spec:
         - name: DB_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
-              name: cohesiv-secrets
+              name: mypds-secrets
               key: develop-db-connection-string
         resources:
           requests:
@@ -53,4 +52,3 @@ spec:
           initialDelaySeconds: 10
           tcpSocket:
             port: 4040
-      # [END containers]
