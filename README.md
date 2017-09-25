@@ -8,7 +8,7 @@ practices in application deployment, utilizing a modern stack including `Docker`
  `GRPC`, `Golang`, and `Node`.
 
 ## Table of Contents
-- [Dependencies] (#dependencies)
+- [Dependencies](#dependencies)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Updating GRPC Spec](#updating-proto)
@@ -32,20 +32,22 @@ practices in application deployment, utilizing a modern stack including `Docker`
 *__Note:__ This project must exist in your GOPATH to use vscode language features like intellisense. The path above works with a default Golang setup*
 
 ## Usage
-`cohesiv -c mypds generate`
-- Generate client kube configs
-`cohesiv run server`
-- Build all Go and Typescript services, then docker-compose
-`cohesiv run web`
-- Run localhost client app in browser
-`cohesiv run android`
-- Run app on connected android device or first emulator
-`cohesiv run ios`
-- Run app on ios simulator
-`cohesiv build #PLATFORM`
-- Build for platform (server,web,android,ios)
-`cohesiv deploy #PLATFORM`
-- Deploy for platform (android,ios)
+- `cohesiv -c mypds generate`
+Generate client kube configs
+- `cohesiv run server`
+Build all Go and Typescript services, then docker-compose
+- `cohesiv run web`
+Run localhost client app in browser
+- `cohesiv run android`
+Run app on connected android device or first emulator
+- `cohesiv run ios`
+Run app on ios simulator
+- `cohesiv build #PLATFORM`
+Build for platform (server,web,android,ios)
+- `cohesiv test #PLATFORM`
+Run tests for platform (server,web,android,ios)
+- `cohesiv deploy #PLATFORM`
+Deploy for platform
 
 ## Updating GRPC Spec
 
