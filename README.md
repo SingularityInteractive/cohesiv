@@ -43,7 +43,7 @@ Run app on connected android device or first emulator
 - `cohesiv run ios`
 Run app on ios simulator
 - `cohesiv build #PLATFORM`
-Build for platform (server, web, android, ios)
+Build release for platform (server, web, android, ios)
 - `cohesiv test #PLATFORM`
 Run tests for platform
 - `cohesiv deploy #PLATFORM`

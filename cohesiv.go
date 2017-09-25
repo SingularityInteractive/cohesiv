@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const ANDROID_IDENTIFIER string = "com.github.SingularityInteractive.cohesiv"
+
 type Configs struct {
 	Clients []ClientConfig `yaml:"clients"`
 }
@@ -309,9 +311,79 @@ func runClientNpmScript(script string) error {
 	return nil
 }
 
+func performGradleTask(task string) error {
+	cmd := exec.Command("./gradlew", fmt.Sprintf(":app:%s", task))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Dir = "client/app/android"
+	err := cmd.Start()
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("Start %s for android failed", task), 15)
+	}
+	err = cmd.Wait()
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%s for android failed", task), 16)
+	}
+	fmt.Printf("Android %s finished\n", task)
+	return nil
+}
+
+func startAndroidApp() error {
+	runCmd := exec.Command("adb", "shell", "am", "start", "-n", fmt.Sprintf("%s/.MainActivity", ANDROID_IDENTIFIER))
+	runCmd.Stdout = os.Stdout
+	runCmd.Stderr = os.Stderr
+	err := runCmd.Start()
+	if err != nil {
+		return cli.NewExitError("Start running on android failed", 19)
+	}
+	err = runCmd.Wait()
+	if err != nil {
+		return cli.NewExitError("Run on android failed", 20)
+	}
+	fmt.Println("Run on Android success")
+	return nil
+}
+
 func dispatch(command string, platform string, flags Flags) error {
 	fmt.Printf("%s for %s, client: %s\n", command, platform, flags.Client)
 	switch command {
+	case "clean":
+		switch platform {
+		case "android":
+			if err := performGradleTask("clean"); err != nil {
+				return err
+			}
+		case "ios":
+			podCmd := exec.Command("pod", "install")
+			podCmd.Stdout = os.Stdout
+			podCmd.Stderr = os.Stderr
+			podCmd.Dir = "client/app/ios"
+			err := podCmd.Start()
+			if err != nil {
+				return cli.NewExitError("Start pod install failed", 21)
+			}
+			err = podCmd.Wait()
+			if err != nil {
+				return cli.NewExitError("Pod install failed", 22)
+			}
+			fmt.Println("Pod install finished")
+			cleanCmd := exec.Command("xcodebuild", "-sdk", "iphonesimulator", "-destination", "platform=iOS Simulator,name=iPhone 8", "-derivedDataPath", "build", "-configuration", "Debug", "-workspace", "cohesiv.xcworkspace", "-scheme", "cohesiv", "clean")
+			cleanCmd.Stdout = os.Stdout
+			cleanCmd.Stderr = os.Stderr
+			cleanCmd.Dir = "client/app/ios"
+			err = cleanCmd.Start()
+			if err != nil {
+				return cli.NewExitError("Start iOS build failed", 23)
+			}
+			err = cleanCmd.Wait()
+			if err != nil {
+				return cli.NewExitError("iOS build failed", 24)
+			}
+			fmt.Println("iOS clean finished")
+		default:
+			return cli.NewExitError("Clean is not configured for this platform", 57)
+		}
+		break
 	case "build":
 		switch platform {
 		case "server":
@@ -327,47 +399,12 @@ func dispatch(command string, platform string, flags Flags) error {
 			}
 			break
 		case "android":
-			cmd := exec.Command("./gradlew", ":app:build")
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Dir = "client/app/android"
-			err := cmd.Start()
-			if err != nil {
-				return cli.NewExitError("Start building for android failed", 15)
+			if err := performGradleTask("assembleRelease"); err != nil {
+				return err
 			}
-			err = cmd.Wait()
-			if err != nil {
-				return cli.NewExitError("Build for android failed", 16)
-			}
-			fmt.Println("Android build finished")
 		case "ios":
-			podCmd := exec.Command("pod", "install")
-			podCmd.Stdout = os.Stdout
-			podCmd.Stderr = os.Stderr
-			podCmd.Dir = "client/app/ios"
-			err := podCmd.Start()
-			if err != nil {
-				return cli.NewExitError("Start pod install failed", 21)
-			}
-			err = podCmd.Wait()
-			if err != nil {
-				return cli.NewExitError("Pod install failed", 22)
-			}
-			fmt.Println("Pod install finished")
-			buildCmd := exec.Command("xcodebuild", "-sdk", "iphonesimulator", "-destination", "platform=iOS Simulator,name=iPhone 8", "-derivedDataPath", "build", "-configuration", "Debug", "-workspace", "cohesiv.xcworkspace", "-scheme", "cohesiv", "build")
-			buildCmd.Stdout = os.Stdout
-			buildCmd.Stderr = os.Stderr
-			buildCmd.Dir = "client/app/ios"
-			err = buildCmd.Start()
-			if err != nil {
-				return cli.NewExitError("Start iOS build failed", 23)
-			}
-			err = buildCmd.Wait()
-			if err != nil {
-				return cli.NewExitError("iOS build failed", 24)
-			}
-			fmt.Println("iOS build finished")
-
+			//TODO build release build
+			return cli.NewExitError("iOS release build has not yet been configured", 58)
 		default:
 			return cli.NewExitError("Unrecognized platform", 12)
 		}
@@ -448,7 +485,7 @@ func dispatch(command string, platform string, flags Flags) error {
 					if err != nil {
 						return cli.NewExitError("Unable to parse input", 39)
 					}
-					if len(emulators) <= inputInt || inputInt < 1 {
+					if len(emulators) < inputInt || inputInt < 1 {
 						return cli.NewExitError("Index out of range", 40)
 					}
 				}
@@ -483,36 +520,40 @@ func dispatch(command string, platform string, flags Flags) error {
 					time.Sleep(time.Second * 2)
 				}
 			}
-			cmd := exec.Command("./gradlew", ":app:installDebug")
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Dir = "client/app/android"
-			err = cmd.Start()
-			if err != nil {
-				return cli.NewExitError("Start installing on android failed", 17)
+			if err := performGradleTask("installDebug"); err != nil {
+				return err
 			}
-			err = cmd.Wait()
-			if err != nil {
-				return cli.NewExitError("Install on android failed", 18)
+			if err := startAndroidApp(); err != nil {
+				return err
 			}
-			fmt.Println("Android install finished")
-			runCmd := exec.Command("adb", "shell", "am", "start", "-n", "com.github.SingularityInteractive.cohesiv/.MainActivity")
-			runCmd.Stdout = os.Stdout
-			runCmd.Stderr = os.Stderr
-			err = runCmd.Start()
-			if err != nil {
-				return cli.NewExitError("Start running on android failed", 19)
-			}
-			err = runCmd.Wait()
-			if err != nil {
-				return cli.NewExitError("Run on android failed", 20)
-			}
-			fmt.Println("Run on Android success")
+			break
 		case "ios":
-			xcrunLaunchSimulator := exec.Command("xcrun", "instruments", "-w", "iPhone X (11.0)")
+			getSimulatorsCmd := exec.Command("xcrun", "instruments", "-s", "devices")
+			getSimulatorsOutput, err := getSimulatorsCmd.Output()
+			if err != nil {
+				return cli.NewExitError("Get simulators failed", 56)
+			}
+			iosDevices := strings.Split(strings.Split(string(getSimulatorsOutput), "Known Devices:\n")[1], "\n")
+			iosDevices = iosDevices[:len(iosDevices)-1]
+			fmt.Println("Choose iOS Device")
+			for i := 0; i < len(iosDevices); i++ {
+				fmt.Printf("%d: %s\n", i+1, iosDevices[i])
+			}
+			fmt.Printf("Enter a number: ")
+			var input string
+			fmt.Scanln(&input)
+			inputInt, err := strconv.Atoi(strings.TrimSpace(string(input)))
+			if err != nil {
+				return cli.NewExitError("Unable to parse input", 39)
+			}
+			if len(iosDevices) < inputInt || inputInt < 1 {
+				return cli.NewExitError("Index out of range", 40)
+			}
+
+			xcrunLaunchSimulator := exec.Command("xcrun", "instruments", "-w", iosDevices[inputInt-1])
 			xcrunLaunchSimulator.Stdout = os.Stdout
 			xcrunLaunchSimulator.Stderr = os.Stderr
-			err := xcrunLaunchSimulator.Start()
+			err = xcrunLaunchSimulator.Start()
 			if err != nil {
 				return cli.NewExitError("Start launching simulator failed", 34)
 			}
@@ -520,6 +561,20 @@ func dispatch(command string, platform string, flags Flags) error {
 			/*if err != nil { // Don't fail on error, it worked
 				return cli.NewExitError("Launch simulator failed", 35)
 			}*/
+			buildCmd := exec.Command("xcodebuild", "-sdk", "iphonesimulator", "-destination", "platform=iOS Simulator,name=iPhone 8", "-derivedDataPath", "build", "-configuration", "Debug", "-workspace", "cohesiv.xcworkspace", "-scheme", "cohesiv", "build")
+			buildCmd.Stdout = os.Stdout
+			buildCmd.Stderr = os.Stderr
+			buildCmd.Dir = "client/app/ios"
+			err = buildCmd.Start()
+			if err != nil {
+				return cli.NewExitError("Start iOS build failed", 23)
+			}
+			err = buildCmd.Wait()
+			if err != nil {
+				return cli.NewExitError("iOS build failed", 24)
+			}
+			fmt.Println("iOS build finished")
+
 			var appPath string
 			appPath = fmt.Sprintf("build/Build/Products/Debug-iphonesimulator/%s.app", flags.Client)
 			fmt.Printf("installing app from: %s\n", appPath)
@@ -630,6 +685,12 @@ func info(app *cli.App, flags Flags) {
 		}
 	}
 	app.Commands = []cli.Command{
+		{
+			Name:    "clean",
+			Aliases: []string{"c"},
+			Usage:   "Clean cohesiv",
+			Action:  getAction("clean"),
+		},
 		{
 			Name:    "build",
 			Aliases: []string{"b"},
