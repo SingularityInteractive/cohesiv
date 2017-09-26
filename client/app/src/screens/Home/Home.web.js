@@ -6,6 +6,7 @@ import Tabs, { Tab } from 'material-ui/Tabs'
 import { inject, observer } from 'mobx-react'
 import { map } from 'lodash'
 
+import { ToDoCard } from '../../components/web'
 import theme from '../../theme'
 
 const styles = {
@@ -31,15 +32,33 @@ const styles = {
     // puts the 'border' under the tab indicator
     boxShadow: 'inset 0 -1px 1px -1px #cccccc'
   },
+  tabIndicator: {
+    backgroundColor: '#444444'
+  },
   tabRoot: {
     minWidth: 40
   },
   tabLabel: {
     textTransform: 'none'
+    // color: '#444444'
   },
   tabLabelContainer: {
     paddingLeft: 0,
     paddingRight: 0
+  },
+  sectionHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24
+  },
+  textLeft: {
+    display: 'inline-block',
+    alignSelf: 'flex-start'
+  },
+  textRight: {
+    display: 'inline-block',
+    alignSelf: 'flex-end'
   }
 }
 
@@ -56,6 +75,31 @@ export default class Home extends Component {
     { value: 'todos', label: "To-do's" },
     { value: 'next-steps', label: 'Next steps' },
     { value: 'social-feed', label: 'Social feed' }
+  ]
+
+  // TODO: get the stores set up and use them for todos
+  todos = [
+    {
+      mission: 'Journey to Mars',
+      type: 'skill',
+      task: 'Subsist Off Potatoes',
+      hasNotification: true,
+      handleClick: () => console.log('you just clicked the skill')
+    },
+    {
+      mission: 'Journey to Mars',
+      type: 'share',
+      task: 'Recruit One Person to Come With',
+      hasNotification: false,
+      handleClick: () => console.log('you just clicked the share')
+    },
+    {
+      mission: 'Journey to Mars',
+      type: 'react',
+      task: 'No Drugs on Mars Policy',
+      hasNotification: false,
+      handleClick: () => console.log('you just clicked the react')
+    }
   ]
 
   _handleTabChange = (event, newRoute) => {
@@ -84,8 +128,7 @@ export default class Home extends Component {
                   className={classes.tabContainer}
                   value={currentRoute}
                   onChange={this._handleTabChange}
-                  indicatorColor="primary"
-                  textColor="primary">
+                  indicatorClassName={classes.tabIndicator}>
                   {map(this.subRoutes, ({ value, label }) => (
                     <Tab
                       key={value}
@@ -94,13 +137,36 @@ export default class Home extends Component {
                       classes={{
                         root: classes.tabRoot,
                         label: classes.tabLabel,
-                        labelContainer: classes.tabLabelContainer
+                        labelContainer: classes.tabLabelContainer,
+                        rootPrimarySelected: classes.tabTest
                       }}
                       disableRipple={true}
                       style={{ marginRight: 40 }}
                     />
                   ))}
                 </Tabs>
+                {/* page sections */}
+                {/* todos */}
+                <span className={classes.sectionHeader}>
+                  <Typography type="subheading" classes={{ root: classes.textLeft }}>
+                    To-do's
+                  </Typography>
+                  <a href="/">
+                    <Typography type="body2" classes={{ root: classes.textRight }}>
+                      See all
+                    </Typography>
+                  </a>
+                </span>
+                {map(this.todos, ({ mission, type, task, hasNotification, handleClick }, index) => (
+                  <ToDoCard
+                    key={`${type}${index}`}
+                    mission={mission}
+                    type={type}
+                    task={task}
+                    hasNotification={hasNotification}
+                    handleClick={handleClick}
+                  />
+                ))}
                 {Pages.pages.map((page, i) => (
                   <Card key={i} className={classes.card}>
                     <CardMedia className={classes.media} title="" image={page.uri} />

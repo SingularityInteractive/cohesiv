@@ -145,21 +145,21 @@ export default {
       contrastDefaultColor: 'light'
     },
     error: {
-      '50': '#ffebee',
-      '100': '#ffcdd2',
-      '200': '#ef9a9a',
-      '300': '#e57373',
-      '400': '#ef5350',
-      '500': '#f44336',
-      '600': '#e53935',
-      '700': '#d32f2f',
-      '800': '#c62828',
-      '900': '#b71c1c',
-      A100: '#ff8a80',
-      A200: '#ff5252',
-      A400: '#ff1744',
-      A700: '#d50000',
-      contrastDefaultColor: 'light'
+      50: '#fcebea',
+      100: '#f7cdca',
+      200: '#f2aca7',
+      300: '#ec8b83',
+      400: '#e87269',
+      500: '#e4594e',
+      600: '#e15147',
+      700: '#dd483d',
+      800: '#d93e35',
+      900: '#d12e25',
+      A100: '#ffffff',
+      A200: '#ffdbda',
+      A400: '#ffaaa7',
+      A700: '#ff928d',
+      contrastDefaultColor: 'dark'
     },
     warning: {
       '500': '#f0ad4e'
@@ -233,11 +233,11 @@ export default {
       color: 'rgba(0, 0, 0, 0.87)'
     },
     subheading: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: 400,
       fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: '24px',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: '#666666'
     },
     body2: {
       fontSize: 14,
@@ -258,7 +258,7 @@ export default {
       fontWeight: 400,
       fontFamily: `'${FONT_NAME}', sans-serif`,
       lineHeight: 1,
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: '#999999'
     },
     button: {
       fontSize: 14,
