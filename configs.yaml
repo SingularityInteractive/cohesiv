@@ -62,4 +62,3 @@ clients:
     deployment:
     ingress:
     service:
-  
