@@ -43,36 +43,6 @@ const styles = theme => ({
   carousel: {
     width: '100%',
     maxHeight: 186
-  },
-  carouselButton: {
-    border: 0,
-    cursor: 'pointer',
-    display: 'inline-flex',
-    outline: 'none',
-    position: 'relative',
-    alignItems: 'center',
-    userSelect: 'none',
-    textDecoration: 'none',
-    justifyContent: 'center',
-    WebkitAppearance: 'none',
-    WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
-    padding: 0,
-    fontSize: '24px',
-    textAlign: 'center',
-    transition: 'background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    borderRadius: '50%',
-    backgroundColor: 'transparent',
-    flex: '0 0 auto'
-  },
-  slide: {
-    marginRight: 12,
-    marginLeft: 12
-  },
-  firstSlide: {
-    marginRight: 12
-  },
-  lastSlide: {
-    marginLeft: 12
   }
 })
 
@@ -84,66 +54,65 @@ export default class ScrollableCardList extends Component {
   }
 
   state = {
-    currentIndex: 0
+    currentSubset: 0,
+    sets: 0,
+    previousDisabled: true,
+    nextDisabled: false
   }
 
   componentWillMount() {
-    this.setState({ totalCards: this.props.cards.length })
+    const sets = Math.floor(this.props.cards.length / 3)
+    const nextDisabled = sets <= 1
+
+    this.setState({
+      sets,
+      nextDisabled
+    })
   }
 
   renderCards = () => {
     const { classes, cards } = this.props
-    const { currentIndex, totalCards } = this.state
+    const { currentSubset } = this.state
+    // if (!cards.length) return null
+    const startingIndex = currentSubset * 3
+    const cardsInView = cards.slice(startingIndex, startingIndex + 3)
 
-    return map(cards, ({ imgUrl, text, type }, index) => {
-      const slideClass = isEqual(index, currentIndex)
-        ? classes.firstSlide
-        : isEqual(index, currentIndex + 2) ? classes.lastSlide : classes.slide
-      return (
-        <Slide key={`${Date.now()}${index}`} index={index} innerClassName={slideClass}>
-          <div>
-            <Card style={{ borderRadius: 2 }}>
+    return (
+      <Grid container>
+        {map(cardsInView, ({ imgUrl, text, type }, index) => (
+          <Grid item xs={4}>
+            <Card>
               <CardMedia image={imgUrl} title={text} className={classes.media} />
               <CardContent>
                 <Typography>{text}</Typography>
               </CardContent>
             </Card>
-          </div>
-        </Slide>
-      )
-    })
-
-    // const { imgUrl, text, type } = card
-    // return null
-
-    // return (
-    //   map(cards.slice(currentIndex, currentIndex + 2))
-    // )
-    // return (
-    //   <Card>
-    //     <CardMedia image={imgUrl} title={text} className={classes.media} />
-    //     <CardContent>
-    //       <Typography>{text}</Typography>
-    //     </CardContent>
-    //   </Card>
-    // )
+          </Grid>
+        ))}
+      </Grid>
+    )
   }
 
   _handleScrollClick = direction => {
-    const { currentIndex, totalCards } = this.state
+    const { currentSubset, sets } = this.state
+    let previousDisabled = false
+    let nextDisabled = false
+
     const actions = {
-      back: () => {
-        if (isEqual(currentIndex, 0)) {
+      previous: () => {
+        if (isEqual(currentSubset, 0)) {
           return null
         } else {
-          this.setState({ currentIndex: currentIndex - 1 })
+          previousDisabled = isEqual(currentSubset - 1, 0)
+          this.setState({ currentSubset: currentSubset - 1, nextDisabled, previousDisabled })
         }
       },
       next: () => {
-        if (isEqual(currentIndex, totalCards - 1)) {
+        if (isEqual(currentSubset, sets)) {
           return null
         } else {
-          this.setState({ currentIndex: currentIndex + 1 })
+          nextDisabled = isEqual(currentSubset + 1, sets)
+          this.setState({ currentSubset: currentSubset + 1, nextDisabled, previousDisabled })
         }
       }
     }
@@ -153,41 +122,38 @@ export default class ScrollableCardList extends Component {
 
   render() {
     const { classes, title, handleClick, cards } = this.props
-    const { currentIndex } = this.state
-    console.log('currentIndex', currentIndex)
+    const { previousDisabled, nextDisabled } = this.state
     return (
       <div className={classes.root}>
-        <CarouselProvider
-          className={classes.carousel}
-          naturalSlideWidth={184}
-          naturalSlideHeight={186}
-          totalSlides={cards.length}
-          visibleSlides={3}
-          currentSlide={currentIndex}>
-          <span className={classes.header}>
-            <Typography type="subheading" classes={{ root: classes.textLeft }}>
-              {title}
-            </Typography>
-            <span className={classes.flex}>
-              <a href="/" className={classes.link}>
-                <Typography type="body2" classes={{ root: classes.textRight }}>
-                  See all
-                </Typography>
-              </a>
-              <ButtonBack
-                className={classes.carouselButton}
-                onClick={() => this._handleScrollClick('back')}>
-                <KeyboardArrowLeft />
-              </ButtonBack>
-              <ButtonNext
-                className={classes.carouselButton}
-                onClick={() => this._handleScrollClick('next')}>
-                <KeyboardArrowRight />
-              </ButtonNext>
-            </span>
+        <span className={classes.header}>
+          <Typography type="subheading" classes={{ root: classes.textLeft }}>
+            {title}
+          </Typography>
+          <span className={classes.flex}>
+            <a href="/" className={classes.link}>
+              <Typography type="body2" classes={{ root: classes.textRight }}>
+                See all
+              </Typography>
+            </a>
+            <IconButton
+              color="primary"
+              className={classes.iconButton}
+              disabled={previousDisabled}
+              aria-label="Scroll previous cards"
+              onClick={() => this._handleScrollClick('previous')}>
+              <KeyboardArrowLeft />
+            </IconButton>
+            <IconButton
+              color="primary"
+              className={classes.iconButton}
+              disabled={nextDisabled}
+              aria-label="Scroll next cards"
+              onClick={() => this._handleScrollClick('next')}>
+              <KeyboardArrowRight />
+            </IconButton>
           </span>
-          <Slider>{this.renderCards()}</Slider>
-        </CarouselProvider>
+        </span>
+        {this.renderCards()}
       </div>
     )
   }

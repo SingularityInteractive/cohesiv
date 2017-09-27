@@ -108,27 +108,42 @@ export default class Home extends Component {
   cards = [
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Rando calrisian',
+      text: 'Rando calrisian #1',
       type: 'skill'
     },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Purchase moon boots',
+      text: 'Purchase moon boots #2',
       type: 'mission'
     },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Dali is a dog',
+      text: 'Dali is a dog #3',
       type: 'story'
     },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Learn to tie shoes',
+      text: 'Learn to tie shoes #4',
       type: 'skill'
     },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Making sandwiches: the basics',
+      text: 'Making sandwiches: the basics #5',
+      type: 'skill'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Making sandwiches: the basics #6',
+      type: 'skill'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Making sandwiches: the basics #7',
+      type: 'skill'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Making sandwiches: the basics #8',
       type: 'skill'
     }
   ]
