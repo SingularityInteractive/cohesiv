@@ -16,7 +16,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const ANDROID_IDENTIFIER string = "com.github.SingularityInteractive"
+const BUNDLE_IDENTIFIER string = "com.github.SingularityInteractive"
 
 type Configs struct {
 	Clients []ClientConfig `yaml:"clients"`
@@ -329,7 +329,7 @@ func performGradleTask(task string) error {
 }
 
 func startAndroidApp(client string) error {
-	runCmd := exec.Command("adb", "shell", "am", "start", "-n", fmt.Sprintf("%s.%s/%s.cohesiv.MainActivity", ANDROID_IDENTIFIER, client, ANDROID_IDENTIFIER))
+	runCmd := exec.Command("adb", "shell", "am", "start", "-n", fmt.Sprintf("%s.%s/%s.cohesiv.MainActivity", BUNDLE_IDENTIFIER, client, BUNDLE_IDENTIFIER))
 	runCmd.Stdout = os.Stdout
 	runCmd.Stderr = os.Stderr
 	err := runCmd.Start()
@@ -603,7 +603,8 @@ func dispatch(command string, platform string, flags Flags) error {
 				return cli.NewExitError("Installing app failed", 31)
 			}
 			fmt.Println("app installed")
-			xcrunSimulator := exec.Command("xcrun", "simctl", "launch", "booted", "com.github.SingularityInteractive.cohesiv")
+			clientBundleIdentifier := fmt.Sprintf("%s.%s", BUNDLE_IDENTIFIER, flags.Client)
+			xcrunSimulator := exec.Command("xcrun", "simctl", "launch", "booted", clientBundleIdentifier)
 			xcrunSimulator.Dir = "client/app/ios"
 			xcrunSimulator.Stdout = os.Stdout
 			xcrunSimulator.Stderr = os.Stderr

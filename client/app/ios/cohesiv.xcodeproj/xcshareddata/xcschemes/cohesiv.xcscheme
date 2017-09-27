@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B56386401DB9693800A0598C"
-               BuildableName = "cohesiv.app"
+               BuildableName = ".app"
                BlueprintName = "cohesiv"
                ReferencedContainer = "container:cohesiv.xcodeproj">
             </BuildableReference>
@@ -34,7 +34,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B56386401DB9693800A0598C"
-            BuildableName = "cohesiv.app"
+            BuildableName = ".app"
             BlueprintName = "cohesiv"
             ReferencedContainer = "container:cohesiv.xcodeproj">
          </BuildableReference>
@@ -58,7 +58,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B56386401DB9693800A0598C"
-            BuildableName = "cohesiv.app"
+            BuildableName = ".app"
             BlueprintName = "cohesiv"
             ReferencedContainer = "container:cohesiv.xcodeproj">
          </BuildableReference>
@@ -84,7 +84,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B56386401DB9693800A0598C"
-            BuildableName = "cohesiv.app"
+            BuildableName = ".app"
             BlueprintName = "cohesiv"
             ReferencedContainer = "container:cohesiv.xcodeproj">
          </BuildableReference>
