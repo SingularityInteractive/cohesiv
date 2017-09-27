@@ -6,7 +6,7 @@ import Tabs, { Tab } from 'material-ui/Tabs'
 import { inject, observer } from 'mobx-react'
 import { map } from 'lodash'
 
-import { ToDoCard } from '../../components/web'
+import { ToDoCard, ScrollableCardList } from '../../components/web'
 import theme from '../../theme'
 
 const styles = {
@@ -45,6 +45,9 @@ const styles = {
   tabLabelContainer: {
     paddingLeft: 0,
     paddingRight: 0
+  },
+  contentSection: {
+    marginBottom: 48
   },
   sectionHeader: {
     display: 'flex',
@@ -102,6 +105,34 @@ export default class Home extends Component {
     }
   ]
 
+  cards = [
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Rando calrisian',
+      type: 'skill'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Purchase moon boots',
+      type: 'mission'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Dali is a dog',
+      type: 'story'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Learn to tie shoes',
+      type: 'skill'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Making sandwiches: the basics',
+      type: 'skill'
+    }
+  ]
+
   _handleTabChange = (event, newRoute) => {
     this.setState({ currentRoute: newRoute })
   }
@@ -147,26 +178,35 @@ export default class Home extends Component {
                 </Tabs>
                 {/* page sections */}
                 {/* todos */}
-                <span className={classes.sectionHeader}>
-                  <Typography type="subheading" classes={{ root: classes.textLeft }}>
-                    To-do's
-                  </Typography>
-                  <a href="/">
-                    <Typography type="body2" classes={{ root: classes.textRight }}>
-                      See all
+                <div className={classes.contentSection}>
+                  <span className={classes.sectionHeader}>
+                    <Typography type="subheading" classes={{ root: classes.textLeft }}>
+                      To-do's
                     </Typography>
-                  </a>
-                </span>
-                {map(this.todos, ({ mission, type, task, hasNotification, handleClick }, index) => (
-                  <ToDoCard
-                    key={`${type}${index}`}
-                    mission={mission}
-                    type={type}
-                    task={task}
-                    hasNotification={hasNotification}
-                    handleClick={handleClick}
-                  />
-                ))}
+                    <a href="/">
+                      <Typography type="body2" classes={{ root: classes.textRight }}>
+                        See all
+                      </Typography>
+                    </a>
+                  </span>
+                  {map(
+                    this.todos,
+                    ({ mission, type, task, hasNotification, handleClick }, index) => (
+                      <ToDoCard
+                        key={`${type}${index}`}
+                        mission={mission}
+                        type={type}
+                        task={task}
+                        hasNotification={hasNotification}
+                        handleClick={handleClick}
+                      />
+                    )
+                  )}
+                </div>
+                {/* next-steps */}
+                <div className={classes.contentSection}>
+                  <ScrollableCardList title="Next steps" cards={this.cards} />
+                </div>
                 {Pages.pages.map((page, i) => (
                   <Card key={i} className={classes.card}>
                     <CardMedia className={classes.media} title="" image={page.uri} />
