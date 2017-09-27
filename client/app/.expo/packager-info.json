@@ -1,8 +1,8 @@
 {
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 5287,
-  "expoServerNgrokUrl": "https://nm-4am.andrewgouin.app.exp.direct",
-  "packagerNgrokUrl": "https://packager.nm-4am.andrewgouin.app.exp.direct",
-  "ngrokPid": 5301
+  "packagerPid": 42264,
+  "expoServerNgrokUrl": "https://mt-xmy.andrewgouin.app.exp.direct",
+  "packagerNgrokUrl": "https://packager.mt-xmy.andrewgouin.app.exp.direct",
+  "ngrokPid": 42285
 }

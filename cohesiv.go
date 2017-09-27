@@ -16,7 +16,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const ANDROID_IDENTIFIER string = "com.github.SingularityInteractive.cohesiv"
+const ANDROID_IDENTIFIER string = "com.github.SingularityInteractive"
 
 type Configs struct {
 	Clients []ClientConfig `yaml:"clients"`
@@ -161,18 +161,18 @@ type YamlVars struct {
 	Replace []string
 }
 
-func getReplacedBytes(data []byte, client string, target string) []byte {
+func getReplacedBytes(data []byte, flags Flags) []byte {
 	hostTarget := ""
-	if target != "production" {
-		hostTarget = fmt.Sprintf("%s.", target)
+	if flags.Target != "production" {
+		hostTarget = fmt.Sprintf("%s.", flags.Target)
 	}
 	vars := YamlVars{[]string{
 		"${CLIENT}",
 		"${TARGET}",
 		"${HOST_TARGET}"},
 		[]string{
-			client,
-			target,
+			flags.Client,
+			flags.Target,
 			hostTarget}}
 	for i := 0; i < len(vars.Find); i++ {
 		data = bytes.Replace(data, []byte(vars.Find[i]), []byte(vars.Replace[i]), -1)
@@ -180,14 +180,14 @@ func getReplacedBytes(data []byte, client string, target string) []byte {
 	return data
 }
 
-func getDeploymentConfig(clientConfig ClientConfig, target string, script string, client string) (error, DeploymentConfig) {
+func getDeploymentConfig(clientConfig ClientConfig, flags Flags, script string) (error, DeploymentConfig) {
 	defaultsFilePath, _ := filepath.Abs(fmt.Sprintf("./defaults/%s.yaml", script))
 	defaultsYaml, err := ioutil.ReadFile(defaultsFilePath)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("unable to read defaults/%s.yaml", script), 50), DeploymentConfig{}
 	}
 	var defaultsConfig DeploymentConfig
-	if err := yaml.Unmarshal(getReplacedBytes(defaultsYaml, client, target), &defaultsConfig); err != nil {
+	if err := yaml.Unmarshal(getReplacedBytes(defaultsYaml, flags), &defaultsConfig); err != nil {
 		return cli.NewExitError(fmt.Sprintf("unable to parse defaults/%s.yaml", script), 51), DeploymentConfig{}
 	}
 
@@ -198,13 +198,13 @@ func getDeploymentConfig(clientConfig ClientConfig, target string, script string
 			return cli.NewExitError("unable to read defaults/container.yaml", 50), DeploymentConfig{}
 		}
 		var defaultContainerConfig ContainerConfig
-		err = yaml.Unmarshal(getReplacedBytes(defaultContainerYaml, client, target), &defaultContainerConfig)
+		err = yaml.Unmarshal(getReplacedBytes(defaultContainerYaml, flags), &defaultContainerConfig)
 		if err != nil {
 			return cli.NewExitError("unable to parse defaults/container.yaml", 52), DeploymentConfig{}
 		}
 		//take defaults and overwrite them with clientConfig
 		var newConfig DeploymentConfig
-		switch target {
+		switch flags.Target {
 		case "develop":
 			newConfig = clientConfig.Develop.Deployment
 			break
@@ -251,13 +251,13 @@ func getDeploymentConfig(clientConfig ClientConfig, target string, script string
 
 }
 
-func replaceVars(inputFilepath string, outputFilepath string, client string, target string) error {
+func replaceVars(inputFilepath string, outputFilepath string, flags Flags) error {
 	inputPath, _ := filepath.Abs(inputFilepath)
 	inputFile, err := ioutil.ReadFile(inputPath)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("unable to read %s", inputPath), 50)
 	}
-	outputFile := getReplacedBytes(inputFile, client, target)
+	outputFile := getReplacedBytes(inputFile, flags)
 	outputPath, _ := filepath.Abs(outputFilepath)
 	if err := ioutil.WriteFile(outputPath, outputFile, 0644); err != nil {
 		fmt.Println(err)
@@ -328,8 +328,8 @@ func performGradleTask(task string) error {
 	return nil
 }
 
-func startAndroidApp() error {
-	runCmd := exec.Command("adb", "shell", "am", "start", "-n", fmt.Sprintf("%s/.MainActivity", ANDROID_IDENTIFIER))
+func startAndroidApp(client string) error {
+	runCmd := exec.Command("adb", "shell", "am", "start", "-n", fmt.Sprintf("%s.%s/%s.cohesiv.MainActivity", ANDROID_IDENTIFIER, client, ANDROID_IDENTIFIER))
 	runCmd.Stdout = os.Stdout
 	runCmd.Stderr = os.Stderr
 	err := runCmd.Start()
@@ -341,6 +341,13 @@ func startAndroidApp() error {
 		return cli.NewExitError("Run on android failed", 20)
 	}
 	fmt.Println("Run on Android success")
+	return nil
+}
+
+func overwriteAppJson(flags Flags) error {
+	if err := replaceVars("./defaults/app.json", "./client/app/app.json", flags); err != nil {
+		return cli.NewExitError("unable to generate client app.json", 55)
+	}
 	return nil
 }
 
@@ -403,7 +410,6 @@ func dispatch(command string, platform string, flags Flags) error {
 				return err
 			}
 		case "ios":
-			//TODO build release build
 			return cli.NewExitError("iOS release build has not yet been configured", 58)
 		default:
 			return cli.NewExitError("Unrecognized platform", 12)
@@ -453,6 +459,9 @@ func dispatch(command string, platform string, flags Flags) error {
 			}
 			break
 		case "android":
+			if err := overwriteAppJson(flags); err != nil {
+				return err
+			}
 			numberOfDevices, err := getNumberAdbDevices()
 			if err != nil {
 				return err
@@ -523,11 +532,14 @@ func dispatch(command string, platform string, flags Flags) error {
 			if err := performGradleTask("installDebug"); err != nil {
 				return err
 			}
-			if err := startAndroidApp(); err != nil {
+			if err := startAndroidApp(flags.Client); err != nil {
 				return err
 			}
 			break
 		case "ios":
+			if err := overwriteAppJson(flags); err != nil {
+				return err
+			}
 			getSimulatorsCmd := exec.Command("xcrun", "instruments", "-s", "devices")
 			getSimulatorsOutput, err := getSimulatorsCmd.Output()
 			if err != nil {
@@ -625,14 +637,15 @@ func dispatch(command string, platform string, flags Flags) error {
 		if err != nil {
 			return err
 		}
-		if err := replaceVars("./defaults/Makefile", "./client/Makefile", flags.Client, flags.Target); err != nil {
+		if err := replaceVars("./defaults/Makefile", "./client/Makefile", flags); err != nil {
 			return cli.NewExitError("unable to generate client Makefile", 55)
 		}
 		var targets []string = []string{"develop", "staging", "production"}
 		var scripts []string = []string{"deployment", "ingress", "service"}
 		for _, target := range targets {
 			for _, script := range scripts {
-				err, config := getDeploymentConfig(clientConfig, target, script, flags.Client)
+				var flags Flags = Flags{flags.Client, target}
+				err, config := getDeploymentConfig(clientConfig, flags, script)
 				if err != nil {
 					return cli.NewExitError(fmt.Sprintf("%s configuration not found", script), 9)
 				}
@@ -677,7 +690,8 @@ func info(app *cli.App, flags Flags) {
 	}
 	getAction := func(command string) func(c *cli.Context) error {
 		return func(c *cli.Context) error {
-			if len(c.Args()) == 0 && command != "generate" {
+			os.Setenv("CLIENT", flags.Client)
+			if len(c.Args()) == 0 && command != "generate" && command != "new" {
 				return cli.NewExitError("No platform specified", 3)
 			}
 			platform := c.Args().Get(0)
@@ -720,6 +734,12 @@ func info(app *cli.App, flags Flags) {
 			Aliases: []string{"g"},
 			Usage:   "Generate client deployment files",
 			Action:  getAction("generate"),
+		},
+		{
+			Name:    "new",
+			Aliases: []string{"n"},
+			Usage:   "Create new client",
+			Action:  getAction("new"),
 		},
 	}
 }
