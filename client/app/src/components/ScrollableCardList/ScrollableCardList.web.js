@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 import { withStyles } from 'material-ui/styles'
 import { Typography, IconButton, Grid } from 'material-ui'
 import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card'
-import { CarouselProvider, Slider, Slide, ButtonBack, ButtonNext } from 'pure-react-carousel'
-import 'pure-react-carousel/dist/react-carousel.es.css'
 import { map, isEqual, each } from 'lodash'
 // icons
 import KeyboardArrowLeft from 'material-ui-icons/KeyboardArrowLeft'
 import KeyboardArrowRight from 'material-ui-icons/KeyboardArrowRight'
+import WbSunnyIcon from 'material-ui-icons/WbSunny'
+import ShareIcon from 'material-ui-icons/Share'
+import LightbulbOutlineIcon from 'material-ui-icons/LightbulbOutline'
+import AirplanemodeActiveIcon from 'material-ui-icons/AirplanemodeActive'
 
 const styles = theme => ({
   root: {
@@ -38,11 +40,26 @@ const styles = theme => ({
     alignSelf: 'flex-end'
   },
   media: {
-    height: 72
+    height: 72,
+    borderTopRightRadius: 2,
+    borderTopLeftRadius: 2
   },
-  carousel: {
-    width: '100%',
-    maxHeight: 186
+  card: {
+    borderRadius: 2,
+    cursor: 'pointer'
+  },
+  cardActions: {
+    paddingRight: 16,
+    paddingBottom: 24,
+    paddingLeft: 16,
+    paddingTop: 0
+  },
+  cardActionIconContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+  cardActionSubIcon: {
+    fill: '#999999',
+    height: 16,
+    width: 16,
+    marginRight: 8
   }
 })
 
@@ -77,20 +94,64 @@ export default class ScrollableCardList extends Component {
     const startingIndex = currentSubset * 3
     const cardsInView = cards.slice(startingIndex, startingIndex + 3)
 
+    const actions = {
+      mission: () => (
+        <div className={classes.cardActionIconContainer}>
+          <AirplanemodeActiveIcon className={classes.cardActionSubIcon} />
+          <Typography type="caption">New mission</Typography>
+        </div>
+      ),
+      skill: () => (
+        <div className={classes.cardActionIconContainer}>
+          <WbSunnyIcon className={classes.cardActionSubIcon} />
+          <Typography type="caption">New skill</Typography>
+        </div>
+      ),
+      share: () => (
+        <div className={classes.cardActionIconContainer}>
+          <ShareIcon className={classes.cardActionSubIcon} />
+          <Typography type="caption">New share</Typography>
+        </div>
+      ),
+      story: () => (
+        <div className={classes.cardActionIconContainer}>
+          <LightbulbOutlineIcon className={classes.cardActionSubIcon} />
+          <Typography type="caption">New story</Typography>
+        </div>
+      ),
+      default: () => null
+    }
+
     return (
       <Grid container>
-        {map(cardsInView, ({ imgUrl, text, type }, index) => (
-          <Grid item xs={4}>
-            <Card>
-              <CardMedia image={imgUrl} title={text} className={classes.media} />
-              <CardContent>
-                <Typography>{text}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        {map(cardsInView, ({ imgUrl, text, type }, index) => {
+          const action = (actions[type] || actions.default)()
+
+          return (
+            <Grid item xs={4} key={`${Date.now()}${index}`}>
+              <Card className={classes.card} elevation={1}>
+                <CardMedia
+                  image={imgUrl}
+                  title={text}
+                  className={classes.media}
+                  onClick={() => this._handleCardClick(text)}
+                />
+                <CardContent>
+                  <Typography type="body2">
+                    <strong>{text}</strong>
+                  </Typography>
+                </CardContent>
+                <CardActions className={classes.cardActions}>{action}</CardActions>
+              </Card>
+            </Grid>
+          )
+        })}
       </Grid>
     )
+  }
+
+  _handleCardClick = card => {
+    console.log('take me to this cards page', card)
   }
 
   _handleScrollClick = direction => {
