@@ -135,18 +135,26 @@ type ClientConfig struct {
 	Production TargetConfig `yaml:"production"`
 }
 
-func getClientConfig(client string) (error, ClientConfig) {
+func getConfigs() (error, Configs) {
 	configFile, _ := filepath.Abs("./configs.yaml")
 	yamlFile, err := ioutil.ReadFile(configFile)
 	var configs Configs
 	if err != nil {
 		fmt.Println(err)
-		return cli.NewExitError("unable to read configs.yaml", 5), ClientConfig{}
+		return cli.NewExitError("unable to read configs.yaml", 5), Configs{}
 	}
 	err = yaml.Unmarshal(yamlFile, &configs)
 	if err != nil {
 		fmt.Println(err)
-		return cli.NewExitError("unable to parse configs.yaml", 6), ClientConfig{}
+		return cli.NewExitError("unable to parse configs.yaml", 6), Configs{}
+	}
+	return nil, configs
+}
+
+func getClientConfig(client string) (error, ClientConfig) {
+	err, configs := getConfigs()
+	if err != nil {
+		return err, ClientConfig{}
 	}
 	for i := 0; i < len(configs.Clients); i++ {
 		if configs.Clients[i].Name == client {
@@ -352,7 +360,7 @@ func overwriteAppJson(flags Flags) error {
 }
 
 func dispatch(command string, platform string, flags Flags) error {
-	fmt.Printf("%s for %s, client: %s\n", command, platform, flags.Client)
+	//fmt.Printf("%s for %s, client: %s\n", command, platform, flags.Client)
 	switch command {
 	case "clean":
 		switch platform {
@@ -662,6 +670,19 @@ func dispatch(command string, platform string, flags Flags) error {
 				fmt.Printf("Wrote to %s\n", path)
 			}
 		}
+	case "get":
+		err, configs := getConfigs()
+		if err != nil {
+			return err
+		}
+		for i := 0; i < len(configs.Clients); i++ {
+			if i != 0 {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("%s", configs.Clients[i].Name)
+		}
+		fmt.Printf("\n")
+		break
 	}
 	return nil
 }
@@ -692,7 +713,7 @@ func info(app *cli.App, flags Flags) {
 	getAction := func(command string) func(c *cli.Context) error {
 		return func(c *cli.Context) error {
 			os.Setenv("CLIENT", flags.Client)
-			if len(c.Args()) == 0 && command != "generate" && command != "new" {
+			if len(c.Args()) == 0 && command != "generate" && command != "new" && command != "get" {
 				return cli.NewExitError("No platform specified", 3)
 			}
 			platform := c.Args().Get(0)
@@ -741,6 +762,11 @@ func info(app *cli.App, flags Flags) {
 			Aliases: []string{"n"},
 			Usage:   "Create new client",
 			Action:  getAction("new"),
+		},
+		{
+			Name:   "get",
+			Usage:  "Get all clients",
+			Action: getAction("get"),
 		},
 	}
 }
