@@ -7,7 +7,7 @@
   "author": "Sam McCord <samuel.e.mccord@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "precommit": "lint-staged",
+    "precommit": "go build -o cohesiv-cli cohesiv.go && lint-staged",
     "access:dev":
       "yarn run access:build && yarn run concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc -w -p access\" \"nodemon access/dist/access/src/index.js\"",
     "access:build": "tsc -p access",

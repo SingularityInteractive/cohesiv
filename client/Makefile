@@ -1,4 +1,4 @@
-CONTAINER_NAME=mypds
+CONTAINER_NAME=`cohesiv get clients`
 PUBLIC_URL=/
 
 SHELL=/usr/bin/env bash

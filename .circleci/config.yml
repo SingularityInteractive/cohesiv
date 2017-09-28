@@ -72,12 +72,12 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-client-node_modules-{{ checksum "package.json" }}
+            - v5-client-node_modules-{{ checksum "client/package.json" }}
       - run:
           name: Install node deps
           command: cd client && yarn --pure-lockfile
       - save_cache:
-          key: v5-client-node_modules-{{ checksum "package.json" }}
+          key: v5-client-node_modules-{{ checksum "client/package.json" }}
           paths:
             - ./client/node_modules
   build-cohesiv-go:
@@ -135,7 +135,7 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-client-node_modules-{{ checksum "package.json" }}
+            - v5-client-node_modules-{{ checksum "client/package.json" }}
       - run:
           name: Build Web
           command: cd client && yarn build:web
@@ -317,6 +317,9 @@ jobs:
       - restore_cache:
           keys:
             - v5-repo-{{ checksum ".circle-sha" }}
+      - run:
+          name: Install CLI
+          command: ./installCli.sh
       - restore_cache:
           keys:
             - v5-client-build-{{ checksum ".circle-sha" }}
