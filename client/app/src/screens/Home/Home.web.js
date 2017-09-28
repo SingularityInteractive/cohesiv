@@ -106,26 +106,21 @@ export default class Home extends Component {
   ]
 
   cards = [
+    { imgUrl: 'http://lorempixel.com/400/200/', text: 'Rando calrisian #1', type: 'skill' },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Rando calrisian #1',
+      text: 'qwoijefklj2380jLSKJDfoi23jjaflweijrowamfoe2*)E2309ajsdlkfjwelkfmaskj)E92000',
       type: 'skill'
     },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Purchase moon boots #2',
-      type: 'mission'
-    },
-    {
-      imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Dali is a dog #3',
-      type: 'story'
-    },
-    {
-      imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Learn to tie shoes #4',
+      text:
+        'This is some super long text, longer than any title of a task ever should be, but hey, its gloo, so who knows ¯_(ツ)_/¯',
       type: 'skill'
     },
+    { imgUrl: 'http://lorempixel.com/400/200/', text: 'Purchase moon boots #2', type: 'mission' },
+    { imgUrl: 'http://lorempixel.com/400/200/', text: 'Dali is a dog #3', type: 'story' },
+    { imgUrl: 'http://lorempixel.com/400/200/', text: 'Learn to tie shoes #4', type: 'skill' },
     {
       imgUrl: 'http://lorempixel.com/400/200/',
       text: 'Making sandwiches: the basics #5',
@@ -139,11 +134,6 @@ export default class Home extends Component {
     {
       imgUrl: 'http://lorempixel.com/400/200/',
       text: 'Making sandwiches: the basics #7',
-      type: 'skill'
-    },
-    {
-      imgUrl: 'http://lorempixel.com/400/200/',
-      text: 'Making sandwiches: the basics #8',
       type: 'skill'
     }
   ]

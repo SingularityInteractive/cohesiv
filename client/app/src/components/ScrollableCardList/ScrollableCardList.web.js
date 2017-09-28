@@ -46,9 +46,20 @@ const styles = theme => ({
   },
   card: {
     borderRadius: 2,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    height: 186
+  },
+  cardContent: {
+    height: 72,
+    paddingLeft: 16,
+    paddingTop: 16,
+    paddingRight: 16,
+    boxSizing: 'border-box'
   },
   cardActions: {
+    height: 18,
+    position: 'relative',
+    bottom: 0,
     paddingRight: 16,
     paddingBottom: 24,
     paddingLeft: 16,
@@ -85,6 +96,29 @@ export default class ScrollableCardList extends Component {
       sets,
       nextDisabled
     })
+  }
+
+  // deals with titles that are too long for one line (truncating text should be easier than this ¯\_(ツ)_/¯)
+  formatText(text) {
+    const words = text.split(' ')
+    let line1LengthLimitReached = false
+    let line1Parts = []
+    let line2Parts = []
+    each(words, word => {
+      const workingParts = [...line1Parts, word]
+      if (workingParts.join(' ').length <= 21 && !line1LengthLimitReached) {
+        line1Parts.push(word)
+      } else {
+        line1LengthLimitReached = true
+        line2Parts.push(word)
+      }
+    })
+    const lines = [line1Parts.join(' '), line2Parts.join(' ')]
+    return map(lines, (line, index) => (
+      <Typography type="body2" noWrap={isEqual(index, 1)} key={`${Date.now()}${index}title`}>
+        <strong>{line}</strong>
+      </Typography>
+    ))
   }
 
   renderCards = () => {
@@ -136,12 +170,17 @@ export default class ScrollableCardList extends Component {
                   className={classes.media}
                   onClick={() => this._handleCardClick(text)}
                 />
-                <CardContent>
-                  <Typography type="body2">
-                    <strong>{text}</strong>
-                  </Typography>
-                </CardContent>
-                <CardActions className={classes.cardActions}>{action}</CardActions>
+                <div className={classes.cardContent}>{this.formatText(text)}</div>
+                <div
+                  style={{
+                    height: 40,
+                    display: 'flex',
+                    paddingLeft: 16,
+                    paddingBottom: 24,
+                    paddingRight: 16
+                  }}>
+                  {action}
+                </div>
               </Card>
             </Grid>
           )
@@ -156,24 +195,20 @@ export default class ScrollableCardList extends Component {
 
   _handleScrollClick = direction => {
     const { currentSubset, sets } = this.state
-    let previousDisabled = false
-    let nextDisabled = false
 
     const actions = {
       previous: () => {
         if (isEqual(currentSubset, 0)) {
           return null
         } else {
-          previousDisabled = isEqual(currentSubset - 1, 0)
-          this.setState({ currentSubset: currentSubset - 1, nextDisabled, previousDisabled })
+          this.setState({ currentSubset: currentSubset - 1 })
         }
       },
       next: () => {
-        if (isEqual(currentSubset, sets)) {
+        if (isEqual(currentSubset + 1, sets)) {
           return null
         } else {
-          nextDisabled = isEqual(currentSubset + 1, sets)
-          this.setState({ currentSubset: currentSubset + 1, nextDisabled, previousDisabled })
+          this.setState({ currentSubset: currentSubset + 1 })
         }
       }
     }
@@ -183,7 +218,10 @@ export default class ScrollableCardList extends Component {
 
   render() {
     const { classes, title, handleClick, cards } = this.props
-    const { previousDisabled, nextDisabled } = this.state
+    const { currentSubset, sets } = this.state
+    const previousDisabled = isEqual(currentSubset, 0)
+    const nextDisabled = isEqual(currentSubset + 1, sets)
+
     return (
       <div className={classes.root}>
         <span className={classes.header}>
