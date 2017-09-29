@@ -31,8 +31,10 @@ import { getRouteNameFromPath } from '../index'
 const styles = {
   root: {
     backgroundColor: '#f8f8f8',
-    height: '100vh',
-    width: '100vw'
+    height: '100%',
+    width: '100vw',
+    // so that the content isnt covered up by the AppBar
+    paddingTop: 48
   },
   end: {
     position: 'fixed',
@@ -96,7 +98,7 @@ class Navigation extends Component {
     const routeName = getRouteNameFromPath(location.pathname)
     return (
       <div className={classes.root}>
-        <AppBar position="static" color="primary">
+        <AppBar position="fixed" color="primary">
           <Small>
             <Toolbar>
               <IconButton color="contrast" aria-label="Menu">

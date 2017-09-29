@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { withStyles } from 'material-ui/styles'
 import { Paper, Grid, Typography, Icon } from 'material-ui'
 // icons
@@ -89,6 +90,14 @@ function ToDoCard(props) {
       </Grid>
     </Paper>
   )
+}
+
+ToDoCard.propTypes = {
+  mission: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  task: PropTypes.string.isRequired,
+  hasNotification: PropTypes.bool.isRequired,
+  handleClick: PropTypes.func.isRequired
 }
 
 export default withStyles(styles)(ToDoCard)

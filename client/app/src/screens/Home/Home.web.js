@@ -6,7 +6,7 @@ import Tabs, { Tab } from 'material-ui/Tabs'
 import { inject, observer } from 'mobx-react'
 import { map } from 'lodash'
 
-import { ToDoCard, ScrollableCardList } from '../../components/web'
+import { ToDoCard, ScrollableCardList, SocialCard } from '../../components/web'
 import theme from '../../theme'
 
 const styles = {
@@ -79,7 +79,7 @@ export default class Home extends Component {
     { value: 'next-steps', label: 'Next steps' },
     { value: 'social-feed', label: 'Social feed' }
   ]
-
+  // START DUMMIE "DATA"/////////////////////////////////////////////////////////////////////////////////////////////////////
   // TODO: get the stores set up and use them for todos
   todos = [
     {
@@ -135,8 +135,45 @@ export default class Home extends Component {
       imgUrl: 'http://lorempixel.com/400/200/',
       text: 'Making sandwiches: the basics #7',
       type: 'skill'
+    },
+    {
+      imgUrl: 'http://lorempixel.com/400/200/',
+      text: 'Making sandwiches: the basics #8',
+      type: 'skill'
     }
   ]
+
+  socialEvents = [
+    {
+      owner: 'John Stamos',
+      date: new Date('11/16/1954'),
+      imgUrl: 'http://lorempixel.com/400/200/',
+      comments: ['wow!', 'so sick!'],
+      type: 'quest_new',
+      name: 'College of Bureaucracy - Masters Degree',
+      description:
+        "This if the finest institution and degree one can acquire. Don't believe us? Just ask some of our world-renowned alumni. They're super duper smart",
+      missions: 28
+    },
+    {
+      owner: 'John Stamos',
+      date: new Date('02/16/1977'),
+      imgUrl: 'http://lorempixel.com/200/200/',
+      comments: ['noice!', 'you da best!', "you'll get em next time!"],
+      type: 'mission_new',
+      name: 'My School and I. Wait? Is it "I" or "Me"?',
+      parent_quest: 'School for the Future'
+    },
+    {
+      owner: 'Becky Baller',
+      date: new Date('02/16/1990'),
+      comments: ['keep your chin up'],
+      type: 'connection_new',
+      connection: 'Andrew Andrews',
+      connection_info: "MLKHS Class of '08"
+    }
+  ]
+  // END DUMMIE "DATA"/////////////////////////////////////////////////////////////////////////////////////////////////////
 
   _handleTabChange = (event, newRoute) => {
     this.setState({ currentRoute: newRoute })
@@ -211,6 +248,26 @@ export default class Home extends Component {
                 {/* next-steps */}
                 <div className={classes.contentSection}>
                   <ScrollableCardList title="Next steps" cards={this.cards} />
+                </div>
+                {/* social feed */}
+                <div className={classes.contentSection}>
+                  <span className={classes.sectionHeader}>
+                    <Typography type="subheading" classes={{ root: classes.textLeft }}>
+                      Social feed
+                    </Typography>
+                    <a href="/">
+                      <Typography type="body2" classes={{ root: classes.textRight }}>
+                        See all
+                      </Typography>
+                    </a>
+                  </span>
+                  <Grid container direction="column" spacing={16}>
+                    {map(this.socialEvents, (event, index) => (
+                      <Grid item xs={12} key={`${Date.now()}${index}event`}>
+                        <SocialCard event={event} />
+                      </Grid>
+                    ))}
+                  </Grid>
                 </div>
                 {Pages.pages.map((page, i) => (
                   <Card key={i} className={classes.card}>

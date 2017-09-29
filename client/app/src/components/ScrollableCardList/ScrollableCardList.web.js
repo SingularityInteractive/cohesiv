@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { withStyles } from 'material-ui/styles'
 import { Typography, IconButton, Grid } from 'material-ui'
-import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card'
+import Card, { CardContent, CardMedia } from 'material-ui/Card'
 import { map, isEqual, each } from 'lodash'
 // icons
 import KeyboardArrowLeft from 'material-ui-icons/KeyboardArrowLeft'
@@ -56,14 +57,12 @@ const styles = theme => ({
     paddingRight: 16,
     boxSizing: 'border-box'
   },
-  cardActions: {
-    height: 18,
-    position: 'relative',
-    bottom: 0,
-    paddingRight: 16,
-    paddingBottom: 24,
+  cardActionContainer: {
+    height: 40,
+    display: 'flex',
     paddingLeft: 16,
-    paddingTop: 0
+    paddingBottom: 24,
+    paddingRight: 16
   },
   cardActionIconContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
   cardActionSubIcon: {
@@ -75,7 +74,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-export default class ScrollableCardList extends Component {
+class ScrollableCardList extends Component {
   static defaultProps = {
     ...Component.defaultProps,
     cards: []
@@ -89,7 +88,7 @@ export default class ScrollableCardList extends Component {
   }
 
   componentWillMount() {
-    const sets = Math.floor(this.props.cards.length / 3)
+    const sets = Math.ceil(this.props.cards.length / 3)
     const nextDisabled = sets <= 1
 
     this.setState({
@@ -171,16 +170,7 @@ export default class ScrollableCardList extends Component {
                   onClick={() => this._handleCardClick(text)}
                 />
                 <div className={classes.cardContent}>{this.formatText(text)}</div>
-                <div
-                  style={{
-                    height: 40,
-                    display: 'flex',
-                    paddingLeft: 16,
-                    paddingBottom: 24,
-                    paddingRight: 16
-                  }}>
-                  {action}
-                </div>
+                <div className={classes.cardActionContainer}>{action}</div>
               </Card>
             </Grid>
           )
@@ -189,6 +179,7 @@ export default class ScrollableCardList extends Component {
     )
   }
 
+  // TODO: hook this up
   _handleCardClick = card => {
     console.log('take me to this cards page', card)
   }
@@ -217,7 +208,7 @@ export default class ScrollableCardList extends Component {
   }
 
   render() {
-    const { classes, title, handleClick, cards } = this.props
+    const { classes, title, cards } = this.props
     const { currentSubset, sets } = this.state
     const previousDisabled = isEqual(currentSubset, 0)
     const nextDisabled = isEqual(currentSubset + 1, sets)
@@ -257,3 +248,14 @@ export default class ScrollableCardList extends Component {
     )
   }
 }
+
+ScrollableCardList.propTypes = {
+  cards: PropTypes.array,
+  title: PropTypes.string.isRequired
+}
+
+ScrollableCardList.defaultProps = {
+  cards: []
+}
+
+export default ScrollableCardList
