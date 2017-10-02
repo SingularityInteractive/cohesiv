@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   namespace: cohesiv
-  name: mypds-deployment
+  name: cohesiv-deployment
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -12,43 +12,4 @@ spec:
   template:
     metadata:
       labels:
-        app: mypds
-    spec:
-      containers:
-      - name: mypds
-        image: 750213922035.dkr.ecr.us-east-1.amazonaws.com/singularity/mypds:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 4040
-        env:
-        - name: PORT
-          value: "4040"
-        - name: NODE_ENV
-          value: development
-        - name: JWT_SECRET
-          value: fgL8y7-ABYLZyudHBxwUXQaNsNdzJtfYjsUw_cBefJQj8s8G9s1ZWJDmNmmgG1qy
-        - name: TAG_SVC_ADDR
-          valueFrom:
-            configMapKeyRef:
-              name: cohesiv
-              key: hosts.tagdirectory
-        - name: ACCESS_SVC_ADDR
-          valueFrom:
-            configMapKeyRef:
-              name: cohesiv
-              key: hosts.access
-        - name: DB_CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: mypds-secrets
-              key: staging-db-connection-string
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            memory: 256Mi
-        livenessProbe:
-          initialDelaySeconds: 10
-          tcpSocket:
-            port: 4040
+        app: cohesiv

@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai'
 import request from 'supertest-as-promised'
 import httpStatus from 'http-status'
-import app from '../dist/index'
+import app from '../index'
 
 describe('## Misc', () => {
   describe('# GET /healthcheck', () => {

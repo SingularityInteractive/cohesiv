@@ -14,6 +14,27 @@ jobs:
           key: v5-repo-{{ checksum ".circle-sha" }}
           paths:
             - /go/src/github.com/SingularityInteractive/cohesiv
+  install-cli:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/SingularityInteractive/cohesiv
+    steps:
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
+      - restore_cache:
+          keys:
+            - v5-repo-{{ checksum ".circle-sha" }}
+      - restore_cache:
+          keys:
+            - v5-cli-{{ checksum "cli/version.go" }}
+      - run:
+          name: Install Cli
+          command: ./installCli.sh && cp $GOPATH/bin/cohesiv /usr/local/bin
+      - save_cache:
+          key: v5-cli-{{ checksum "cli/version.go" }}
+          paths:
+            - /usr/local/bin/cohesiv
   install-cohesiv-golang-dependencies:
     docker:
       - image: circleci/golang:latest
@@ -122,7 +143,7 @@ jobs:
           key: v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
           paths:
             - ./access/dist
-  build-client:
+  build-clients:
     docker:
       - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -136,17 +157,16 @@ jobs:
       - restore_cache:
           keys:
             - v5-client-node_modules-{{ checksum "client/package.json" }}
+      - restore_cache:
+          keys:
+            - v5-cli-{{ checksum "cli/version.go" }}
       - run:
-          name: Build Web
-          command: cd client && yarn build:web
-      - run:
-          name: Build TS Server
-          command: cd client && yarn build:server
+          name: Build all clients
+          command: cohesiv build
       - save_cache:
-          key: v5-client-build-{{ checksum ".circle-sha" }}
+          key: v5-client-builds-{{ checksum ".circle-sha" }}
           paths:
-            - ./client/server/dist
-            - ./client/public
+            - ./client/builds
   test-client:
     docker:
       - image: node:8
@@ -160,7 +180,7 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
-            - v5-client-build-{{ checksum ".circle-sha" }}
+            - v5-client-builds-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
             - v5-client-node_modules-{{ checksum "package.json" }}

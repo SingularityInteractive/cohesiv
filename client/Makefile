@@ -1,4 +1,4 @@
-CONTAINER_NAME=`cohesiv get clients`
+CONTAINER_NAME=cohesiv
 PUBLIC_URL=/
 
 SHELL=/usr/bin/env bash

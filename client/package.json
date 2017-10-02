@@ -15,16 +15,16 @@
       "cross-env NODE_ENV=development concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch:server\" \"nodemon server/dist/index.js\"",
     "watch:server": "tsc -p server -w",
     "start:web": "node config/scripts/start.js",
-    "build:server": "tsc -p server",
+    "build:server": "tsc -p server --outDir ./builds/$CLIENT/server/dist",
     "build:web": "node config/scripts/build.js",
     "lint": "tslint -c server/tslint.json -p server && eslint *.js client/src config --color",
     "test": "yarn test:server && yarn test:web",
     "test:coverage":
-      "cross-env NODE_ENV=test ./node_modules/.bin/istanbul cover _mocha -- --ui bdd --reporter spec --colors --compilers js:babel-core/register server/tests --recursive",
+      "cross-env NODE_ENV=test ./node_modules/.bin/istanbul cover _mocha -- --ui bdd --reporter spec --colors --compilers js:babel-core/register ./builds/$CLIENT/server/tests --recursive",
     "test:check-coverage": "yarn test:coverage && istanbul check-coverage",
     "test:web": "node config/scripts/test.js --env=jsdom",
     "test:server":
-      "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --compilers js:babel-core/register server/tests --recursive",
+      "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --compilers js:babel-core/register ./builds/$CLIENT/server/tests --recursive",
     "report-coverage": "coveralls < ./coverage/lcov.info"
   },
   "keywords": [

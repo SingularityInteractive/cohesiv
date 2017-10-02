@@ -1,0 +1,30 @@
+{
+  "clients": [
+    {
+      "name": "mypds"
+    },
+    {
+      "name": "cohesiv"
+    }
+  ],
+  "target_defaults": {
+    "develop": {
+      "branch_name": "develop",
+      "replica_count": 1,
+      "revision_history_limit": 3,
+      "subdomain": "develop"
+    },
+    "staging": {
+      "branch_name": "staging",
+      "replica_count": 1,
+      "revision_history_limit": 3,
+      "subdomain": "staging"
+    },
+    "master": {
+      "branch_name": "master",
+      "replica_count": 3,
+      "revision_history_limit": 5,
+      "subdomain": ""
+    }
+  }
+}
