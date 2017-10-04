@@ -34,11 +34,7 @@ func test(c *cli.Context, clients []string) error {
 	default:
 		for _, c := range clients {
 			os.Setenv("CLIENT", c)
-			err := runClientNpmScript("test:server")
-			if err != nil {
-				return err
-			}
-			err = runClientNpmScript("test:web")
+			err := runClientNpmScript("test")
 			if err != nil {
 				return err
 			}

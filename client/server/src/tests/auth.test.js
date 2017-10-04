@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai'
-import request from 'supertest-as-promised'
-import httpStatus from 'http-status'
-import jwt from 'jsonwebtoken'
+import * as request from 'supertest-as-promised'
+import * as httpStatus from 'http-status'
+import * as jwt from 'jsonwebtoken'
 import app from '../index'
 import config from '../config/index'
 

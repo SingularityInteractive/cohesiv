@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai'
-import request from 'supertest-as-promised'
-import httpStatus from 'http-status'
+import * as request from 'supertest-as-promised'
+import * as httpStatus from 'http-status'
 import app from '../index'
 
 describe('## Misc', () => {

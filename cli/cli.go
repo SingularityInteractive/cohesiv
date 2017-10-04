@@ -83,6 +83,11 @@ func main() {
 			Usage:  "Get all clients",
 			Action: dispatch("get", &flags),
 		},
+		{
+			Name:   "parse",
+			Usage:  "Parse environment values for consumption with cli",
+			Action: dispatch("parse", &flags),
+		},
 	}
 	app.Run(os.Args)
 }

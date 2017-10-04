@@ -27,6 +27,16 @@ docker-push-ecr: configure_aws_cli
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_SHA1} ;\
 		docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/cohesiv/$$b:${CIRCLE_BRANCH} ;\
 	done
+copy-client-build-files:
+	mkdir -p ./client/builds/${CLIENT}
+	cp ./client/package.json ./client/Dockerfile ./client/yarn.lock ./client/builds/${CLIENT}
+client-docker-image:
+	docker build -t singularity/${CLIENT} --rm=false ./client/builds/${CLIENT}
+	docker tag singularity/${CLIENT} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/${CLIENT}:${CIRCLE_SHA1}
+	docker tag singularity/${CLIENT} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/${CLIENT}:${CIRCLE_BRANCH}
+client-docker-push-ecr:
+	docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/${CLIENT}:${CIRCLE_SHA1}
+	docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/singularity/${CLIENT}:${CIRCLE_BRANCH}
 configure_aws_cli:
 	aws --version
 	aws configure set default.region us-east-1

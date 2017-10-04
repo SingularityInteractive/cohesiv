@@ -49,16 +49,21 @@ func dispatch(command string, flags *Flags) func(c *cli.Context) error {
 		case "build":
 			return build(c, clients)
 		case "deploy":
-			return deploy(c)
+			return deploy(c, clients, targets)
 		case "run":
 			fmt.Printf("Running client: %s\n", clients[0])
 			return run(c, clients[0])
 		case "test":
+			if err = build(c, clients); err != nil {
+				return err
+			}
 			return test(c, clients)
 		case "generate":
 			return generate(clients, targets, &clientConfig)
 		case "get":
 			return get(&clientConfig)
+		case "parse":
+			return parse(c)
 		}
 		return nil
 	}

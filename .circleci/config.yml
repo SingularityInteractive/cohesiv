@@ -138,7 +138,7 @@ jobs:
             - v5-cohesiv-node_modules-{{ checksum "package.json" }}
       - run:
           name: Build TS Services
-          command: yarn access:build
+          command: make tsc
       - save_cache:
           key: v5-cohesiv-node-build-{{ checksum ".circle-sha" }}
           paths:
@@ -162,12 +162,12 @@ jobs:
             - v5-cli-{{ checksum "cli/version.go" }}
       - run:
           name: Build all clients
-          command: cohesiv build
+          command: cohesiv -c mypds build
       - save_cache:
           key: v5-client-builds-{{ checksum ".circle-sha" }}
           paths:
             - ./client/builds
-  test-client:
+  test-clients:
     docker:
       - image: node:8
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
@@ -184,12 +184,15 @@ jobs:
       - restore_cache:
           keys:
             - v5-client-node_modules-{{ checksum "package.json" }}
+      - restore_cache:
+          keys:
+            - v5-cli-{{ checksum "cli/version.go" }}
       - run:
-          name: Test TS Server
-          command: cd client && yarn test:server
+          name: Test Clients
+          command: cohesiv -c mypds test server
   deploy-cohesiv-develop:
     docker:
-      - image: sammccord/kops-docker
+      - image: singularityinteractive/cohesiv-ci:latest
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -233,7 +236,7 @@ jobs:
             make deauthorize-develop-circle-ip
   deploy-cohesiv-staging:
     docker:
-      - image: sammccord/kops-docker
+      - image: singularityinteractive/cohesiv-ci:latest
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -277,7 +280,7 @@ jobs:
             make deauthorize-staging-circle-ip
   deploy-cohesiv-production:
     docker:
-      - image: sammccord/kops-docker
+      - image: singularityinteractive/cohesiv-ci:latest
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -319,9 +322,9 @@ jobs:
             make authorize-master-circle-ip
             kubectl apply -f kube/production
             make deauthorize-master-circle-ip
-  deploy-client-develop:
+  deploy-all-clients-develop:
     docker:
-      - image: sammccord/kops-docker
+      - image: singularityinteractive/cohesiv-ci:latest
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -337,20 +340,23 @@ jobs:
       - restore_cache:
           keys:
             - v5-repo-{{ checksum ".circle-sha" }}
-      - run:
-          name: Install CLI
-          command: ./installCli.sh
+      - restore_cache:
+          keys:
+            - v5-cli-{{ checksum "cli/version.go" }}
       - restore_cache:
           keys:
             - v5-client-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
-          command: cd client && make docker-image
+          command: cohesiv -c mypds build docker
+      - run:
+          name: Generate k8s configs
+          command: cohesiv -c mypds -t develop generate
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
-            cd client && make docker-push-ecr
+            cohesiv -c mypds deploy docker
       - run:
           name: Get client develop cluster credentials
           command: |
@@ -361,11 +367,11 @@ jobs:
           command: |
             sed -i "s/:develop/:$CIRCLE_SHA1/g" client/kube/develop/deployment.yaml
             make authorize-develop-circle-ip
-            kubectl apply -f client/kube/develop
+            cohesiv -c mypds -t develop deploy k8s
             make deauthorize-develop-circle-ip
-  deploy-client-staging:
+  deploy-all-clients-staging:
     docker:
-      - image: sammccord/kops-docker
+      - image: singularityinteractive/cohesiv-ci:latest
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -383,15 +389,21 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
+            - v5-cli-{{ checksum "cli/version.go" }}
+      - restore_cache:
+          keys:
             - v5-client-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
-          command: cd client && make docker-image
+          command: cohesiv -c mypds build docker
+      - run:
+          name: Generate k8s configs
+          command: cohesiv -c mypds -t staging generate
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
-            cd client && make docker-push-ecr
+            cohesiv -c mypds deploy docker
       - run:
           name: Get client staging cluster credentials
           command: |
@@ -402,11 +414,11 @@ jobs:
           command: |
             sed -i "s/:staging/:$CIRCLE_SHA1/g" client/kube/staging/deployment.yaml
             make authorize-staging-circle-ip
-            kubectl apply -f client/kube/staging
+            cohesiv -c mypds -t staging deploy k8s
             make deauthorize-staging-circle-ip
-  deploy-client-production:
+  deploy-all-clients-production:
     docker:
-      - image: sammccord/kops-docker
+      - image: singularityinteractive/cohesiv-ci:latest
     working_directory: /go/src/github.com/SingularityInteractive/cohesiv
     steps:
       - run:
@@ -424,15 +436,21 @@ jobs:
             - v5-repo-{{ checksum ".circle-sha" }}
       - restore_cache:
           keys:
+            - v5-cli-{{ checksum "cli/version.go" }}
+      - restore_cache:
+          keys:
             - v5-client-build-{{ checksum ".circle-sha" }}
       - run:
           name: Build docker image
-          command: cd client && make docker-image
+          command: cohesiv -c mypds build docker
+      - run:
+          name: Generate k8s configs
+          command: cohesiv -c mypds -t master generate
       - run:
           name: Push to ecr
           command: |
             eval $(aws ecr get-login --region ${AWS_DEFAULT_REGION} --no-include-email)
-            cd client && make docker-push-ecr
+            cohesiv -c deploy docker
       - run:
           name: Get client production cluster credentials
           command: |
@@ -443,7 +461,7 @@ jobs:
           command: |
             sed -i "s/:master/:$CIRCLE_SHA1/g" client/kube/production/deployment.yaml
             make authorize-master-circle-ip
-            kubectl apply -f client/kube/production
+            cohesiv -c mypds -t master deploy k8s
             make deauthorize-master-circle-ip
 workflows:
   version: 2
@@ -489,27 +507,27 @@ workflows:
       - install-client-dependencies:
           requires:
             - checkout-code
-      - build-client:
+      - build-clients:
           requires:
             - install-client-dependencies
-      - test-client:
+      - test-clients:
           requires:
-            - build-client
-      - deploy-client-develop:
+            - build-clients
+      - deploy-all-clients-develop:
           requires:
-            - build-client
+            - build-clients
           filters:
             branches:
               only: develop
-      - deploy-client-staging:
+      - deploy-all-clients-staging:
           requires:
-            - build-client
+            - build-clients
           filters:
             branches:
               only: staging
-      - deploy-client-production:
+      - deploy-all-clients--production:
           requires:
-            - build-client
+            - build-clients
           filters:
             branches:
               only: master

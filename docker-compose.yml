@@ -88,7 +88,7 @@ services:
       - "4040:4040"
     environment:
       NODE_ENV: development
-      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/mypds?sslmode=disable
+      DB_CONNECTION_STRING: postgres://postgres:password@postgres:5432/cohesiv?sslmode=disable
       PORT: '4040'
       JWT_SECRET: 'abcdefg'
       ACCESS_SVC_ADDR: 'access:8002'
