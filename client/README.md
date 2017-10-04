@@ -15,24 +15,22 @@ A boilerplate monolith designed to be deployed within a [Cohesiv](https://github
 
 - `cd client && yarn`
 
-*__Note:__ react-native is nested in client to prevent mixing native dependencies with web and server*
+*__Note:__ react-native is nested in app/ to prevent mixing native dependencies with web and server*
 
 
 ## Usage
 
-After forking, you should change this repo's name to the product name of the client we're developing for, like `mypds`, also replacing pretty much all instances of the word _"base"_ or _"cohesiv-client"_ with your new product name, like `mypds` in k8s configs or url's. The full list of places to check can be found [here](#locations-to-change-product-name)
-
 - Run `yarn start:web` to start webpack-dev-server for the `PWA`
-- Open `client` folder with Expo XDE for rapid native development
+- Open `app` folder with Expo XDE for rapid native development, or use `exp` for command line packager
 - See the [Cohesiv](https://github.com/SingularityInteractive/cohesiv) repo for instructions on running the supporting microservices
 
 #### Sharing Code between Web and Native
 
-Native and Web can share MobX stores `client/src/stores`, `fetch` functionality, and configuration `client/src/config`, but not much else as to keep bundles small and the experience optimized per platform.
+Native and Web can share MobX stores `app/src/stores`, `fetch` functionality, and configuration `app/src/config`, but not much else as to keep bundles small and the experience optimized per platform.
 
-The library `react-native-web` implements react-native API's for a browser context, so packages like `AsyncStorage`, `Dimensions`, etc. can be safely built for the browser. The `client/src/components/MediaQuery` component is a good example of a cross-platform component.
+The library `react-native-web` implements react-native API's for a browser context, so packages like `AsyncStorage`, `Dimensions`, etc. can be safely built for the browser. The `app/src/components/MediaQuery` component is a good example of a cross-platform component.
 
-If you're writing a file to be built cross-platform and needs platform specific modules like `react-native-joi` in `client/src/config/index`, import the native library, add the browser equivalent from the project root, `yarn add joi-browser`, and create an alias entry in `config/webpack.config` so react-native gets the actual import, but webpack gets the one for the browser.
+If you're writing a file to be built cross-platform and needs platform specific modules like `react-native-joi` in `app/src/config/index`, import the native library, add the browser equivalent from the project root, `yarn add joi-browser`, and create an alias entry in `config/webpack.config` so react-native gets the actual import, but webpack gets the one for the browser.
 
 #### Sequelize
 
@@ -113,7 +111,7 @@ Please [open an issue](https://github.com/SingularityInteractive/base/issues/new
 {
     "package.json" : "No brainer here",
     "../docker-compose.yml" : "Mainly for console log differentiation purposes here",
-    "client/package.json": "Just to keep consistent with the root package.json",
+    "app/package.json": "Just to keep consistent with the root package.json",
     "kube/**/*.yaml": "The k8s configs apply under the 'base' namespace, so all references should be changed.",
     "Makefile": "Change the CONTAINER_NAME variable for the AWS ECR image, and PUBLIC_URL so that it accurately reflects the host"
 }

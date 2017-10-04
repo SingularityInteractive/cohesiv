@@ -1,0 +1,47 @@
+FROM node:alpine
+
+ENV KUBECTL_VERSION 1.7.4
+ENV KOPS_VERSION 1.7.0
+ENV HELM_VERSION 2.6.0
+
+#install kubectl
+RUN apk add --no-cache --update \
+  curl \
+  jq \
+  vim \
+  tar \
+  sed \
+  bash \
+  bash-doc \
+  make \
+  bash-completion \
+  util-linux pciutils usbutils coreutils binutils findutils grep \
+  ca-certificates \
+  openssh-client \
+  python \
+  && curl -s -L https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /usr/bin/kubectl \
+  && chmod +x /usr/bin/kubectl \
+  && rm -rf /var/cache/apk/*
+
+#install kops
+RUN  curl -s -L https://github.com/kubernetes/kops/releases/download/${KOPS_VERSION}/kops-linux-amd64 -o /usr/bin/kops \
+  && chmod +x /usr/bin/kops
+
+RUN curl https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz \
+  -o /usr/bin/helm-v${HELM_VERSION}-linux-amd64.tar.gz \
+  && tar xvzf /usr/bin/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C /tmp/ \
+  && mv /tmp/linux-amd64/helm /usr/bin \
+  && chmod +x /usr/bin/helm
+
+#install python and dependencies
+RUN python -m ensurepip \
+  && rm -r /usr/lib/python*/ensurepip \
+  && pip install --upgrade pip setuptools \
+  awscli kube-shell --ignore-installed \
+  && rm -r /root/.cache
+
+RUN JQ_URL="https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/jq-latest"   && curl --silent --show-error --location --fail --retry 3 --output /usr/bin/jq $JQ_URL   && chmod +x /usr/bin/jq   && jq --version
+RUN set -ex && export DOCKER_VERSION=$(curl --silent --fail --retry 3 https://download.docker.com/linux/static/stable/x86_64/ | grep -o -e 'docker-[.0-9]*-ce\.tgz' | sort -r | head -n 1) && DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/${DOCKER_VERSION}" && echo Docker URL: $DOCKER_URL && curl --silent --show-error --location --fail --retry 3 --output /tmp/docker.tgz "${DOCKER_URL}" && ls -lha /tmp/docker.tgz && tar -xz -C /tmp -f /tmp/docker.tgz && mv /tmp/docker/* /usr/bin && rm -rf /tmp/docker /tmp/docker.tgz && which docker && (docker version || true)
+RUN DOCKERIZE_URL="https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/dockerize-latest.tar.gz" && curl --silent --show-error --location --fail --retry 3 --output /tmp/dockerize-linux-amd64.tar.gz $DOCKERIZE_URL && tar -C /usr/local/bin -xzvf /tmp/dockerize-linux-amd64.tar.gz && rm -rf /tmp/dockerize-linux-amd64.tar.gz && dockerize --version
+
+CMD ["bash"]

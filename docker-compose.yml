@@ -79,11 +79,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-  mypds:
+  client:
     restart: always
     build:
-      context: ./mypds
-      dockerfile: Dockerfile.dev
+      context: ./client/builds/mypds
+    command: yarn start:server
     ports:
       - "4040:4040"
     environment:

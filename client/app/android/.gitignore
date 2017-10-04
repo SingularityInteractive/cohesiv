@@ -11,4 +11,5 @@ app/build
 build
 captures
 local.properties
+keystore.properties
 *.apk
